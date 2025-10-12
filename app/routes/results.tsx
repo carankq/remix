@@ -4,6 +4,17 @@ import { Form, Link, useLoaderData } from "@remix-run/react";
 import { Header } from "../components/Header";
 import { Footer } from "../components/Footer";
 
+type Instructor = {
+  id: string;
+  name: string;
+  description?: string;
+  pricePerHour?: number;
+  vehicleType?: string;
+  yearsOfExperience?: number;
+  rating?: number;
+  totalReviews?: number;
+};
+
 export async function loader({ request }: LoaderFunctionArgs) {
   const url = new URL(request.url);
   const params = url.searchParams;
@@ -15,7 +26,17 @@ export async function loader({ request }: LoaderFunctionArgs) {
     const res = await fetch(apiUrl, { headers: { "Accept": "application/json" } });
     if (!res.ok) throw new Error(`Failed: ${res.status}`);
     const data = await res.json().catch(() => ({}));
-    const list = Array.isArray(data) ? data : (Array.isArray(data?.instructors) ? data.instructors : []);
+    const rawList: any[] = Array.isArray(data) ? data : (Array.isArray((data as any)?.instructors) ? (data as any).instructors : []);
+    const list: Instructor[] = rawList.map((r) => ({
+      id: String(r.id ?? r._id ?? ""),
+      name: String(r.name ?? r.fullName ?? "Unknown"),
+      description: typeof r.description === 'string' ? r.description : '',
+      pricePerHour: Number(r.pricePerHour ?? r.hourlyRate ?? r.price ?? 0) || undefined,
+      vehicleType: r.vehicleType ?? r.transmission,
+      yearsOfExperience: Number(r.yearsOfExperience ?? r.experienceYears ?? 0) || undefined,
+      rating: Number(r.rating ?? r.averageRating ?? 0) || undefined,
+      totalReviews: Number(r.totalReviews ?? r.reviewCount ?? 0) || undefined,
+    })).filter(i => i.id);
     return json({ instructors: list });
   } catch (e) {
     return json({ instructors: [] as any[], error: "Unable to load instructors" }, { status: 200 });
