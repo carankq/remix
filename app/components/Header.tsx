@@ -9,7 +9,7 @@ export function Header() {
             <h1 className="text-2xl text-gray-900 brand-name">Carank</h1>
           </Link>
           <div className="flex items-center gap-3">
-            <Link to="/" className="btn btn-primary">Find instructors</Link>
+            <Link to="/auth" className="btn btn-primary">Login</Link>
           </div>
         </div>
       </div>
