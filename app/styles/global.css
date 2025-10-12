@@ -342,9 +342,29 @@ body {
   }
   
   /* Hero title - prevent wrapping */
-  .text-4xl.md\:text-5xl {
+  .text-3xl.md\:text-4xl {
     font-size: 1.75rem !important;
     line-height: 1.2 !important;
+    min-height: 4.2rem !important; /* 2 lines at 1.75rem * 1.2 line-height */
+  }
+  
+  /* Hero content - left align on mobile */
+  .fade-in.flex.flex-col.text-center {
+    text-align: left !important;
+    padding-left: 1rem !important;
+    padding-right: 1rem !important;
+  }
+  
+  .fade-in.flex.flex-col.text-center h2,
+  .fade-in.flex.flex-col.text-center p {
+    text-align: left !important;
+    max-width: 100% !important;
+  }
+  
+  .fade-in.flex.flex-col.text-center .max-w-3xl {
+    margin-left: 0 !important;
+    margin-right: 0 !important;
+    max-width: 100% !important;
   }
   
   /* Search Section */
