@@ -17,7 +17,7 @@ export default function AuthRoute() {
         alignItems: 'center'
       }}>
         <div className="container mx-auto px-4 md:px-8">
-          <div style={{ maxWidth: '480px', width: '100%', margin: '0 auto' }}>
+          <div style={{ maxWidth: '600px', width: '100%', margin: '0 auto' }}>
             
             {/* Auth Card */}
             <div style={{
@@ -73,7 +73,7 @@ export default function AuthRoute() {
               </div>
 
               {/* Form Content */}
-              <div style={{ padding: '3rem' }}>
+              <div style={{ padding: '3rem', minHeight: '550px' }}>
                 
                 {/* Header */}
                 <div style={{ textAlign: 'center', marginBottom: '2rem' }}>
@@ -95,6 +95,57 @@ export default function AuthRoute() {
                       : 'Join Carank and start your driving journey'}
                   </p>
                 </div>
+
+                {/* Role Selection for Signup - Moved to top */}
+                {!isLogin && (
+                  <div style={{
+                    marginBottom: '2rem',
+                    padding: '1.5rem',
+                    background: '#eff6ff',
+                    borderRadius: '0.75rem'
+                  }}>
+                    <p style={{
+                      fontSize: '0.875rem',
+                      fontWeight: '500',
+                      color: '#374151',
+                      marginBottom: '1rem'
+                    }}>
+                      I want to join as:
+                    </p>
+                    <div style={{ display: 'flex', gap: '0.75rem' }}>
+                      <label style={{
+                        flex: 1,
+                        padding: '1rem',
+                        background: 'white',
+                        border: '2px solid #2563eb',
+                        borderRadius: '0.5rem',
+                        cursor: 'pointer',
+                        textAlign: 'center',
+                        fontSize: '0.875rem',
+                        fontWeight: '500',
+                        color: '#2563eb'
+                      }}>
+                        <input type="radio" name="role" value="student" defaultChecked style={{ display: 'none' }} />
+                        🎓 Student
+                      </label>
+                      <label style={{
+                        flex: 1,
+                        padding: '1rem',
+                        background: 'white',
+                        border: '2px solid #e5e7eb',
+                        borderRadius: '0.5rem',
+                        cursor: 'pointer',
+                        textAlign: 'center',
+                        fontSize: '0.875rem',
+                        fontWeight: '500',
+                        color: '#6b7280'
+                      }}>
+                        <input type="radio" name="role" value="instructor" style={{ display: 'none' }} />
+                        🚗 Instructor
+                      </label>
+                    </div>
+                  </div>
+                )}
 
                 {/* Form */}
                 <form style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
@@ -318,59 +369,6 @@ export default function AuthRoute() {
                     {isLogin ? 'Sign In' : 'Create Account'}
                   </button>
                 </form>
-
-                {/* Role Selection for Signup */}
-                {!isLogin && (
-                  <>
-                    <div style={{
-                      marginTop: '1.5rem',
-                      padding: '1.5rem',
-                      background: '#eff6ff',
-                      borderRadius: '0.75rem'
-                    }}>
-                      <p style={{
-                        fontSize: '0.875rem',
-                        fontWeight: '500',
-                        color: '#374151',
-                        marginBottom: '1rem'
-                      }}>
-                        I want to join as:
-                      </p>
-                      <div style={{ display: 'flex', gap: '0.75rem' }}>
-                        <label style={{
-                          flex: 1,
-                          padding: '1rem',
-                          background: 'white',
-                          border: '2px solid #2563eb',
-                          borderRadius: '0.5rem',
-                          cursor: 'pointer',
-                          textAlign: 'center',
-                          fontSize: '0.875rem',
-                          fontWeight: '500',
-                          color: '#2563eb'
-                        }}>
-                          <input type="radio" name="role" value="student" defaultChecked style={{ display: 'none' }} />
-                          🎓 Student
-                        </label>
-                        <label style={{
-                          flex: 1,
-                          padding: '1rem',
-                          background: 'white',
-                          border: '2px solid #e5e7eb',
-                          borderRadius: '0.5rem',
-                          cursor: 'pointer',
-                          textAlign: 'center',
-                          fontSize: '0.875rem',
-                          fontWeight: '500',
-                          color: '#6b7280'
-                        }}>
-                          <input type="radio" name="role" value="instructor" style={{ display: 'none' }} />
-                          🚗 Instructor
-                        </label>
-                      </div>
-                    </div>
-                  </>
-                )}
 
               </div>
             </div>
