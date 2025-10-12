@@ -10,9 +10,9 @@ export default function AuthRoute() {
     <div>
       <Header />
       <main style={{ 
-        minHeight: '80vh',
+        minHeight: '100vh',
         background: '#f9fafb',
-        padding: '4rem 0',
+        padding: '1.5rem 0',
         display: 'flex',
         alignItems: 'center'
       }}>
@@ -26,7 +26,8 @@ export default function AuthRoute() {
               boxShadow: '0 1px 3px rgba(0,0,0,0.1)',
               border: '1px solid #e5e7eb',
               overflow: 'hidden'
-            }}>
+            }}
+            className="auth-card">
               
               {/* Tab Switcher */}
               <div style={{
@@ -73,7 +74,8 @@ export default function AuthRoute() {
               </div>
 
               {/* Form Content */}
-              <div style={{ padding: '3rem', minHeight: '550px' }}>
+              <div style={{ padding: '2rem', minHeight: '550px' }}
+                className="auth-form-content">
                 
                 {/* Header */}
                 <div style={{ textAlign: 'center', marginBottom: '2rem' }}>

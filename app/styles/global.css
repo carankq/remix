@@ -283,3 +283,114 @@ body {
   box-shadow: 0 4px 6px rgba(0,0,0,0.1);
 }
 
+/* Mobile-optimized Auth Page */
+@media (max-width: 768px) {
+  .auth-card {
+    border-radius: 0.75rem !important;
+    margin: 0 -0.5rem;
+  }
+  
+  .auth-form-content {
+    padding: 1.5rem !important;
+    min-height: auto !important;
+  }
+  
+  .auth-card h1 {
+    font-size: 1.75rem !important;
+  }
+  
+  .auth-card input,
+  .auth-card button[type="submit"] {
+    font-size: 16px !important; /* Prevents zoom on iOS */
+    padding: 0.875rem 1rem !important;
+  }
+  
+  .auth-card label {
+    font-size: 0.875rem !important;
+  }
+}
+
+/* Mobile-optimized Homepage & Search Section */
+@media (max-width: 768px) {
+  /* Hero Section */
+  .display-title {
+    font-size: 2rem !important;
+    line-height: 1.2 !important;
+    padding: 0 0.5rem;
+  }
+  
+  /* Search Section */
+  .bg-deep-navy {
+    padding: 2rem 0 !important;
+  }
+  
+  .filters-row {
+    padding: 1rem !important;
+    gap: 1rem !important;
+  }
+  
+  .filters-item {
+    min-width: 100%;
+  }
+  
+  .filters-divider {
+    display: none !important;
+  }
+  
+  /* Summary card - stack vertically on mobile */
+  .summary-card {
+    flex-direction: column !important;
+    align-items: flex-start !important;
+    gap: 1rem !important;
+    padding: 1rem !important;
+  }
+  
+  .summary-card > div:first-child {
+    width: 100%;
+  }
+  
+  .summary-actions {
+    margin-top: 1rem !important;
+  }
+  
+  /* Buttons row - stack vertically on mobile */
+  .buttons-row {
+    flex-direction: column !important;
+    width: 100%;
+    gap: 0.75rem !important;
+  }
+  
+  .buttons-row button {
+    width: 100%;
+    justify-content: center;
+    padding: 0.875rem 1.5rem !important;
+    font-size: 16px !important; /* Prevents zoom on iOS */
+  }
+  
+  /* Make inputs touch-friendly */
+  .input,
+  .input-bare,
+  .select,
+  .select-bare {
+    font-size: 16px !important; /* Prevents zoom on iOS */
+    padding: 0.875rem !important;
+    min-height: 44px; /* iOS recommended touch target */
+  }
+  
+  /* Filter tags - better wrapping */
+  .summary-card .flex-wrap {
+    max-width: 100%;
+  }
+  
+  /* Hero section stats */
+  .flex.flex-row.gap-3 {
+    flex-direction: column !important;
+    gap: 0.75rem !important;
+  }
+  
+  /* Adjust rounded elements for mobile */
+  .rounded-2xl {
+    border-radius: 1rem !important;
+  }
+}
+
