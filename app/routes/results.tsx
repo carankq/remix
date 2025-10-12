@@ -34,14 +34,21 @@ export async function loader({ request }: LoaderFunctionArgs) {
   const base = envBase || url.origin;
   const apiUrl = `${base}/instructors?${params.toString()}`;
   try {
-    const res = await fetch(apiUrl, { headers: { "Accept": "application/json" } });
+    const res = await fetch(apiUrl, { 
+      headers: { 
+        "Accept": "application/json",
+        "Accept-Encoding": "gzip, deflate, br"
+      } 
+    });
     if (!res.ok) throw new Error(`Failed: ${res.status}`);
     const data = await res.json().catch(() => ({}));
     const rawList: any[] = Array.isArray(data) ? data : (Array.isArray((data as any)?.instructors) ? (data as any).instructors : []);
+    
+    // Only include necessary fields to reduce payload size
     const list: Instructor[] = rawList.map((r) => ({
       id: String(r.id ?? r._id ?? ""),
       name: String(r.name ?? r.fullName ?? "Unknown"),
-      description: typeof r.description === 'string' ? r.description : '',
+      description: typeof r.description === 'string' ? r.description?.substring(0, 200) : '', // Limit description length
       pricePerHour: Number(r.pricePerHour ?? r.hourlyRate ?? r.price ?? 0) || undefined,
       vehicleType: r.vehicleType ?? r.transmission,
       yearsOfExperience: Number(r.yearsOfExperience ?? r.experienceYears ?? 0) || undefined,
@@ -52,16 +59,28 @@ export async function loader({ request }: LoaderFunctionArgs) {
       company: r.company,
       phone: r.phone,
       email: r.email,
-      specializations: Array.isArray(r.specializations) ? r.specializations : undefined,
-      availability: Array.isArray(r.availability) ? r.availability : undefined,
-      languages: Array.isArray(r.languages) ? r.languages : undefined,
+      specializations: Array.isArray(r.specializations) ? r.specializations.slice(0, 5) : undefined, // Limit array size
+      availability: Array.isArray(r.availability) ? r.availability.slice(0, 7) : undefined, // Limit to one week
+      languages: Array.isArray(r.languages) ? r.languages.slice(0, 3) : undefined, // Limit languages shown
       enabled: r.enabled,
       image: r.image || r.profileImage || r.avatar,
     })).filter(i => i.id);
-    return json({ instructors: list });
+    
+    return json({ instructors: list }, {
+      headers: {
+        "Cache-Control": "public, max-age=300, s-maxage=600", // Cache for 5 min client, 10 min CDN
+      }
+    });
   } catch (e) {
     return json({ instructors: [] as any[], error: "Unable to load instructors" }, { status: 200 });
   }
+}
+
+// Add headers for better caching
+export function headers({ loaderHeaders }: { loaderHeaders: Headers }) {
+  return {
+    "Cache-Control": loaderHeaders.get("Cache-Control") || "public, max-age=300",
+  };
 }
 
 export async function action({ request }: ActionFunctionArgs) {

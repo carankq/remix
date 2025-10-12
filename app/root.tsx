@@ -10,11 +10,24 @@ import {
 import stylesHref from "./styles/global.css?url";
 
 export const links: LinksFunction = () => [
-  { rel: "stylesheet", href: stylesHref }
+  { rel: "stylesheet", href: stylesHref },
+  { rel: "preconnect", href: "https://fonts.googleapis.com" },
+  { rel: "preconnect", href: "https://fonts.gstatic.com", crossOrigin: "anonymous" },
 ];
 
 export async function loader({ request }: LoaderFunctionArgs) {
-  return { ENV: { API_HOST: process.env.API_HOST || "" } };
+  return { 
+    ENV: { 
+      API_HOST: process.env.API_HOST || "" 
+    } 
+  };
+}
+
+// Optimize headers for caching
+export function headers() {
+  return {
+    "Cache-Control": "public, max-age=3600",
+  };
 }
 
 export default function App() {
@@ -24,6 +37,7 @@ export default function App() {
       <head>
         <meta charSet="utf-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <meta name="theme-color" content="#1e293b" />
         <Meta />
         <Links />
       </head>

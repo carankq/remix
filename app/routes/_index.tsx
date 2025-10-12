@@ -21,12 +21,36 @@ export async function loader({ request }: LoaderFunctionArgs) {
   };
   
   try {
-    const res = await fetch(`${base}/blogs?limit=3`, { headers: { Accept: 'application/json' } });
+    const res = await fetch(`${base}/blogs?limit=3`, { 
+      headers: { 
+        Accept: 'application/json',
+        'Accept-Encoding': 'gzip, deflate, br'
+      } 
+    });
     const data = await res.json().catch(() => []);
-    return json({ blogsTop3: Array.isArray(data) ? data.slice(0, 3) : [], searchParams });
+    const blogs = Array.isArray(data) ? data.slice(0, 3) : [];
+    
+    // Optimize: Only include necessary fields for preview
+    const blogsTop3 = blogs.map((blog: any) => ({
+      slug: blog.slug || blog.id,
+      title: blog.title || blog.name,
+      summary: blog.summary?.substring(0, 200) || blog.excerpt?.substring(0, 200), // Limit preview length
+    }));
+    
+    return json({ blogsTop3, searchParams }, {
+      headers: {
+        'Cache-Control': 'public, max-age=300, s-maxage=900',
+      }
+    });
   } catch {
     return json({ blogsTop3: [], searchParams });
   }
+}
+
+export function headers({ loaderHeaders }: { loaderHeaders: Headers }) {
+  return {
+    'Cache-Control': loaderHeaders.get('Cache-Control') || 'public, max-age=300',
+  };
 }
 
 export async function action({ request }: ActionFunctionArgs) {

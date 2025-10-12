@@ -19,13 +19,39 @@ export async function loader({ request }: LoaderFunctionArgs) {
   const base = envBase || url.origin;
   const api = `${base}/blogs?limit=*`;
   try {
-    const res = await fetch(api, { headers: { Accept: 'application/json' } });
+    const res = await fetch(api, { 
+      headers: { 
+        Accept: 'application/json',
+        'Accept-Encoding': 'gzip, deflate, br'
+      } 
+    });
     const data = await res.json().catch(() => []);
-    const items: BlogListItem[] = Array.isArray(data) ? data : (Array.isArray(data?.blogs) ? data.blogs : []);
-    return json({ items });
+    const rawItems: any[] = Array.isArray(data) ? data : (Array.isArray(data?.blogs) ? data.blogs : []);
+    
+    // Optimize: Trim summaries to reduce payload
+    const items: BlogListItem[] = rawItems.map(item => ({
+      slug: item.slug,
+      title: item.title,
+      summary: item.summary?.substring(0, 250), // Limit summary length
+      date: item.date,
+      author: item.author,
+      readTime: item.readTime
+    }));
+    
+    return json({ items }, {
+      headers: {
+        'Cache-Control': 'public, max-age=600, s-maxage=1800',
+      }
+    });
   } catch {
     return json({ items: [] as BlogListItem[] });
   }
+}
+
+export function headers({ loaderHeaders }: { loaderHeaders: Headers }) {
+  return {
+    'Cache-Control': loaderHeaders.get('Cache-Control') || 'public, max-age=600',
+  };
 }
 
 export default function BlogsIndexRoute() {
