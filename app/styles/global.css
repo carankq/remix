@@ -321,12 +321,43 @@ body {
   
   /* Search Section */
   .bg-deep-navy {
-    padding: 2rem 0 !important;
+    padding: 1.5rem 0 !important;
+  }
+  
+  /* Reduce vertical padding throughout */
+  .py-12,
+  .py-16,
+  .md\:py-20 {
+    padding-top: 1.5rem !important;
+    padding-bottom: 1.5rem !important;
+  }
+  
+  .py-8 {
+    padding-top: 1rem !important;
+    padding-bottom: 1rem !important;
+  }
+  
+  .mb-6 {
+    margin-bottom: 1rem !important;
+  }
+  
+  .mb-8 {
+    margin-bottom: 1.5rem !important;
+  }
+  
+  .mb-12 {
+    margin-bottom: 2rem !important;
+  }
+  
+  .gap-8,
+  .gap-10,
+  .gap-12 {
+    gap: 1.5rem !important;
   }
   
   .filters-row {
-    padding: 1rem !important;
-    gap: 1rem !important;
+    padding: 0.75rem !important;
+    gap: 0.75rem !important;
     display: flex !important;
     flex-direction: column !important;
   }
@@ -351,8 +382,8 @@ body {
   .summary-card {
     flex-direction: column !important;
     align-items: flex-start !important;
-    gap: 1rem !important;
-    padding: 1rem !important;
+    gap: 0.75rem !important;
+    padding: 0.875rem !important;
   }
   
   .summary-card > div:first-child {
@@ -360,7 +391,7 @@ body {
   }
   
   .summary-actions {
-    margin-top: 1rem !important;
+    margin-top: 0.75rem !important;
   }
   
   /* Buttons row - stack vertically on mobile */
