@@ -66,15 +66,15 @@ export function HeroSection() {
             
             {/* Stats */}
             <div className="flex flex-col md:flex-row gap-4 justify-center items-stretch">
-              <div className="bg-white rounded-lg p-4 shadow-md flex-1 max-w-xs">
+              <div className="bg-white rounded-lg shadow-md flex-1 max-w-xs" style={{ padding: '2rem' }}>
                 <p className="text-3xl font-bold text-blue-600">500+</p>
                 <p className="text-sm text-gray-600 mt-1">Students Passed</p>
               </div>
-              <div className="bg-white rounded-lg p-4 shadow-md flex-1 max-w-xs">
+              <div className="bg-white rounded-lg shadow-md flex-1 max-w-xs" style={{ padding: '2rem' }}>
                 <p className="text-3xl font-bold text-green-600">4.8★</p>
                 <p className="text-sm text-gray-600 mt-1">Average Rating</p>
               </div>
-              <div className="bg-white rounded-lg p-4 shadow-md flex-1 max-w-xs">
+              <div className="bg-white rounded-lg shadow-md flex-1 max-w-xs" style={{ padding: '2rem' }}>
                 <p className="text-3xl font-bold text-purple-600">50+</p>
                 <p className="text-sm text-gray-600 mt-1">Expert Instructors</p>
               </div>
