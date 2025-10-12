@@ -499,5 +499,11 @@ body {
   .rounded-2xl {
     border-radius: 1rem !important;
   }
+  
+  /* Make slideshow images fill more space on mobile */
+  .absolute.inset-0 img {
+    height: 100% !important;
+    object-position: center !important;
+  }
 }
 
