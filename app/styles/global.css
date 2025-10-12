@@ -137,6 +137,39 @@ body {
   }
 }
 
+/* Custom select dropdown styling */
+select option {
+  padding: 0.75rem 1rem !important;
+  background: #ffffff !important;
+  font-size: 1rem !important;
+  line-height: 1.5 !important;
+}
+
+select option:hover,
+select option:focus,
+select option:checked {
+  background: linear-gradient(to right, #eff6ff, #ffffff) !important;
+  color: #1e40af !important;
+  font-weight: 500 !important;
+}
+
+select option:first-child {
+  color: #9ca3af !important;
+  font-style: italic !important;
+}
+
+/* Better select dropdown appearance on supported browsers */
+select {
+  background-image: none !important;
+}
+
+/* Firefox specific dropdown styling */
+@-moz-document url-prefix() {
+  select option {
+    padding: 0.5rem 1rem !important;
+  }
+}
+
 /* Slideshow utilities needed for proper layout */
 .relative { position: relative; }
 .absolute { position: absolute; }

@@ -187,9 +187,9 @@ export function SearchSection({
                       e.currentTarget.style.boxShadow = 'none';
                     }}
                   >
-                    <option value="">Any Gender</option>
-                    <option value="Male">Male</option>
-                    <option value="Female">Female</option>
+                    <option value="" style={{ padding: '0.75rem 1rem', background: '#ffffff', color: '#9ca3af' }}>Any Gender</option>
+                    <option value="Male" style={{ padding: '0.75rem 1rem', background: '#ffffff', color: '#111827' }}>Male</option>
+                    <option value="Female" style={{ padding: '0.75rem 1rem', background: '#ffffff', color: '#111827' }}>Female</option>
                   </select>
                   <svg 
                     width="18" 
@@ -264,10 +264,10 @@ export function SearchSection({
                       e.currentTarget.style.boxShadow = 'none';
                     }}
                   >
-                    <option value="">Any Vehicle Type</option>
-                    <option value="Manual">Manual</option>
-                    <option value="Automatic">Automatic</option>
-                    <option value="Both">Both</option>
+                    <option value="" style={{ padding: '0.75rem 1rem', background: '#ffffff', color: '#9ca3af' }}>Any Vehicle Type</option>
+                    <option value="Manual" style={{ padding: '0.75rem 1rem', background: '#ffffff', color: '#111827' }}>Manual</option>
+                    <option value="Automatic" style={{ padding: '0.75rem 1rem', background: '#ffffff', color: '#111827' }}>Automatic</option>
+                    <option value="Both" style={{ padding: '0.75rem 1rem', background: '#ffffff', color: '#111827' }}>Both</option>
                   </select>
                   <svg 
                     width="18" 
@@ -341,13 +341,13 @@ export function SearchSection({
                       e.currentTarget.style.boxShadow = 'none';
                     }}
                   >
-                    <option value="">Any Language</option>
-                    <option value="British Sign Language">British Sign Language</option>
-                    <option value="English">English</option>
-                    <option value="Spanish">Spanish</option>
-                    <option value="French">French</option>
-                    <option value="Urdu">Urdu</option>
-                    <option value="Polish">Polish</option>
+                    <option value="" style={{ padding: '0.75rem 1rem', background: '#ffffff', color: '#9ca3af' }}>Any Language</option>
+                    <option value="British Sign Language" style={{ padding: '0.75rem 1rem', background: '#ffffff', color: '#111827' }}>British Sign Language</option>
+                    <option value="English" style={{ padding: '0.75rem 1rem', background: '#ffffff', color: '#111827' }}>English</option>
+                    <option value="Spanish" style={{ padding: '0.75rem 1rem', background: '#ffffff', color: '#111827' }}>Spanish</option>
+                    <option value="French" style={{ padding: '0.75rem 1rem', background: '#ffffff', color: '#111827' }}>French</option>
+                    <option value="Urdu" style={{ padding: '0.75rem 1rem', background: '#ffffff', color: '#111827' }}>Urdu</option>
+                    <option value="Polish" style={{ padding: '0.75rem 1rem', background: '#ffffff', color: '#111827' }}>Polish</option>
                   </select>
                   <svg 
                     width="18" 
