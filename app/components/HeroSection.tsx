@@ -7,14 +7,63 @@ const stories = [
   { id: 4, image: 'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=800&h=600&fit=crop', title: 'Maria learned in her native language', description: 'Our multilingual instructors make learning accessible' }
 ];
 
+const phrases = [
+  { prefix: 'Expert', word: 'Guidance' },
+  { prefix: 'Professional', word: 'Knowledge' },
+  { prefix: 'Dedicated', word: 'Proficiency' },
+  { prefix: 'Personalised', word: 'Support' },
+  { prefix: 'Quality', word: 'Instruction' },
+];
+
 export function HeroSection() {
   const [currentSlide, setCurrentSlide] = useState(0);
   const [paused, setPaused] = useState(false);
+  const [currentPhraseIndex, setCurrentPhraseIndex] = useState(0);
+  const [displayedText, setDisplayedText] = useState('');
+  const [isDeleting, setIsDeleting] = useState(false);
+  
+  // Slideshow effect
   useEffect(() => {
     if (paused) return;
     const t = setInterval(() => setCurrentSlide(p => (p + 1) % stories.length), 5000);
     return () => clearInterval(t);
   }, [paused]);
+  
+  // Typing animation effect
+  useEffect(() => {
+    const currentPhrase = phrases[currentPhraseIndex];
+    const fullText = `${currentPhrase.prefix} ${currentPhrase.word}`;
+    const typingSpeed = isDeleting ? 50 : 100;
+    const pauseBeforeDelete = 2000;
+    const pauseBeforeType = 500;
+    
+    if (!isDeleting && displayedText === fullText) {
+      // Pause before starting to delete
+      const timeout = setTimeout(() => setIsDeleting(true), pauseBeforeDelete);
+      return () => clearTimeout(timeout);
+    }
+    
+    if (isDeleting && displayedText === '') {
+      // Move to next phrase and pause before typing
+      setIsDeleting(false);
+      setCurrentPhraseIndex((prev) => (prev + 1) % phrases.length);
+      const timeout = setTimeout(() => {}, pauseBeforeType);
+      return () => clearTimeout(timeout);
+    }
+    
+    // Type or delete character
+    const timeout = setTimeout(() => {
+      setDisplayedText((prev) => {
+        if (isDeleting) {
+          return prev.slice(0, -1);
+        } else {
+          return fullText.slice(0, prev.length + 1);
+        }
+      });
+    }, typingSpeed);
+    
+    return () => clearTimeout(timeout);
+  }, [displayedText, isDeleting, currentPhraseIndex]);
 
   return (
     <section className="bg-gradient-to-br from-gray-100 to-gray-200 py-16 md:py-20">
@@ -56,8 +105,8 @@ export function HeroSection() {
 
           {/* Content */}
           <div className="fade-in flex flex-col text-center px-4 md:px-12">
-            <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mb-6 leading-tight brand-name">
-              Master the Road with <span className="text-blue-600">Expert Guidance</span>
+            <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-6 leading-tight brand-name">
+              Master the Road with <span className="text-blue-600">{displayedText}<span className="typing-cursor">|</span></span>
             </h2>
             <p className="text-xl text-gray-600 mb-8 leading-relaxed max-w-3xl mx-auto">
               Connect with top-rated, experienced driving instructors who are passionate about helping you succeed. 

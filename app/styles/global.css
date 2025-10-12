@@ -120,6 +120,23 @@ body {
   flex-wrap: wrap !important;
 }
 
+/* Typing cursor animation */
+.typing-cursor {
+  display: inline-block;
+  margin-left: 2px;
+  animation: blink 1s infinite;
+  font-weight: 400;
+}
+
+@keyframes blink {
+  0%, 50% {
+    opacity: 1;
+  }
+  51%, 100% {
+    opacity: 0;
+  }
+}
+
 /* Slideshow utilities needed for proper layout */
 .relative { position: relative; }
 .absolute { position: absolute; }
@@ -322,6 +339,12 @@ body {
     font-size: 2rem !important;
     line-height: 1.2 !important;
     padding: 0 0.5rem;
+  }
+  
+  /* Hero title - prevent wrapping */
+  .text-4xl.md\:text-5xl {
+    font-size: 1.75rem !important;
+    line-height: 1.2 !important;
   }
   
   /* Search Section */
