@@ -177,7 +177,7 @@ export function FAQSection({ blogs }: { blogs: any[] }) {
                       e.currentTarget.style.transform = 'translateY(0)';
                     }}
                   >
-                    <div style={{ display: 'flex', alignItems: 'start', justifyContent: 'space-between', gap: '2rem' }}>
+                    <div className="blog-card-content" style={{ display: 'flex', alignItems: 'start', justifyContent: 'space-between', gap: '2rem' }}>
                       <div style={{ flex: 1, minWidth: 0 }}>
                         <h3 style={{
                           fontSize: '1.5rem',

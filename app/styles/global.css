@@ -334,6 +334,21 @@ body {
 
 /* Mobile-optimized Homepage & Search Section */
 @media (max-width: 768px) {
+  /* Latest Insights Blog Cards - Stack vertically on mobile */
+  .blog-card-content {
+    flex-direction: column !important;
+    gap: 1.5rem !important;
+  }
+  
+  .blog-card-content > div {
+    width: 100% !important;
+  }
+  
+  .blog-card-content a {
+    width: 100% !important;
+    justify-content: center !important;
+  }
+
   /* Hero Section */
   .display-title {
     font-size: 2rem !important;
