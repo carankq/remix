@@ -327,14 +327,24 @@ body {
   .filters-row {
     padding: 1rem !important;
     gap: 1rem !important;
+    display: flex !important;
+    flex-direction: column !important;
   }
   
   .filters-item {
     min-width: 100%;
+    width: 100%;
+    display: block !important;
   }
   
   .filters-divider {
     display: none !important;
+  }
+  
+  /* Ensure all filter inputs are visible */
+  .md\:flex-1 {
+    flex: none !important;
+    width: 100% !important;
   }
   
   /* Summary card - stack vertically on mobile */
