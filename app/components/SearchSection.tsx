@@ -81,54 +81,258 @@ export function SearchSection({
 
           <h1 className="display-title text-white mb-6 brand-name">Find your perfect driving instructor.</h1>
 
-          <div className="bg-white rounded-2xl shadow-md overflow-hidden mb-6 slide-in">
+          <div className="bg-white rounded-2xl shadow-md overflow-hidden mb-6 slide-in" style={{ 
+            border: '1px solid #e5e7eb'
+          }}>
             <div className="flex flex-col md:flex-row items-stretch filters-row" style={{ padding: '1.5rem', gap: '2rem' }}>
               <div className="md:flex-1 filters-item">
-                <div className="text-xs font-semibold text-gray-600 mb-1">From</div>
+                <label style={{
+                  display: 'block',
+                  fontSize: '0.875rem',
+                  fontWeight: '600',
+                  color: '#374151',
+                  marginBottom: '0.5rem'
+                }}>From</label>
                 <div className="relative">
-                  <span style={{ position: 'absolute', left: '0.5rem', top: '50%', transform: 'translateY(-50%)' }}>
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#6b7280" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 10c0 6-9 12-9 12s-9-6-9-12a9 9 0 1 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+                  <span style={{ 
+                    position: 'absolute', 
+                    left: '1rem', 
+                    top: '50%', 
+                    transform: 'translateY(-50%)',
+                    pointerEvents: 'none',
+                    zIndex: 1
+                  }}>
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#9ca3af" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                      <path d="M21 10c0 6-9 12-9 12s-9-6-9-12a9 9 0 1 1 18 0z"/>
+                      <circle cx="12" cy="10" r="3"/>
+                    </svg>
                   </span>
-                  <input type="text" value={pendingPostcode} onChange={(e) => handlePostcodeInputChange(e.target.value)} onKeyDown={(e) => { if (e.key === 'Enter') { e.preventDefault(); startNewPostcode(); } }} placeholder="Enter postcode area" className="input-bare w-full" style={{ paddingLeft: '1.75rem' }} />
+                  <input 
+                    type="text" 
+                    value={pendingPostcode} 
+                    onChange={(e) => handlePostcodeInputChange(e.target.value)} 
+                    onKeyDown={(e) => { if (e.key === 'Enter') { e.preventDefault(); startNewPostcode(); } }} 
+                    placeholder="Enter postcode area" 
+                    style={{
+                      width: '100%',
+                      padding: '0.75rem 1rem 0.75rem 3rem',
+                      fontSize: '1rem',
+                      color: '#111827',
+                      border: '2px solid #e5e7eb',
+                      borderRadius: '0.75rem',
+                      outline: 'none',
+                      transition: 'all 0.2s ease',
+                      background: '#ffffff'
+                    }}
+                    onFocus={(e) => {
+                      e.currentTarget.style.borderColor = '#2563eb';
+                      e.currentTarget.style.boxShadow = '0 0 0 3px rgba(37, 99, 235, 0.1)';
+                    }}
+                    onBlur={(e) => {
+                      e.currentTarget.style.borderColor = '#e5e7eb';
+                      e.currentTarget.style.boxShadow = 'none';
+                    }}
+                  />
                 </div>
               </div>
               <div className="hidden md:block w-px bg-gray-200 filters-divider" />
               <div className="md:flex-1 filters-item">
-                <div className="text-xs font-semibold text-gray-600 mb-1">Instructor gender</div>
+                <label style={{
+                  display: 'block',
+                  fontSize: '0.875rem',
+                  fontWeight: '600',
+                  color: '#374151',
+                  marginBottom: '0.5rem'
+                }}>Instructor gender</label>
                 <div className="relative">
-                  <span style={{ position: 'absolute', left: '0.5rem', top: '50%', transform: 'translateY(-50%)' }}>
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#6b7280" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                  <span style={{ 
+                    position: 'absolute', 
+                    left: '1rem', 
+                    top: '50%', 
+                    transform: 'translateY(-50%)',
+                    pointerEvents: 'none',
+                    zIndex: 1
+                  }}>
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#9ca3af" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                      <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+                      <circle cx="12" cy="7" r="4"/>
+                    </svg>
                   </span>
-                  <select value={filters.gender} onChange={(e) => handleFilterChange('gender', e.target.value)} className="select-bare w-full" style={{ paddingLeft: '1.75rem' }}>
+                  <select 
+                    value={filters.gender} 
+                    onChange={(e) => handleFilterChange('gender', e.target.value)} 
+                    style={{
+                      width: '100%',
+                      padding: '0.75rem 2.5rem 0.75rem 3rem',
+                      fontSize: '1rem',
+                      color: '#111827',
+                      border: '2px solid #e5e7eb',
+                      borderRadius: '0.75rem',
+                      outline: 'none',
+                      transition: 'all 0.2s ease',
+                      background: '#ffffff',
+                      cursor: 'pointer',
+                      appearance: 'none'
+                    }}
+                    onFocus={(e) => {
+                      e.currentTarget.style.borderColor = '#2563eb';
+                      e.currentTarget.style.boxShadow = '0 0 0 3px rgba(37, 99, 235, 0.1)';
+                    }}
+                    onBlur={(e) => {
+                      e.currentTarget.style.borderColor = '#e5e7eb';
+                      e.currentTarget.style.boxShadow = 'none';
+                    }}
+                  >
                     <option value="">Any Gender</option>
                     <option value="Male">Male</option>
                     <option value="Female">Female</option>
                   </select>
+                  <svg 
+                    width="20" 
+                    height="20" 
+                    viewBox="0 0 24 24" 
+                    fill="none" 
+                    stroke="#9ca3af" 
+                    strokeWidth="2" 
+                    strokeLinecap="round" 
+                    strokeLinejoin="round"
+                    style={{
+                      position: 'absolute',
+                      right: '1rem',
+                      top: '50%',
+                      transform: 'translateY(-50%)',
+                      pointerEvents: 'none'
+                    }}
+                  >
+                    <polyline points="6 9 12 15 18 9"/>
+                  </svg>
                 </div>
               </div>
               <div className="hidden md:block w-px bg-gray-200 filters-divider" />
               <div className="md:flex-1 filters-item">
-                <div className="text-xs font-semibold text-gray-600 mb-1">Vehicle type</div>
+                <label style={{
+                  display: 'block',
+                  fontSize: '0.875rem',
+                  fontWeight: '600',
+                  color: '#374151',
+                  marginBottom: '0.5rem'
+                }}>Vehicle type</label>
                 <div className="relative">
-                  <span style={{ position: 'absolute', left: '0.5rem', top: '50%', transform: 'translateY(-50%)' }}>
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#6b7280" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M3 13l2-5a3 3 0 0 1 3-2h6a3 3 0 0 1 3 2l2 5"/><rect x="3" y="13" width="18" height="6" rx="2"/><circle cx="7.5" cy="17" r="1.5"/><circle cx="16.5" cy="17" r="1.5"/></svg>
+                  <span style={{ 
+                    position: 'absolute', 
+                    left: '1rem', 
+                    top: '50%', 
+                    transform: 'translateY(-50%)',
+                    pointerEvents: 'none',
+                    zIndex: 1
+                  }}>
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#9ca3af" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                      <path d="M3 13l2-5a3 3 0 0 1 3-2h6a3 3 0 0 1 3 2l2 5"/>
+                      <rect x="3" y="13" width="18" height="6" rx="2"/>
+                      <circle cx="7.5" cy="17" r="1.5"/>
+                      <circle cx="16.5" cy="17" r="1.5"/>
+                    </svg>
                   </span>
-                  <select value={filters.vehicleType} onChange={(e) => handleFilterChange('vehicleType', e.target.value)} className="select-bare w-full" style={{ paddingLeft: '1.75rem' }}>
+                  <select 
+                    value={filters.vehicleType} 
+                    onChange={(e) => handleFilterChange('vehicleType', e.target.value)} 
+                    style={{
+                      width: '100%',
+                      padding: '0.75rem 2.5rem 0.75rem 3rem',
+                      fontSize: '1rem',
+                      color: '#111827',
+                      border: '2px solid #e5e7eb',
+                      borderRadius: '0.75rem',
+                      outline: 'none',
+                      transition: 'all 0.2s ease',
+                      background: '#ffffff',
+                      cursor: 'pointer',
+                      appearance: 'none'
+                    }}
+                    onFocus={(e) => {
+                      e.currentTarget.style.borderColor = '#2563eb';
+                      e.currentTarget.style.boxShadow = '0 0 0 3px rgba(37, 99, 235, 0.1)';
+                    }}
+                    onBlur={(e) => {
+                      e.currentTarget.style.borderColor = '#e5e7eb';
+                      e.currentTarget.style.boxShadow = 'none';
+                    }}
+                  >
                     <option value="">Any Vehicle Type</option>
                     <option value="Manual">Manual</option>
                     <option value="Automatic">Automatic</option>
                     <option value="Both">Both</option>
                   </select>
+                  <svg 
+                    width="20" 
+                    height="20" 
+                    viewBox="0 0 24 24" 
+                    fill="none" 
+                    stroke="#9ca3af" 
+                    strokeWidth="2" 
+                    strokeLinecap="round" 
+                    strokeLinejoin="round"
+                    style={{
+                      position: 'absolute',
+                      right: '1rem',
+                      top: '50%',
+                      transform: 'translateY(-50%)',
+                      pointerEvents: 'none'
+                    }}
+                  >
+                    <polyline points="6 9 12 15 18 9"/>
+                  </svg>
                 </div>
               </div>
               <div className="hidden md:block w-px bg-gray-200 filters-divider" />
               <div className="md:flex-1 filters-item">
-                <div className="text-xs font-semibold text-gray-600 mb-1">Language</div>
+                <label style={{
+                  display: 'block',
+                  fontSize: '0.875rem',
+                  fontWeight: '600',
+                  color: '#374151',
+                  marginBottom: '0.5rem'
+                }}>Language</label>
                 <div className="relative">
-                  <span style={{ position: 'absolute', left: '0.5rem', top: '50%', transform: 'translateY(-50%)' }}>
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#6b7280" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M3 5h18M8 5s1.5 9 7 9M4 19h16"/></svg>
+                  <span style={{ 
+                    position: 'absolute', 
+                    left: '1rem', 
+                    top: '50%', 
+                    transform: 'translateY(-50%)',
+                    pointerEvents: 'none',
+                    zIndex: 1
+                  }}>
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#9ca3af" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                      <circle cx="12" cy="12" r="10"/>
+                      <line x1="2" y1="12" x2="22" y2="12"/>
+                      <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/>
+                    </svg>
                   </span>
-                  <select value={filters.language} onChange={(e) => handleFilterChange('language', e.target.value)} className="select-bare w-full" style={{ paddingLeft: '1.75rem' }}>
+                  <select 
+                    value={filters.language} 
+                    onChange={(e) => handleFilterChange('language', e.target.value)} 
+                    style={{
+                      width: '100%',
+                      padding: '0.75rem 2.5rem 0.75rem 3rem',
+                      fontSize: '1rem',
+                      color: '#111827',
+                      border: '2px solid #e5e7eb',
+                      borderRadius: '0.75rem',
+                      outline: 'none',
+                      transition: 'all 0.2s ease',
+                      background: '#ffffff',
+                      cursor: 'pointer',
+                      appearance: 'none'
+                    }}
+                    onFocus={(e) => {
+                      e.currentTarget.style.borderColor = '#2563eb';
+                      e.currentTarget.style.boxShadow = '0 0 0 3px rgba(37, 99, 235, 0.1)';
+                    }}
+                    onBlur={(e) => {
+                      e.currentTarget.style.borderColor = '#e5e7eb';
+                      e.currentTarget.style.boxShadow = 'none';
+                    }}
+                  >
                     <option value="">Any Language</option>
                     <option value="British Sign Language">British Sign Language</option>
                     <option value="English">English</option>
@@ -137,6 +341,25 @@ export function SearchSection({
                     <option value="Urdu">Urdu</option>
                     <option value="Polish">Polish</option>
                   </select>
+                  <svg 
+                    width="20" 
+                    height="20" 
+                    viewBox="0 0 24 24" 
+                    fill="none" 
+                    stroke="#9ca3af" 
+                    strokeWidth="2" 
+                    strokeLinecap="round" 
+                    strokeLinejoin="round"
+                    style={{
+                      position: 'absolute',
+                      right: '1rem',
+                      top: '50%',
+                      transform: 'translateY(-50%)',
+                      pointerEvents: 'none'
+                    }}
+                  >
+                    <polyline points="6 9 12 15 18 9"/>
+                  </svg>
                 </div>
               </div>
             </div>
