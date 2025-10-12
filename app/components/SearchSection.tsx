@@ -52,7 +52,7 @@ export function SearchSection({ onSearch, autoSearch = false }: { onSearch: (que
         <div className="max-w-6xl mx-auto">
           <h1 className="display-title text-white mb-6">Find your perfect driving instructor.</h1>
           <div className="bg-white rounded-2xl shadow-md overflow-hidden mb-6 slide-in">
-            <div className="flex flex-col md:flex-row items-stretch gap-2 md:gap-4 filters-row">
+            <div className="flex flex-col md:flex-row items-stretch gap-4 filters-row" style={{ gap: '1.5rem' }}>
               <div className="p-4 md:flex-1 filters-item">
                 <div className="text-xs font-semibold text-gray-600 mb-1">From</div>
                 <div className="relative">
@@ -111,7 +111,7 @@ export function SearchSection({ onSearch, autoSearch = false }: { onSearch: (que
               </div>
             </div>
           </div>
-          <div className="summary-card fade-in summary-actions">
+          <div className="summary-card fade-in summary-actions mt-4">
             <div className="flex items-center gap-3">
               <span className="text-sm font-medium text-primary">Active filters:</span>
               <div className="flex flex-wrap gap-2">

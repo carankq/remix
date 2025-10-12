@@ -1,10 +1,24 @@
-import { useNavigate } from "@remix-run/react";
-import type { ActionFunctionArgs } from "@remix-run/node";
+import { useNavigate, useLoaderData } from "@remix-run/react";
+import type { ActionFunctionArgs, LoaderFunctionArgs } from "@remix-run/node";
+import { json } from "@remix-run/node";
 import { Header } from "../components/Header";
 import { Footer } from "../components/Footer";
 import { SearchSection } from "../components/SearchSection";
 import { HeroSection } from "../components/HeroSection";
 import { FAQSection } from "../components/FAQSection";
+
+export async function loader({ request }: LoaderFunctionArgs) {
+  const url = new URL(request.url);
+  const envBase = process.env.API_HOST ? String(process.env.API_HOST).replace(/\/$/, "") : "";
+  const base = envBase || url.origin;
+  try {
+    const res = await fetch(`${base}/blogs?limit=3`, { headers: { Accept: 'application/json' } });
+    const data = await res.json().catch(() => []);
+    return json({ blogsTop3: Array.isArray(data) ? data.slice(0, 3) : [] });
+  } catch {
+    return json({ blogsTop3: [] });
+  }
+}
 
 export async function action({ request }: ActionFunctionArgs) {
   const formData = await request.formData();
@@ -21,6 +35,7 @@ export async function action({ request }: ActionFunctionArgs) {
 
 export default function Index() {
   const navigate = useNavigate();
+  const { blogsTop3 } = useLoaderData<typeof loader>();
   return (
     <div>
       <Header />
@@ -33,7 +48,7 @@ export default function Index() {
         navigate(`/results?${params.toString()}`);
       }} />
       <HeroSection />
-      <FAQSection />
+      <FAQSection blogs={blogsTop3} />
       <Footer />
     </div>
   );

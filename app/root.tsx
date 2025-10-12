@@ -8,8 +8,10 @@ import {
   useLoaderData
 } from "@remix-run/react";
 import stylesHref from "./styles/global.css?url";
+import tailwindHref from "./styles/tailwind.css?url";
 
 export const links: LinksFunction = () => [
+  { rel: "stylesheet", href: tailwindHref },
   { rel: "stylesheet", href: stylesHref }
 ];
 

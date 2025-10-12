@@ -1,17 +1,21 @@
 import type { LoaderFunctionArgs } from "@remix-run/node";
 import { json } from "@remix-run/node";
-import { readFile } from "node:fs/promises";
 import { Link, useLoaderData } from "@remix-run/react";
 import { Header } from "../components/Header";
 import { Footer } from "../components/Footer";
 
-type BlogListItem = { slug: string; title: string; summary?: string; date?: string };
+type BlogListItem = { slug?: string; title?: string; summary?: string; date?: string };
 
-export async function loader({}: LoaderFunctionArgs) {
+export async function loader({ request }: LoaderFunctionArgs) {
+  const url = new URL(request.url);
+  const envBase = process.env.API_HOST ? String(process.env.API_HOST).replace(/\/$/, "") : "";
+  const base = envBase || url.origin;
+  const api = `${base}/blogs?limit=*`;
   try {
-    const raw = await readFile(process.cwd() + "/public/blogs/index.json", "utf8");
-    const items = JSON.parse(raw);
-    return json({ items: Array.isArray(items) ? (items as BlogListItem[]) : [] });
+    const res = await fetch(api, { headers: { Accept: 'application/json' } });
+    const data = await res.json().catch(() => []);
+    const items: BlogListItem[] = Array.isArray(data) ? data : [];
+    return json({ items });
   } catch {
     return json({ items: [] as BlogListItem[] });
   }
@@ -30,17 +34,20 @@ export default function BlogsIndexRoute() {
               <div className="px-4 py-4 text-gray-600">No blogs.</div>
             ) : (
               <nav>
-                {items.map((b) => (
-                  <div key={b.slug} className="px-4 py-3 border border-gray-100">
+                {items.map((b, i) => {
+                  const title = String(b.title || '').trim() || 'Untitled';
+                  const slug = (b.slug && String(b.slug)) || title.toLowerCase().replace(/[^a-z0-9]+/g, '-');
+                  return (
+                  <div key={slug + '-' + i} className="px-4 py-3 border border-gray-100">
                     <div className="flex items-center justify-between gap-3">
                       <div>
-                        <div className="text-gray-900">{b.title}</div>
+                        <div className="text-gray-900 capitalize">{title}</div>
                         {b.summary && <div className="text-gray-600">{b.summary}</div>}
                       </div>
-                      <Link to={`/blogs/${b.slug}`} className="no-underline text-gray-900">Read →</Link>
+                      <Link to={`/blogs/${slug}`} className="no-underline text-gray-900">Read →</Link>
                     </div>
                   </div>
-                ))}
+                );})}
               </nav>
             )}
           </div>

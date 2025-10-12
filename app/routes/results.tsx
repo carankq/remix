@@ -1,14 +1,25 @@
 import type { LoaderFunctionArgs, ActionFunctionArgs } from "@remix-run/node";
 import { json, redirect } from "@remix-run/node";
 import { Form, Link, useLoaderData } from "@remix-run/react";
-import { filterInstructors } from "../data/mock";
 import { Header } from "../components/Header";
 import { Footer } from "../components/Footer";
 
 export async function loader({ request }: LoaderFunctionArgs) {
   const url = new URL(request.url);
-  const list = filterInstructors(url.searchParams);
-  return json({ instructors: list });
+  const params = url.searchParams;
+  // Build API base: prefer env, otherwise same origin as the current request
+  const envBase = process.env.API_HOST ? String(process.env.API_HOST).replace(/\/$/, "") : "";
+  const base = envBase || url.origin;
+  const apiUrl = `${base}/instructors?${params.toString()}`;
+  try {
+    const res = await fetch(apiUrl, { headers: { "Accept": "application/json" } });
+    if (!res.ok) throw new Error(`Failed: ${res.status}`);
+    const data = await res.json().catch(() => ({}));
+    const list = Array.isArray(data) ? data : (Array.isArray(data?.instructors) ? data.instructors : []);
+    return json({ instructors: list });
+  } catch (e) {
+    return json({ instructors: [] as any[], error: "Unable to load instructors" }, { status: 200 });
+  }
 }
 
 export async function action({ request }: ActionFunctionArgs) {

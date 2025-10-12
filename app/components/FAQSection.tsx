@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { Link } from '@remix-run/react';
 
 type FAQItem = { question: string; answer: string };
@@ -49,26 +49,8 @@ function FAQGroup({ title, items }: { title: string; items: FAQItem[] }) {
   );
 }
 
-export function FAQSection() {
+export function FAQSection({ blogs }: { blogs: any[] }) {
   const [audience, setAudience] = useState<'students' | 'instructors'>('students');
-  const [blogs, setBlogs] = useState<any[]>([]);
-  const [blogsLoading, setBlogsLoading] = useState(false);
-  const [blogsError, setBlogsError] = useState<string | null>(null);
-
-  useEffect(() => {
-    let cancelled = false;
-    const load = async () => {
-      setBlogsLoading(true); setBlogsError(null);
-      try {
-        const res = await fetch(`/blogs/index.json`);
-        const data = await res.json().catch(() => []);
-        if (!cancelled) { setBlogs(Array.isArray(data) ? data.slice(0, 3) : []); }
-      } catch { if (!cancelled) setBlogsError('Unable to load blogs.'); }
-      finally { if (!cancelled) setBlogsLoading(false); }
-    };
-    load();
-    return () => { cancelled = true; };
-  }, []);
 
   const isStudents = audience === 'students';
 
@@ -81,9 +63,7 @@ export function FAQSection() {
             <Link to="/blogs" className="text-sm text-blue-600 no-underline hover:text-blue-700">View all</Link>
           </div>
           <div className="bg-white border border-gray-200 rounded-lg overflow-hidden">
-            {blogsLoading && (<div className="px-4 py-3 text-sm text-gray-600">Loading blogs…</div>)}
-            {blogsError && (<div className="px-4 py-3 text-sm text-red-700 bg-red-50 border-t border-red-200">{blogsError}</div>)}
-            {!blogsLoading && !blogsError && (
+            {(
               <nav className="divide-y divide-gray-100">
                 {blogs.map((b: any) => {
                   const title = b.title || b.name || 'Untitled';
