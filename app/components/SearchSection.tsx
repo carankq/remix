@@ -122,8 +122,12 @@ export function SearchSection({ onSearch, autoSearch = false }: { onSearch: (que
                 {postcodes.map((pc, idx) => {
                   const isLast = idx === postcodes.length - 1;
                   return (
-                    <span key={`pc-${idx}`} className="bg-blue-100 text-blue-700 pl-4 pr-3 py-1 rounded-full text-sm font-medium inline-flex items-center gap-1">
-                      <span>📍 {pc}</span>
+                    <span key={`pc-${idx}`} className="bg-blue-100 text-blue-700 pl-3 pr-3 py-1 rounded-full text-sm font-medium inline-flex items-center gap-2">
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                        <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/>
+                        <circle cx="12" cy="10" r="3"/>
+                      </svg>
+                      <span>{pc}</span>
                       {isLast ? (
                         <button type="button" aria-label="Add new postcode" onClick={startNewPostcode} className="inline-flex items-center justify-center w-5 h-5 ml-1 rounded-full bg-transparent text-blue-700 hover:text-blue-900 leading-none active:scale-95 transition" style={{ border: 'none', outline: 'none' }}>
                           <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ display: 'block' }}><path d="M12 5v14M5 12h14" /></svg>
@@ -136,9 +140,37 @@ export function SearchSection({ onSearch, autoSearch = false }: { onSearch: (que
                     </span>
                   );
                 })}
-                {filters.gender && (<span className="bg-blue-100 text-blue-700 px-3 py-1 rounded-full text-sm font-medium">👤 {filters.gender}</span>)}
-                {filters.vehicleType && (<span className="bg-blue-100 text-blue-700 px-3 py-1 rounded-full text-sm font-medium">🚗 {filters.vehicleType}</span>)}
-                {filters.language && (<span className="bg-blue-100 text-blue-700 px-3 py-1 rounded-full text-sm font-medium">🌐 {filters.language}</span>)}
+                {filters.gender && (
+                  <span className="bg-blue-100 text-blue-700 px-3 py-1 rounded-full text-sm font-medium inline-flex items-center gap-2">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                      <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+                      <circle cx="12" cy="7" r="4"/>
+                    </svg>
+                    <span>{filters.gender}</span>
+                  </span>
+                )}
+                {filters.vehicleType && (
+                  <span className="bg-blue-100 text-blue-700 px-3 py-1 rounded-full text-sm font-medium inline-flex items-center gap-2">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                      <path d="M5 17h2l.5-1.5h9L17 17h2"/>
+                      <path d="M12 17v-6"/>
+                      <path d="M9 5h6l3 6H6l3-6z"/>
+                      <circle cx="8" cy="17" r="2"/>
+                      <circle cx="16" cy="17" r="2"/>
+                    </svg>
+                    <span>{filters.vehicleType}</span>
+                  </span>
+                )}
+                {filters.language && (
+                  <span className="bg-blue-100 text-blue-700 px-3 py-1 rounded-full text-sm font-medium inline-flex items-center gap-2">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                      <circle cx="12" cy="12" r="10"/>
+                      <line x1="2" y1="12" x2="22" y2="12"/>
+                      <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/>
+                    </svg>
+                    <span>{filters.language}</span>
+                  </span>
+                )}
                 {postcodes.length === 0 && Object.values(filters).every(val => val === '' || val === 0 || (Array.isArray(val) && val[0] === 20 && val[1] === 60)) && (<span className="text-gray-500 text-sm">No filters applied</span>)}
               </div>
             </div>
