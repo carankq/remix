@@ -118,18 +118,20 @@ export function SearchSection({
                       padding: '0.75rem 1rem 0.75rem 3rem',
                       fontSize: '1rem',
                       color: '#111827',
-                      border: '2px solid #e5e7eb',
+                      border: '1px solid #e5e7eb',
                       borderRadius: '0.75rem',
                       outline: 'none',
                       transition: 'all 0.2s ease',
-                      background: '#ffffff'
+                      background: '#f9fafb'
                     }}
                     onFocus={(e) => {
-                      e.currentTarget.style.borderColor = '#2563eb';
-                      e.currentTarget.style.boxShadow = '0 0 0 3px rgba(37, 99, 235, 0.1)';
+                      e.currentTarget.style.borderColor = '#93c5fd';
+                      e.currentTarget.style.background = '#ffffff';
+                      e.currentTarget.style.boxShadow = '0 0 0 3px rgba(147, 197, 253, 0.1)';
                     }}
                     onBlur={(e) => {
                       e.currentTarget.style.borderColor = '#e5e7eb';
+                      e.currentTarget.style.background = '#f9fafb';
                       e.currentTarget.style.boxShadow = 'none';
                     }}
                   />
@@ -163,23 +165,25 @@ export function SearchSection({
                     onChange={(e) => handleFilterChange('gender', e.target.value)} 
                     style={{
                       width: '100%',
-                      padding: '0.75rem 2.5rem 0.75rem 3rem',
+                      padding: '0.75rem 3rem 0.75rem 3rem',
                       fontSize: '1rem',
-                      color: '#111827',
-                      border: '2px solid #e5e7eb',
+                      color: filters.gender ? '#111827' : '#9ca3af',
+                      border: '1px solid #e5e7eb',
                       borderRadius: '0.75rem',
                       outline: 'none',
                       transition: 'all 0.2s ease',
-                      background: '#ffffff',
+                      background: '#f9fafb',
                       cursor: 'pointer',
                       appearance: 'none'
                     }}
                     onFocus={(e) => {
-                      e.currentTarget.style.borderColor = '#2563eb';
-                      e.currentTarget.style.boxShadow = '0 0 0 3px rgba(37, 99, 235, 0.1)';
+                      e.currentTarget.style.borderColor = '#93c5fd';
+                      e.currentTarget.style.background = '#ffffff';
+                      e.currentTarget.style.boxShadow = '0 0 0 3px rgba(147, 197, 253, 0.1)';
                     }}
                     onBlur={(e) => {
                       e.currentTarget.style.borderColor = '#e5e7eb';
+                      e.currentTarget.style.background = '#f9fafb';
                       e.currentTarget.style.boxShadow = 'none';
                     }}
                   >
@@ -188,12 +192,12 @@ export function SearchSection({
                     <option value="Female">Female</option>
                   </select>
                   <svg 
-                    width="20" 
-                    height="20" 
+                    width="18" 
+                    height="18" 
                     viewBox="0 0 24 24" 
                     fill="none" 
                     stroke="#9ca3af" 
-                    strokeWidth="2" 
+                    strokeWidth="2.5" 
                     strokeLinecap="round" 
                     strokeLinejoin="round"
                     style={{
@@ -238,23 +242,25 @@ export function SearchSection({
                     onChange={(e) => handleFilterChange('vehicleType', e.target.value)} 
                     style={{
                       width: '100%',
-                      padding: '0.75rem 2.5rem 0.75rem 3rem',
+                      padding: '0.75rem 3rem 0.75rem 3rem',
                       fontSize: '1rem',
-                      color: '#111827',
-                      border: '2px solid #e5e7eb',
+                      color: filters.vehicleType ? '#111827' : '#9ca3af',
+                      border: '1px solid #e5e7eb',
                       borderRadius: '0.75rem',
                       outline: 'none',
                       transition: 'all 0.2s ease',
-                      background: '#ffffff',
+                      background: '#f9fafb',
                       cursor: 'pointer',
                       appearance: 'none'
                     }}
                     onFocus={(e) => {
-                      e.currentTarget.style.borderColor = '#2563eb';
-                      e.currentTarget.style.boxShadow = '0 0 0 3px rgba(37, 99, 235, 0.1)';
+                      e.currentTarget.style.borderColor = '#93c5fd';
+                      e.currentTarget.style.background = '#ffffff';
+                      e.currentTarget.style.boxShadow = '0 0 0 3px rgba(147, 197, 253, 0.1)';
                     }}
                     onBlur={(e) => {
                       e.currentTarget.style.borderColor = '#e5e7eb';
+                      e.currentTarget.style.background = '#f9fafb';
                       e.currentTarget.style.boxShadow = 'none';
                     }}
                   >
@@ -264,12 +270,12 @@ export function SearchSection({
                     <option value="Both">Both</option>
                   </select>
                   <svg 
-                    width="20" 
-                    height="20" 
+                    width="18" 
+                    height="18" 
                     viewBox="0 0 24 24" 
                     fill="none" 
                     stroke="#9ca3af" 
-                    strokeWidth="2" 
+                    strokeWidth="2.5" 
                     strokeLinecap="round" 
                     strokeLinejoin="round"
                     style={{
@@ -313,23 +319,25 @@ export function SearchSection({
                     onChange={(e) => handleFilterChange('language', e.target.value)} 
                     style={{
                       width: '100%',
-                      padding: '0.75rem 2.5rem 0.75rem 3rem',
+                      padding: '0.75rem 3rem 0.75rem 3rem',
                       fontSize: '1rem',
-                      color: '#111827',
-                      border: '2px solid #e5e7eb',
+                      color: filters.language ? '#111827' : '#9ca3af',
+                      border: '1px solid #e5e7eb',
                       borderRadius: '0.75rem',
                       outline: 'none',
                       transition: 'all 0.2s ease',
-                      background: '#ffffff',
+                      background: '#f9fafb',
                       cursor: 'pointer',
                       appearance: 'none'
                     }}
                     onFocus={(e) => {
-                      e.currentTarget.style.borderColor = '#2563eb';
-                      e.currentTarget.style.boxShadow = '0 0 0 3px rgba(37, 99, 235, 0.1)';
+                      e.currentTarget.style.borderColor = '#93c5fd';
+                      e.currentTarget.style.background = '#ffffff';
+                      e.currentTarget.style.boxShadow = '0 0 0 3px rgba(147, 197, 253, 0.1)';
                     }}
                     onBlur={(e) => {
                       e.currentTarget.style.borderColor = '#e5e7eb';
+                      e.currentTarget.style.background = '#f9fafb';
                       e.currentTarget.style.boxShadow = 'none';
                     }}
                   >
@@ -342,12 +350,12 @@ export function SearchSection({
                     <option value="Polish">Polish</option>
                   </select>
                   <svg 
-                    width="20" 
-                    height="20" 
+                    width="18" 
+                    height="18" 
                     viewBox="0 0 24 24" 
                     fill="none" 
                     stroke="#9ca3af" 
-                    strokeWidth="2" 
+                    strokeWidth="2.5" 
                     strokeLinecap="round" 
                     strokeLinejoin="round"
                     style={{
