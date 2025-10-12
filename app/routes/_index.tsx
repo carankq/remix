@@ -1,7 +1,10 @@
-import { Form, Link, useNavigation } from "@remix-run/react";
+import { useNavigate } from "@remix-run/react";
 import type { ActionFunctionArgs } from "@remix-run/node";
 import { Header } from "../components/Header";
 import { Footer } from "../components/Footer";
+import { SearchSection } from "../components/SearchSection";
+import { HeroSection } from "../components/HeroSection";
+import { FAQSection } from "../components/FAQSection";
 
 export async function action({ request }: ActionFunctionArgs) {
   const formData = await request.formData();
@@ -17,22 +20,20 @@ export async function action({ request }: ActionFunctionArgs) {
 }
 
 export default function Index() {
-  const nav = useNavigation();
-  const submitting = nav.state === "submitting";
+  const navigate = useNavigate();
   return (
     <div>
       <Header />
-      <section className="bg-white">
-        <div className="container px-4 py-8">
-          <h2 className="text-2xl text-gray-900 mb-4">Find a driving instructor</h2>
-          <Form method="post" className="flex items-center gap-3">
-            <input name="q" placeholder="Name or keyword" className="w-full" />
-            <input name="postcode" placeholder="Postcode(s) e.g. E1, E2" className="w-full" />
-            <button className="btn btn-primary" disabled={submitting}>{submitting ? "Searching…" : "Search"}</button>
-          </Form>
-          <p className="text-gray-600 mt-6">Or browse by <Link to="/results">all instructors</Link>.</p>
-        </div>
-      </section>
+      <SearchSection onSearch={(q, filters) => {
+        const params = new URLSearchParams();
+        if (filters.postcode) filters.postcode.split(',').map(p => p.trim()).filter(Boolean).forEach(pc => params.append('postcode', pc));
+        if (filters.gender) params.set('gender', filters.gender);
+        if (filters.vehicleType) params.set('vehicleType', filters.vehicleType);
+        if (filters.language) params.set('language', filters.language);
+        navigate(`/results?${params.toString()}`);
+      }} />
+      <HeroSection />
+      <FAQSection />
       <Footer />
     </div>
   );
