@@ -52,7 +52,7 @@ export function SearchSection({ onSearch, autoSearch = false }: { onSearch: (que
       <div className="container mx-auto px-4">
         <div className="max-w-6xl mx-auto gap-8 py-8" style={{ gap: '1.5em' }}>
 
-          <h1 className="display-title text-white mb-6">Find your perfect driving instructor.</h1>
+          <h1 className="display-title text-white mb-6 brand-name">Find your perfect driving instructor.</h1>
 
           <div className="bg-white rounded-2xl shadow-md overflow-hidden mb-6 slide-in">
             <div className="flex flex-col md:flex-row items-stretch filters-row" style={{ padding: '1.5rem', gap: '2rem' }}>

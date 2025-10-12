@@ -49,7 +49,7 @@ export function HeroSection() {
             </div>
           </div>
           <div className="fade-in flex flex-col justify-center">
-            <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mb-6 leading-tight">Find Your Perfect <span className="text-blue-600">Driving Instructor</span></h2>
+            <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mb-6 leading-tight brand-name">Find Your Perfect <span className="text-blue-600">Driving Instructor</span></h2>
             <p className="text-xl text-gray-600 mb-8 leading-relaxed">Connect with qualified, experienced driving instructors in your area. Use natural language or our smart filters to find the perfect match for your learning style.</p>
             <div className="flex flex-row gap-3">
               <div className="bg-white rounded-lg p-3 shadow-md flex-1"><p className="text-xl font-bold text-blue-600">500+</p><p className="text-sm text-gray-600">Students Passed</p></div>
