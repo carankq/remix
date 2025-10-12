@@ -106,7 +106,7 @@ export function HeroSection() {
           {/* Content */}
           <div className="fade-in flex flex-col text-center px-4 md:px-12">
             <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-6 leading-tight brand-name">
-              Master the Road with <span className="text-blue-600">{displayedText}<span className="typing-cursor">|</span></span>
+              Conquer the Road with <span className="text-blue-600">{displayedText}<span className="typing-cursor">|</span></span>
             </h2>
             <p className="text-xl text-gray-600 mb-8 leading-relaxed max-w-3xl mx-auto">
               Connect with top-rated, experienced driving instructors who are passionate about helping you succeed. 
@@ -116,16 +116,16 @@ export function HeroSection() {
             {/* Stats */}
             <div className="flex flex-col md:flex-row gap-4 justify-center items-stretch">
               <div className="bg-white rounded-lg shadow-md flex-1 max-w-xs" style={{ padding: '2rem' }}>
-                <p className="text-3xl font-bold text-blue-600">500+</p>
-                <p className="text-sm text-gray-600 mt-1">Students Passed</p>
+                <p className="text-3xl font-bold text-blue-600">50+</p>
+                <p className="text-sm text-gray-600 mt-1">Verified Instructors</p>
               </div>
               <div className="bg-white rounded-lg shadow-md flex-1 max-w-xs" style={{ padding: '2rem' }}>
-                <p className="text-3xl font-bold text-green-600">4.8★</p>
-                <p className="text-sm text-gray-600 mt-1">Average Rating</p>
+                <p className="text-3xl font-bold text-purple-600">1000+</p>
+                <p className="text-sm text-gray-600 mt-1">Years of Experience</p>
               </div>
               <div className="bg-white rounded-lg shadow-md flex-1 max-w-xs" style={{ padding: '2rem' }}>
-                <p className="text-3xl font-bold text-purple-600">50+</p>
-                <p className="text-sm text-gray-600 mt-1">Expert Instructors</p>
+                <p className="text-3xl font-bold text-green-600">98%</p>
+                <p className="text-sm text-gray-600 mt-1">Pass Rate</p>
               </div>
             </div>
           </div>
