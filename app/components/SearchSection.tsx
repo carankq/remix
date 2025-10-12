@@ -1,3 +1,4 @@
+import "../tailwind.css";
 import { useEffect, useState } from 'react';
 import { Search, RotateCcw } from './Icons';
 
@@ -49,11 +50,13 @@ export function SearchSection({ onSearch, autoSearch = false }: { onSearch: (que
   return (
     <section className="bg-deep-navy py-12 md:py-20">
       <div className="container mx-auto px-4">
-        <div className="max-w-6xl mx-auto">
+        <div className="max-w-6xl mx-auto gap-8 py-8" style={{ gap: '1.5em' }}>
+
           <h1 className="display-title text-white mb-6">Find your perfect driving instructor.</h1>
+
           <div className="bg-white rounded-2xl shadow-md overflow-hidden mb-6 slide-in">
-            <div className="flex flex-col md:flex-row items-stretch gap-4 filters-row" style={{ gap: '1.5rem' }}>
-              <div className="p-4 md:flex-1 filters-item">
+            <div className="flex flex-col md:flex-row items-stretch filters-row" style={{ padding: '1.5rem', gap: '2rem' }}>
+              <div className="md:flex-1 filters-item">
                 <div className="text-xs font-semibold text-gray-600 mb-1">From</div>
                 <div className="relative">
                   <span style={{ position: 'absolute', left: '0.5rem', top: '50%', transform: 'translateY(-50%)' }}>
@@ -63,7 +66,7 @@ export function SearchSection({ onSearch, autoSearch = false }: { onSearch: (que
                 </div>
               </div>
               <div className="hidden md:block w-px bg-gray-200 filters-divider" />
-              <div className="p-4 md:flex-1 filters-item">
+              <div className="md:flex-1 filters-item">
                 <div className="text-xs font-semibold text-gray-600 mb-1">Instructor gender</div>
                 <div className="relative">
                   <span style={{ position: 'absolute', left: '0.5rem', top: '50%', transform: 'translateY(-50%)' }}>
@@ -77,7 +80,7 @@ export function SearchSection({ onSearch, autoSearch = false }: { onSearch: (que
                 </div>
               </div>
               <div className="hidden md:block w-px bg-gray-200 filters-divider" />
-              <div className="p-4 md:flex-1 filters-item">
+              <div className="md:flex-1 filters-item">
                 <div className="text-xs font-semibold text-gray-600 mb-1">Vehicle type</div>
                 <div className="relative">
                   <span style={{ position: 'absolute', left: '0.5rem', top: '50%', transform: 'translateY(-50%)' }}>
@@ -92,7 +95,7 @@ export function SearchSection({ onSearch, autoSearch = false }: { onSearch: (que
                 </div>
               </div>
               <div className="hidden md:block w-px bg-gray-200 filters-divider" />
-              <div className="p-4 md:flex-1 filters-item">
+              <div className="md:flex-1 filters-item">
                 <div className="text-xs font-semibold text-gray-600 mb-1">Language</div>
                 <div className="relative">
                   <span style={{ position: 'absolute', left: '0.5rem', top: '50%', transform: 'translateY(-50%)' }}>
@@ -111,6 +114,7 @@ export function SearchSection({ onSearch, autoSearch = false }: { onSearch: (que
               </div>
             </div>
           </div>
+
           <div className="summary-card fade-in summary-actions mt-4">
             <div className="flex items-center gap-3">
               <span className="text-sm font-medium text-primary">Active filters:</span>
@@ -143,6 +147,7 @@ export function SearchSection({ onSearch, autoSearch = false }: { onSearch: (que
               <button onClick={handleSearch} className="btn btn-primary flex items-center gap-2"><Search size={16} />Search Instructors</button>
             </div>
           </div>
+
         </div>
       </div>
     </section>

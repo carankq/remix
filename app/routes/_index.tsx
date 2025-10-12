@@ -39,16 +39,16 @@ export default function Index() {
   return (
     <div>
       <Header />
-      <SearchSection onSearch={(q, filters) => {
-        const params = new URLSearchParams();
-        if (filters.postcode) filters.postcode.split(',').map(p => p.trim()).filter(Boolean).forEach(pc => params.append('postcode', pc));
-        if (filters.gender) params.set('gender', filters.gender);
-        if (filters.vehicleType) params.set('vehicleType', filters.vehicleType);
-        if (filters.language) params.set('language', filters.language);
-        navigate(`/results?${params.toString()}`);
-      }} />
-      <HeroSection />
-      <FAQSection blogs={blogsTop3} />
+        <SearchSection onSearch={(q, filters) => {
+          const params = new URLSearchParams();
+          if (filters.postcode) filters.postcode.split(',').map(p => p.trim()).filter(Boolean).forEach(pc => params.append('postcode', pc));
+          if (filters.gender) params.set('gender', filters.gender);
+          if (filters.vehicleType) params.set('vehicleType', filters.vehicleType);
+          if (filters.language) params.set('language', filters.language);
+          navigate(`/results?${params.toString()}`);
+        }} />
+        <HeroSection />
+        <FAQSection blogs={blogsTop3} />
       <Footer />
     </div>
   );
