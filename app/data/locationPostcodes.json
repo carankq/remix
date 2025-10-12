@@ -1,0 +1,23 @@
+{
+  "dartford": [
+    "DA1",
+    "DA2"
+  ],
+  "hackney": [
+    "E8",
+    "E9"
+  ],
+  "chelsea": [
+    "SW3",
+    "SW10"
+  ],
+  "tower-hamlets": [
+    "E1",
+    "E3",
+    "E14"
+  ],
+  "made-up": [
+    "place-123",
+    "place-456"
+  ]
+}
