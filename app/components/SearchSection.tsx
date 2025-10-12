@@ -149,7 +149,19 @@ export function SearchSection({
                 {postcodes.map((pc, idx) => {
                   const isLast = idx === postcodes.length - 1;
                   return (
-                    <span key={`pc-${idx}`} className="bg-blue-100 text-blue-700 pl-3 pr-3 py-1 rounded-full text-sm font-medium inline-flex items-center gap-2">
+                    <span key={`pc-${idx}`} style={{
+                      display: 'inline-flex',
+                      alignItems: 'center',
+                      gap: '0.5rem',
+                      padding: '0.5rem 1rem',
+                      background: 'white',
+                      color: '#1e40af',
+                      borderRadius: '0.5rem',
+                      fontSize: '0.875rem',
+                      fontWeight: '500',
+                      border: '1px solid #e5e7eb',
+                      boxShadow: '0 1px 2px rgba(0,0,0,0.05)'
+                    }}>
                       <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
                         <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/>
                         <circle cx="12" cy="10" r="3"/>
@@ -171,7 +183,19 @@ export function SearchSection({
                   );
                 })}
                 {filters.gender && (
-                  <span className="bg-blue-100 text-blue-700 px-3 py-1 rounded-full text-sm font-medium inline-flex items-center gap-2">
+                  <span style={{
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: '0.5rem',
+                    padding: '0.5rem 1rem',
+                    background: 'white',
+                    color: '#1e40af',
+                    borderRadius: '0.5rem',
+                    fontSize: '0.875rem',
+                    fontWeight: '500',
+                    border: '1px solid #e5e7eb',
+                    boxShadow: '0 1px 2px rgba(0,0,0,0.05)'
+                  }}>
                     <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
                       <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
                       <circle cx="12" cy="7" r="4"/>
@@ -180,7 +204,19 @@ export function SearchSection({
                   </span>
                 )}
                 {filters.vehicleType && (
-                  <span className="bg-blue-100 text-blue-700 px-3 py-1 rounded-full text-sm font-medium inline-flex items-center gap-2">
+                  <span style={{
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: '0.5rem',
+                    padding: '0.5rem 1rem',
+                    background: 'white',
+                    color: '#1e40af',
+                    borderRadius: '0.5rem',
+                    fontSize: '0.875rem',
+                    fontWeight: '500',
+                    border: '1px solid #e5e7eb',
+                    boxShadow: '0 1px 2px rgba(0,0,0,0.05)'
+                  }}>
                     <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
                       <path d="M5 17h2l.5-1.5h9L17 17h2"/>
                       <path d="M12 17v-6"/>
@@ -192,7 +228,19 @@ export function SearchSection({
                   </span>
                 )}
                 {filters.language && (
-                  <span className="bg-blue-100 text-blue-700 px-3 py-1 rounded-full text-sm font-medium inline-flex items-center gap-2">
+                  <span style={{
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: '0.5rem',
+                    padding: '0.5rem 1rem',
+                    background: 'white',
+                    color: '#1e40af',
+                    borderRadius: '0.5rem',
+                    fontSize: '0.875rem',
+                    fontWeight: '500',
+                    border: '1px solid #e5e7eb',
+                    boxShadow: '0 1px 2px rgba(0,0,0,0.05)'
+                  }}>
                     <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
                       <circle cx="12" cy="12" r="10"/>
                       <line x1="2" y1="12" x2="22" y2="12"/>
