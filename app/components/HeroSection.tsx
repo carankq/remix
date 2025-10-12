@@ -18,43 +18,66 @@ export function HeroSection() {
 
   return (
     <section className="bg-gradient-to-br from-gray-100 to-gray-200 py-16 md:py-20">
-      <div className="container mx-auto px-4">
-        <div className="grid md:grid-cols-2 gap-12 items-start md:items-center">
+      <div className="container mx-auto px-4 md:px-8">
+        <div className="max-w-5xl mx-auto flex flex-col gap-8 md:gap-12">
+          {/* Slideshow */}
           <div className="relative scale-in" style={{ animationDelay: '0.3s' }}>
             <div className="relative h-96 md:h-112 rounded-2xl overflow-hidden shadow-2xl" tabIndex={0} onMouseEnter={() => setPaused(true)} onMouseLeave={() => setPaused(false)} onKeyDown={(e) => {
               if (e.key === 'ArrowLeft') setCurrentSlide(p => (p - 1 + stories.length) % stories.length);
               if (e.key === 'ArrowRight') setCurrentSlide(p => (p + 1) % stories.length);
             }}>
               {stories.map((story, index) => (
-                <div key={story.id} className={`absolute inset-0 transition-opacity duration-500 ${index === currentSlide ? 'opacity-100' : 'opacity-0'}`}>
-                  <img src={story.image} alt={story.title} className="w-full h-full object-cover" />
-                  <div className="absolute inset-0" style={{ background: 'linear-gradient(to top, rgba(0, 0, 0, 0.6), transparent, transparent)' }} />
-                  <div className="absolute bottom-6 left-6 right-6 text-white">
+                <div 
+                  key={story.id} 
+                  className={`absolute inset-0 transition-opacity duration-500 z-0 ${index === currentSlide ? 'opacity-100' : 'opacity-0'}`}
+                  style={{ pointerEvents: index === currentSlide ? 'auto' : 'none' }}
+                >
+                  <img src={story.image} alt={story.title} className="w-full h-full object-cover block" style={{ display: 'block' }} />
+                  <div className="absolute inset-0 z-10" style={{ background: 'linear-gradient(to top, rgba(0, 0, 0, 0.6), transparent, transparent)' }} />
+                  <div className="absolute bottom-6 left-6 right-6 text-white z-20">
                     <h3 className="text-2xl font-bold mb-2">{story.title}</h3>
                     <p className="text-lg opacity-90">{story.description}</p>
                   </div>
                 </div>
               ))}
-              <button onClick={() => setCurrentSlide(p => (p - 1 + stories.length) % stories.length)} aria-label="Previous slide" className="carousel-btn absolute left-4 top-half -translate-y-half">
+              <button onClick={() => setCurrentSlide(p => (p - 1 + stories.length) % stories.length)} aria-label="Previous slide" className="carousel-btn absolute left-4 top-half -translate-y-half z-20">
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M15 18L9 12L15 6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg>
               </button>
-              <button onClick={() => setCurrentSlide(p => (p + 1) % stories.length)} aria-label="Next slide" className="carousel-btn absolute right-4 top-half -translate-y-half">
+              <button onClick={() => setCurrentSlide(p => (p + 1) % stories.length)} aria-label="Next slide" className="carousel-btn absolute right-4 top-half -translate-y-half z-20">
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M9 18L15 12L9 6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg>
               </button>
-              <div className="carousel-dots absolute bottom-6 right-6 flex items-center gap-2">
+              <div className="carousel-dots absolute bottom-6 right-6 flex items-center gap-2 z-20">
                 {stories.map((_, index) => (
                   <button key={index} aria-label={`Go to slide ${index + 1}`} onClick={() => setCurrentSlide(index)} className={index === currentSlide ? 'indicator-dot active' : 'indicator-dot'} />
                 ))}
               </div>
             </div>
           </div>
-          <div className="fade-in flex flex-col justify-center">
-            <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mb-6 leading-tight brand-name">Find Your Perfect <span className="text-blue-600">Driving Instructor</span></h2>
-            <p className="text-xl text-gray-600 mb-8 leading-relaxed">Connect with qualified, experienced driving instructors in your area. Use natural language or our smart filters to find the perfect match for your learning style.</p>
-            <div className="flex flex-row gap-3">
-              <div className="bg-white rounded-lg p-3 shadow-md flex-1"><p className="text-xl font-bold text-blue-600">500+</p><p className="text-sm text-gray-600">Students Passed</p></div>
-              <div className="bg-white rounded-lg p-3 shadow-md flex-1"><p className="text-xl font-bold text-green-600">4.8★</p><p className="text-sm text-gray-600">Average Rating</p></div>
-              <div className="bg-white rounded-lg p-3 shadow-md flex-1"><p className="text-xl font-bold text-purple-600">50+</p><p className="text-sm text-gray-600">Expert Instructors</p></div>
+
+          {/* Content */}
+          <div className="fade-in flex flex-col text-center px-4 md:px-12">
+            <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mb-6 leading-tight brand-name">
+              Master the Road with <span className="text-blue-600">Expert Guidance</span>
+            </h2>
+            <p className="text-xl text-gray-600 mb-8 leading-relaxed max-w-3xl mx-auto">
+              Connect with top-rated, experienced driving instructors who are passionate about helping you succeed. 
+              Whether you're a first-timer or need a refresher, find your perfect match today.
+            </p>
+            
+            {/* Stats */}
+            <div className="flex flex-col md:flex-row gap-4 justify-center items-stretch">
+              <div className="bg-white rounded-lg p-4 shadow-md flex-1 max-w-xs">
+                <p className="text-3xl font-bold text-blue-600">500+</p>
+                <p className="text-sm text-gray-600 mt-1">Students Passed</p>
+              </div>
+              <div className="bg-white rounded-lg p-4 shadow-md flex-1 max-w-xs">
+                <p className="text-3xl font-bold text-green-600">4.8★</p>
+                <p className="text-sm text-gray-600 mt-1">Average Rating</p>
+              </div>
+              <div className="bg-white rounded-lg p-4 shadow-md flex-1 max-w-xs">
+                <p className="text-3xl font-bold text-purple-600">50+</p>
+                <p className="text-sm text-gray-600 mt-1">Expert Instructors</p>
+              </div>
             </div>
           </div>
         </div>
