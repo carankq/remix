@@ -11,9 +11,36 @@ type FilterCriteria = {
   language?: string;
 };
 
-export function SearchSection({ onSearch, autoSearch = false }: { onSearch: (query: string, filters: FilterCriteria) => void; autoSearch?: boolean; }) {
-  const [filters, setFilters] = useState<FilterCriteria>({ priceRange: [20, 60], postcode: '', gender: '', vehicleType: '', minExperience: 0, language: '' });
-  const [postcodes, setPostcodes] = useState<string[]>([]);
+type InitialFilters = {
+  postcode?: string;
+  gender?: string;
+  vehicleType?: string;
+  language?: string;
+};
+
+export function SearchSection({ 
+  onSearch, 
+  autoSearch = false, 
+  initialFilters 
+}: { 
+  onSearch: (query: string, filters: FilterCriteria) => void; 
+  autoSearch?: boolean;
+  initialFilters?: InitialFilters;
+}) {
+  // Initialize filters with provided values or defaults
+  const [filters, setFilters] = useState<FilterCriteria>({
+    priceRange: [20, 60],
+    postcode: initialFilters?.postcode || '',
+    gender: initialFilters?.gender || '',
+    vehicleType: initialFilters?.vehicleType || '',
+    minExperience: 0,
+    language: initialFilters?.language || ''
+  });
+  
+  // Initialize postcodes from initialFilters
+  const [postcodes, setPostcodes] = useState<string[]>(
+    initialFilters?.postcode ? initialFilters.postcode.split(',').map(p => p.trim()).filter(Boolean) : []
+  );
   const [pendingPostcode, setPendingPostcode] = useState('');
   const [editingIndex, setEditingIndex] = useState<number>(-1);
 

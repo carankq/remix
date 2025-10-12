@@ -1,6 +1,7 @@
 import type { LoaderFunctionArgs, ActionFunctionArgs } from "@remix-run/node";
 import { json, redirect } from "@remix-run/node";
-import { Form, Link, useLoaderData } from "@remix-run/react";
+import { Form, Link, useLoaderData, useSearchParams } from "@remix-run/react";
+import { useState, useMemo } from "react";
 import { Header } from "../components/Header";
 import { Footer } from "../components/Footer";
 
@@ -75,36 +76,133 @@ export async function action({ request }: ActionFunctionArgs) {
 
 export default function ResultsRoute() {
   const { instructors } = useLoaderData<typeof loader>();
+  const [searchParams] = useSearchParams();
+  const [sortBy, setSortBy] = useState('relevance');
+  
+  // Sort instructors based on selected option
+  const sortedInstructors = useMemo(() => {
+    const sorted = [...instructors];
+    
+    switch (sortBy) {
+      case 'price-low':
+        return sorted.sort((a, b) => (a.pricePerHour || 999) - (b.pricePerHour || 999));
+      case 'price-high':
+        return sorted.sort((a, b) => (b.pricePerHour || 0) - (a.pricePerHour || 0));
+      case 'experience':
+        return sorted.sort((a, b) => (b.yearsOfExperience || 0) - (a.yearsOfExperience || 0));
+      case 'rating':
+        return sorted.sort((a, b) => (b.rating || 0) - (a.rating || 0));
+      default: // relevance
+        return sorted;
+    }
+  }, [instructors, sortBy]);
+  
+  // Build the back to search URL with current params
+  const backToSearchUrl = searchParams.toString() ? `/?${searchParams.toString()}` : '/';
   
   return (
     <div style={{ background: '#f9fafb', minHeight: '100vh' }}>
       <Header />
       
       {/* Hero Header */}
-      <section className="bg-deep-navy py-12 md:py-16">
+      <section className="bg-deep-navy py-8 md:py-12">
         <div className="container mx-auto px-4 md:px-8">
           <div className="max-w-6xl mx-auto">
-            <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-8">
-              <div>
-                <h1 className="text-3xl md:text-4xl font-bold text-white mb-2 brand-name">
+            <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+              <div className="flex items-center gap-4 flex-wrap">
+                <h1 className="text-3xl md:text-4xl font-bold text-white brand-name">
                   Available Instructors
                 </h1>
-                <p className="text-lg text-gray-300">
-                  Find your perfect driving instructor match
-                </p>
+                <span style={{
+                  background: 'rgba(255,255,255,0.2)',
+                  color: 'white',
+                  padding: '0.5rem 1rem',
+                  borderRadius: '2rem',
+                  fontSize: '0.95rem',
+                  fontWeight: '600',
+                  border: '1px solid rgba(255,255,255,0.3)',
+                  whiteSpace: 'nowrap'
+                }}>
+                  {sortedInstructors.length} {sortedInstructors.length === 1 ? 'result' : 'results'}
+                </span>
               </div>
-              <div style={{
-                background: 'rgba(255,255,255,0.15)',
-                backdropFilter: 'blur(10px)',
-                padding: '1rem 1.5rem',
-                borderRadius: '1rem',
-                border: '1px solid rgba(255,255,255,0.2)'
-              }}>
-                <div style={{ fontSize: '2rem', fontWeight: '700', color: 'white', lineHeight: '1' }}>
-                  {instructors.length}
-                </div>
-                <div style={{ fontSize: '0.875rem', color: '#d1d5db', marginTop: '0.25rem' }}>
-                  {instructors.length === 1 ? 'Instructor' : 'Instructors'} Found
+              
+              <div className="flex items-center gap-3 flex-wrap">
+                <Link 
+                  to={backToSearchUrl}
+                  className="btn btn-secondary"
+                  style={{
+                    background: 'rgba(255,255,255,0.15)',
+                    backdropFilter: 'blur(10px)',
+                    border: '1px solid rgba(255,255,255,0.3)',
+                    color: 'white',
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: '0.5rem',
+                    padding: '0.75rem 1.25rem',
+                    fontSize: '0.95rem',
+                    fontWeight: '500',
+                    borderRadius: '0.5rem',
+                    textDecoration: 'none',
+                    transition: 'all 0.2s ease'
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.background = 'rgba(255,255,255,0.25)';
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.background = 'rgba(255,255,255,0.15)';
+                  }}
+                >
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <line x1="19" y1="12" x2="5" y2="12"/>
+                    <polyline points="12 19 5 12 12 5"/>
+                  </svg>
+                  Refine Search
+                </Link>
+                
+                <div style={{ position: 'relative' }}>
+                  <select
+                    value={sortBy}
+                    onChange={(e) => setSortBy(e.target.value)}
+                    style={{
+                      background: 'rgba(255,255,255,0.15)',
+                      backdropFilter: 'blur(10px)',
+                      border: '1px solid rgba(255,255,255,0.3)',
+                      color: 'white',
+                      padding: '0.75rem 2.5rem 0.75rem 1.25rem',
+                      fontSize: '0.95rem',
+                      fontWeight: '500',
+                      borderRadius: '0.5rem',
+                      cursor: 'pointer',
+                      appearance: 'none',
+                      outline: 'none'
+                    }}
+                  >
+                    <option value="relevance" style={{ background: '#1e293b', color: 'white' }}>Sort by: Relevance</option>
+                    <option value="price-low" style={{ background: '#1e293b', color: 'white' }}>Price: Low to High</option>
+                    <option value="price-high" style={{ background: '#1e293b', color: 'white' }}>Price: High to Low</option>
+                    <option value="experience" style={{ background: '#1e293b', color: 'white' }}>Most Experience</option>
+                    <option value="rating" style={{ background: '#1e293b', color: 'white' }}>Highest Rated</option>
+                  </select>
+                  <svg 
+                    width="16" 
+                    height="16" 
+                    viewBox="0 0 24 24" 
+                    fill="none" 
+                    stroke="white" 
+                    strokeWidth="2" 
+                    strokeLinecap="round" 
+                    strokeLinejoin="round"
+                    style={{
+                      position: 'absolute',
+                      right: '1rem',
+                      top: '50%',
+                      transform: 'translateY(-50%)',
+                      pointerEvents: 'none'
+                    }}
+                  >
+                    <polyline points="6 9 12 15 18 9"/>
+                  </svg>
                 </div>
               </div>
             </div>
@@ -116,7 +214,7 @@ export default function ResultsRoute() {
       <section style={{ padding: '3rem 0' }}>
         <div className="container mx-auto px-4 md:px-8">
           <div className="max-w-6xl mx-auto">
-            {instructors.length === 0 ? (
+            {sortedInstructors.length === 0 ? (
               <div style={{
                 background: 'white',
                 border: '1px solid #e5e7eb',
@@ -140,7 +238,7 @@ export default function ResultsRoute() {
               </div>
             ) : (
               <div style={{ display: 'grid', gap: '1.5rem' }}>
-                {instructors.map((instructor) => (
+                {sortedInstructors.map((instructor) => (
                   <InstructorCard key={instructor.id} instructor={instructor} />
                 ))}
               </div>
