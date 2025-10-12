@@ -384,12 +384,42 @@ body {
   .select-bare {
     font-size: 16px !important; /* Prevents zoom on iOS */
     padding: 0.875rem !important;
+    padding-left: 2.5rem !important; /* Make room for icons */
     min-height: 44px; /* iOS recommended touch target */
+  }
+  
+  /* Fix icon positioning in inputs */
+  .filters-item .relative {
+    position: relative;
+  }
+  
+  .filters-item .relative > span:first-child {
+    position: absolute;
+    left: 0.75rem;
+    top: 50%;
+    transform: translateY(-50%);
+    pointer-events: none;
+    z-index: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  
+  .filters-item .relative > span:first-child svg {
+    width: 18px;
+    height: 18px;
+    flex-shrink: 0;
   }
   
   /* Filter tags - better wrapping */
   .summary-card .flex-wrap {
     max-width: 100%;
+  }
+  
+  /* Better spacing for filter labels */
+  .filters-item .text-xs {
+    margin-bottom: 0.5rem !important;
+    display: block;
   }
   
   /* Hero section stats */
