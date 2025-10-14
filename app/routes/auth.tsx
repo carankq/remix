@@ -14,9 +14,21 @@ export default function AuthRoute() {
   const [fullName, setFullName] = useState('');
   const [error, setError] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isTransitioning, setIsTransitioning] = useState(false);
   const { login, signup, isAuthenticated } = useAuth();
   const navigate = useNavigate();
   const isLogin = mode === 'login';
+
+  // Handle mode switching with animation
+  const handleModeSwitch = (newMode: 'login' | 'signup') => {
+    if (newMode === mode) return;
+    setIsTransitioning(true);
+    setTimeout(() => {
+      setMode(newMode);
+      setError(null); // Clear any errors when switching
+      setIsTransitioning(false);
+    }, 150); // Half of the transition duration
+  };
 
   // Redirect to portal if already authenticated
   useEffect(() => {
@@ -108,8 +120,8 @@ export default function AuthRoute() {
                 gap: '0.5rem'
               }}>
                 <button
-                  onClick={() => setMode('login')}
-                  disabled={isSubmitting}
+                  onClick={() => handleModeSwitch('login')}
+                  disabled={isSubmitting || isTransitioning}
                   style={{
                     padding: '1rem',
                     borderRadius: '0.75rem',
@@ -118,7 +130,7 @@ export default function AuthRoute() {
                     color: isLogin ? '#111827' : '#6b7280',
                     fontWeight: isLogin ? '600' : '500',
                     fontSize: '1rem',
-                    cursor: isSubmitting ? 'not-allowed' : 'pointer',
+                    cursor: (isSubmitting || isTransitioning) ? 'not-allowed' : 'pointer',
                     transition: 'all 0.2s ease',
                     boxShadow: isLogin ? '0 1px 2px rgba(0,0,0,0.05)' : 'none'
                   }}
@@ -126,8 +138,8 @@ export default function AuthRoute() {
                   Log in
                 </button>
                 <button
-                  onClick={() => setMode('signup')}
-                  disabled={isSubmitting}
+                  onClick={() => handleModeSwitch('signup')}
+                  disabled={isSubmitting || isTransitioning}
                   style={{
                     padding: '1rem',
                     borderRadius: '0.75rem',
@@ -136,7 +148,7 @@ export default function AuthRoute() {
                     color: !isLogin ? '#111827' : '#6b7280',
                     fontWeight: !isLogin ? '600' : '500',
                     fontSize: '1rem',
-                    cursor: isSubmitting ? 'not-allowed' : 'pointer',
+                    cursor: (isSubmitting || isTransitioning) ? 'not-allowed' : 'pointer',
                     transition: 'all 0.2s ease',
                     boxShadow: !isLogin ? '0 1px 2px rgba(0,0,0,0.05)' : 'none'
                   }}
@@ -146,7 +158,12 @@ export default function AuthRoute() {
               </div>
 
               {/* Form Content */}
-              <div style={{ padding: '2.5rem' }}>
+              <div style={{ 
+                padding: '2.5rem',
+                opacity: isTransitioning ? 0 : 1,
+                transform: isTransitioning ? 'translateY(10px)' : 'translateY(0)',
+                transition: 'opacity 0.3s ease, transform 0.3s ease'
+              }}>
                 <h2 style={{
                   fontSize: '1.5rem',
                   fontWeight: '700',
