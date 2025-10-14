@@ -19,7 +19,8 @@ export const links: LinksFunction = () => [
 export async function loader({ request }: LoaderFunctionArgs) {
   return { 
     ENV: { 
-      API_HOST: process.env.API_HOST || "" 
+      API_HOST: process.env.API_HOST || "",
+      STRIPE_PUBLISHABLE_KEY: process.env.STRIPE_PUBLISHABLE_KEY || ""
     } 
   };
 }
@@ -41,6 +42,7 @@ export default function App() {
         <meta name="theme-color" content="#1e293b" />
         <Meta />
         <Links />
+        <script src="https://js.stripe.com/v3/" async></script>
       </head>
       <body>
         <AuthProvider>

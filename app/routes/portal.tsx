@@ -3,8 +3,10 @@ import { useNavigate } from '@remix-run/react';
 import { Header } from '../components/Header';
 import { Footer } from '../components/Footer';
 import { useAuth } from '../context/AuthContext';
+import { InstructorStripeAccountSection } from '../components/InstructorStripeAccountSection';
+import { PaymentMethodSection } from '../components/PaymentMethodSection';
 
-type Tab = 'overview' | 'bookings' | 'account' | 'instructor';
+type Tab = 'overview' | 'bookings' | 'payments' | 'account' | 'instructor';
 
 interface BookingItem {
   id?: string;
@@ -316,6 +318,7 @@ export default function PortalRoute() {
   const tabs = [
     { id: 'overview' as Tab, label: 'Overview', icon: 'M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6' },
     { id: 'bookings' as Tab, label: user?.accountType === 'instructor' ? 'Booking Requests' : 'My Bookings', icon: 'M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z' },
+    { id: 'payments' as Tab, label: 'Payments', icon: 'M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z' },
     { id: 'account' as Tab, label: 'Account', icon: 'M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z' },
   ];
 
@@ -487,7 +490,7 @@ export default function PortalRoute() {
                           <div>
                             <p style={{ fontSize: '0.875rem', color: '#15803d', marginBottom: '0.25rem' }}>Active Bookings</p>
                             <p style={{ fontSize: '1.5rem', fontWeight: '700', color: '#14532d' }}>
-                              {bookings.filter(b => !b.archived && !b.isArchived && !b.archivedAt).length}
+                              {bookings.filter(b => !b.archived ).length}
                             </p>
                           </div>
                         </div>
@@ -521,6 +524,21 @@ export default function PortalRoute() {
                           View Bookings
                         </button>
                         <button
+                          onClick={() => setActiveTab('payments')}
+                          className="btn btn-secondary"
+                          style={{
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            gap: '0.5rem'
+                          }}
+                        >
+                          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                            <path d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"/>
+                          </svg>
+                          {user.accountType === 'instructor' ? 'Stripe Account' : 'Payment Methods'}
+                        </button>
+                        <button
                           onClick={() => setActiveTab('account')}
                           className="btn btn-secondary"
                           style={{
@@ -531,8 +549,7 @@ export default function PortalRoute() {
                           }}
                         >
                           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                            <path d="M12 2a10 10 0 0110 10 10 10 0 01-10 10A10 10 0 012 12 10 10 0 0112 2z"/>
-                            <path d="M12 6v6l4 2"/>
+                            <path d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
                           </svg>
                           Account Settings
                         </button>
@@ -825,6 +842,50 @@ export default function PortalRoute() {
                             </div>
                           );
                         })}
+                      </div>
+                    )}
+                  </div>
+                )}
+
+                {/* Payments Tab */}
+                {activeTab === 'payments' && (
+                  <div>
+                    <h2 style={{
+                      fontSize: '1.5rem',
+                      fontWeight: '600',
+                      color: '#111827',
+                      marginBottom: '0.5rem',
+                      fontFamily: "'Space Grotesk', 'Poppins', sans-serif"
+                    }}>
+                      {user.accountType === 'instructor' ? 'Stripe Account' : 'Payment Methods'}
+                    </h2>
+                    <p style={{ color: '#6b7280', fontSize: '1rem', marginBottom: '2rem' }}>
+                      {user.accountType === 'instructor' 
+                        ? 'Manage your Stripe Express account to receive payments from students.' 
+                        : 'Manage your payment methods for booking driving lessons.'}
+                    </p>
+
+                    {/* Student Payment Methods */}
+                    {user.accountType !== 'instructor' && (
+                      <div style={{
+                        padding: '2rem',
+                        background: 'white',
+                        border: '1px solid #e5e7eb',
+                        borderRadius: '0.75rem'
+                      }}>
+                        <PaymentMethodSection title="" allowDelete={true} />
+                      </div>
+                    )}
+
+                    {/* Instructor Stripe Account */}
+                    {user.accountType === 'instructor' && user.id && (
+                      <div style={{
+                        padding: '2rem',
+                        background: 'white',
+                        border: '1px solid #e5e7eb',
+                        borderRadius: '0.75rem'
+                      }}>
+                        <InstructorStripeAccountSection instructorId={user.id} />
                       </div>
                     )}
                   </div>
