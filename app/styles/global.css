@@ -365,6 +365,42 @@ select {
   }
 }
 
+/* Auth Page Grid Layout */
+@media (min-width: 769px) {
+  .auth-form.signup-form {
+    display: grid !important;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.25rem !important;
+  }
+  
+  .auth-form.signup-form > button[type="submit"] {
+    grid-column: 1 / -1;
+  }
+  
+  /* Error message spans full width */
+  .auth-form > div[style*="fef2f2"] {
+    grid-column: 1 / -1;
+  }
+  
+  /* Login form - single column */
+  .auth-form.login-form {
+    display: flex !important;
+    flex-direction: column !important;
+  }
+}
+
+/* Mobile-optimized Auth Page - Hide icons and adjust padding */
+@media (max-width: 768px) {
+  .auth-form input,
+  .auth-form select {
+    padding-left: 1rem !important;
+  }
+  
+  .auth-form .relative > span:first-child {
+    display: none !important;
+  }
+}
+
 /* Mobile-optimized Homepage & Search Section */
 @media (max-width: 768px) {
   /* Latest Insights Blog Cards - Stack vertically on mobile */

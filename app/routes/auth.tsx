@@ -87,7 +87,7 @@ export default function AuthRoute() {
         alignItems: 'center'
       }}>
         <div className="container mx-auto px-4 md:px-8">
-          <div style={{ maxWidth: '600px', width: '100%', margin: '0 auto' }}>
+          <div style={{ maxWidth: '900px', width: '100%', margin: '0 auto' }}>
             
             {/* Auth Card */}
             <div style={{
@@ -164,7 +164,7 @@ export default function AuthRoute() {
                   {isLogin ? 'Sign in to your account to continue' : 'Sign up to get started with Carank'}
                 </p>
 
-                <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
+                <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }} className={`auth-form ${isLogin ? 'login-form' : 'signup-form'}`}>
                   
                   {/* Account Type (Signup only) */}
                   {!isLogin && (
@@ -449,7 +449,7 @@ export default function AuthRoute() {
                           value={phoneNumber}
                           onChange={(e) => setPhoneNumber(e.target.value)}
                           disabled={isSubmitting}
-                          placeholder="Enter your phone number"
+                          placeholder="Enter your number"
                           style={{
                             width: '100%',
                             padding: '0.75rem 1rem 0.75rem 3rem',
