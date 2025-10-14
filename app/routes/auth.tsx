@@ -1,10 +1,80 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useNavigate } from "@remix-run/react";
 import { Header } from "../components/Header";
 import { Footer } from "../components/Footer";
+import { useAuth } from "../context/AuthContext";
 
 export default function AuthRoute() {
   const [mode, setMode] = useState<'login' | 'signup'>('login');
+  const [role, setRole] = useState<'student' | 'instructor' | 'account_type'>('account_type');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [phoneNumber, setPhoneNumber] = useState('');
+  const [ageRange, setAgeRange] = useState('');
+  const [fullName, setFullName] = useState('');
+  const [error, setError] = useState<string | null>(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const { login, signup, isAuthenticated } = useAuth();
+  const navigate = useNavigate();
   const isLogin = mode === 'login';
+
+  // Redirect to portal if already authenticated
+  useEffect(() => {
+    if (isAuthenticated) {
+      navigate('/portal');
+    }
+  }, [isAuthenticated, navigate]);
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setError(null);
+
+    // Validation
+    if (!email.includes('@')) {
+      setError('Please enter a valid email address.');
+      return;
+    }
+    if (password.length < 6) {
+      setError('Password must be at least 6 characters long.');
+      return;
+    }
+    if (mode === 'signup') {
+      if (role === 'account_type') {
+        setError('Please choose an account type.');
+        return;
+      }
+      if (!fullName.trim()) {
+        setError('Please enter your full name.');
+        return;
+      }
+      if (!phoneNumber.trim() || !ageRange.trim()) {
+        setError('Please provide your phone number and age range.');
+        return;
+      }
+    }
+
+    setIsSubmitting(true);
+    try {
+      if (mode === 'login') {
+        await login(email, password);
+      } else {
+        await signup({
+          email,
+          password,
+          accountType: role as 'student' | 'instructor',
+          phoneNumber,
+          ageRange,
+          fullName
+        });
+      }
+      // Navigate to portal after successful auth
+      navigate('/portal');
+    } catch (err: any) {
+      setError(err?.message || 'Something went wrong. Please try again.');
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
 
   return (
     <div>
@@ -39,6 +109,7 @@ export default function AuthRoute() {
               }}>
                 <button
                   onClick={() => setMode('login')}
+                  disabled={isSubmitting}
                   style={{
                     padding: '1rem',
                     borderRadius: '0.75rem',
@@ -47,15 +118,16 @@ export default function AuthRoute() {
                     color: isLogin ? '#111827' : '#6b7280',
                     fontWeight: isLogin ? '600' : '500',
                     fontSize: '1rem',
-                    cursor: 'pointer',
+                    cursor: isSubmitting ? 'not-allowed' : 'pointer',
                     transition: 'all 0.2s ease',
-                    boxShadow: isLogin ? '0 2px 8px rgba(0,0,0,0.1)' : 'none'
+                    boxShadow: isLogin ? '0 1px 2px rgba(0,0,0,0.05)' : 'none'
                   }}
                 >
-                  Login
+                  Log in
                 </button>
                 <button
                   onClick={() => setMode('signup')}
+                  disabled={isSubmitting}
                   style={{
                     padding: '1rem',
                     borderRadius: '0.75rem',
@@ -64,323 +136,491 @@ export default function AuthRoute() {
                     color: !isLogin ? '#111827' : '#6b7280',
                     fontWeight: !isLogin ? '600' : '500',
                     fontSize: '1rem',
-                    cursor: 'pointer',
+                    cursor: isSubmitting ? 'not-allowed' : 'pointer',
                     transition: 'all 0.2s ease',
-                    boxShadow: !isLogin ? '0 2px 8px rgba(0,0,0,0.1)' : 'none'
+                    boxShadow: !isLogin ? '0 1px 2px rgba(0,0,0,0.05)' : 'none'
                   }}
                 >
-                  Sign Up
+                  Sign up
                 </button>
               </div>
 
               {/* Form Content */}
-              <div style={{ padding: '2rem', minHeight: '550px' }}
-                className="auth-form-content">
-                
-                {/* Header */}
-                <div style={{ textAlign: 'center', marginBottom: '2rem' }}>
-                  <h1 className="brand-name" style={{
-                    fontSize: '2rem',
-                    fontWeight: '700',
-                    color: '#111827',
-                    marginBottom: '0.5rem'
-                  }}>
-                    {isLogin ? 'Welcome Back' : 'Create Account'}
-                  </h1>
-                  <p style={{
-                    fontSize: '1rem',
-                    color: '#6b7280',
-                    lineHeight: '1.5'
-                  }}>
-                    {isLogin 
-                      ? 'Sign in to access your account' 
-                      : 'Join Carank and start your driving journey'}
-                  </p>
-                </div>
+              <div style={{ padding: '2.5rem' }}>
+                <h2 style={{
+                  fontSize: '1.5rem',
+                  fontWeight: '700',
+                  color: '#111827',
+                  marginBottom: '0.5rem',
+                  fontFamily: "'Space Grotesk', 'Poppins', sans-serif"
+                }}>
+                  {isLogin ? 'Welcome back' : 'Create account'}
+                </h2>
+                <p style={{
+                  color: '#6b7280',
+                  marginBottom: '2rem',
+                  fontSize: '0.95rem'
+                }}>
+                  {isLogin ? 'Sign in to your account to continue' : 'Sign up to get started with Carank'}
+                </p>
 
-                {/* Role Selection for Signup - Moved to top */}
-                {!isLogin && (
-                  <div style={{
-                    marginBottom: '2rem',
-                    padding: '1.5rem',
-                    background: '#eff6ff',
-                    borderRadius: '0.75rem'
-                  }}>
-                    <p style={{
-                      fontSize: '0.875rem',
-                      fontWeight: '500',
-                      color: '#374151',
-                      marginBottom: '1rem'
-                    }}>
-                      I want to join as:
-                    </p>
-                    <div style={{ display: 'flex', gap: '0.75rem' }}>
-                      <label style={{
-                        flex: 1,
-                        padding: '1rem',
-                        background: 'white',
-                        border: '2px solid #2563eb',
-                        borderRadius: '0.5rem',
-                        cursor: 'pointer',
-                        textAlign: 'center',
-                        fontSize: '0.875rem',
-                        fontWeight: '500',
-                        color: '#2563eb'
-                      }}>
-                        <input type="radio" name="role" value="student" defaultChecked style={{ display: 'none' }} />
-                        🎓 Student
-                      </label>
-                      <label style={{
-                        flex: 1,
-                        padding: '1rem',
-                        background: 'white',
-                        border: '2px solid #e5e7eb',
-                        borderRadius: '0.5rem',
-                        cursor: 'pointer',
-                        textAlign: 'center',
-                        fontSize: '0.875rem',
-                        fontWeight: '500',
-                        color: '#6b7280'
-                      }}>
-                        <input type="radio" name="role" value="instructor" style={{ display: 'none' }} />
-                        🚗 Instructor
-                      </label>
-                    </div>
-                  </div>
-                )}
-
-                {/* Form */}
-                <form style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
+                <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
                   
+                  {/* Account Type (Signup only) */}
                   {!isLogin && (
                     <div>
                       <label style={{
                         display: 'block',
                         fontSize: '0.875rem',
-                        fontWeight: '500',
+                        fontWeight: '600',
+                        color: '#374151',
+                        marginBottom: '0.5rem'
+                      }}>
+                        Account Type
+                      </label>
+                      <div className="relative">
+                        <span style={{ 
+                          position: 'absolute', 
+                          left: '1rem', 
+                          top: '50%', 
+                          transform: 'translateY(-50%)',
+                          pointerEvents: 'none',
+                          zIndex: 1
+                        }}>
+                          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#9ca3af" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+                            <circle cx="12" cy="7" r="4"/>
+                          </svg>
+                        </span>
+                        <select
+                          value={role}
+                          onChange={(e) => setRole(e.target.value as 'student' | 'instructor' | 'account_type')}
+                          disabled={isSubmitting}
+                          style={{
+                            width: '100%',
+                            padding: '0.75rem 3rem 0.75rem 3rem',
+                            fontSize: '1rem',
+                            color: role === 'account_type' ? '#9ca3af' : '#111827',
+                            border: '1px solid #e5e7eb',
+                            borderRadius: '0.75rem',
+                            outline: 'none',
+                            transition: 'all 0.2s ease',
+                            background: '#f9fafb',
+                            cursor: 'pointer',
+                            appearance: 'none'
+                          }}
+                          onFocus={(e) => {
+                            e.currentTarget.style.borderColor = '#93c5fd';
+                            e.currentTarget.style.background = '#ffffff';
+                            e.currentTarget.style.boxShadow = '0 0 0 3px rgba(147, 197, 253, 0.1)';
+                          }}
+                          onBlur={(e) => {
+                            e.currentTarget.style.borderColor = '#e5e7eb';
+                            e.currentTarget.style.background = '#f9fafb';
+                            e.currentTarget.style.boxShadow = 'none';
+                          }}
+                        >
+                          <option value="account_type">Select account type</option>
+                          <option value="student">Student</option>
+                          <option value="instructor">Instructor</option>
+                        </select>
+                        <svg 
+                          width="18" 
+                          height="18" 
+                          viewBox="0 0 24 24" 
+                          fill="none" 
+                          stroke="#9ca3af" 
+                          strokeWidth="2.5" 
+                          strokeLinecap="round" 
+                          strokeLinejoin="round"
+                          style={{
+                            position: 'absolute',
+                            right: '1rem',
+                            top: '50%',
+                            transform: 'translateY(-50%)',
+                            pointerEvents: 'none'
+                          }}
+                        >
+                          <polyline points="6 9 12 15 18 9"/>
+                        </svg>
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Full Name (Signup only) */}
+                  {!isLogin && (
+                    <div>
+                      <label style={{
+                        display: 'block',
+                        fontSize: '0.875rem',
+                        fontWeight: '600',
                         color: '#374151',
                         marginBottom: '0.5rem'
                       }}>
                         Full Name
                       </label>
-                      <input
-                        type="text"
-                        placeholder="John Smith"
+                      <div className="relative">
+                        <span style={{ 
+                          position: 'absolute', 
+                          left: '1rem', 
+                          top: '50%', 
+                          transform: 'translateY(-50%)',
+                          pointerEvents: 'none',
+                          zIndex: 1
+                        }}>
+                          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#9ca3af" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+                            <circle cx="12" cy="7" r="4"/>
+                          </svg>
+                        </span>
+                        <input 
+                          type="text"
+                          value={fullName}
+                          onChange={(e) => setFullName(e.target.value)}
+                          disabled={isSubmitting}
+                          placeholder="Enter your full name"
+                          style={{
+                            width: '100%',
+                            padding: '0.75rem 1rem 0.75rem 3rem',
+                            fontSize: '1rem',
+                            color: '#111827',
+                            border: '1px solid #e5e7eb',
+                            borderRadius: '0.75rem',
+                            outline: 'none',
+                            transition: 'all 0.2s ease',
+                            background: '#f9fafb'
+                          }}
+                          onFocus={(e) => {
+                            e.currentTarget.style.borderColor = '#93c5fd';
+                            e.currentTarget.style.background = '#ffffff';
+                            e.currentTarget.style.boxShadow = '0 0 0 3px rgba(147, 197, 253, 0.1)';
+                          }}
+                          onBlur={(e) => {
+                            e.currentTarget.style.borderColor = '#e5e7eb';
+                            e.currentTarget.style.background = '#f9fafb';
+                            e.currentTarget.style.boxShadow = 'none';
+                          }}
+                        />
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Email */}
+                  <div>
+                    <label style={{
+                      display: 'block',
+                      fontSize: '0.875rem',
+                      fontWeight: '600',
+                      color: '#374151',
+                      marginBottom: '0.5rem'
+                    }}>
+                      Email
+                    </label>
+                    <div className="relative">
+                      <span style={{ 
+                        position: 'absolute', 
+                        left: '1rem', 
+                        top: '50%', 
+                        transform: 'translateY(-50%)',
+                        pointerEvents: 'none',
+                        zIndex: 1
+                      }}>
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#9ca3af" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                          <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/>
+                          <polyline points="22,6 12,13 2,6"/>
+                        </svg>
+                      </span>
+                      <input 
+                        type="email"
+                        value={email}
+                        onChange={(e) => setEmail(e.target.value)}
+                        disabled={isSubmitting}
+                        placeholder="Enter your email"
+                        required
                         style={{
                           width: '100%',
-                          padding: '0.875rem 1rem',
-                          border: '2px solid #e5e7eb',
-                          borderRadius: '0.75rem',
+                          padding: '0.75rem 1rem 0.75rem 3rem',
                           fontSize: '1rem',
+                          color: '#111827',
+                          border: '1px solid #e5e7eb',
+                          borderRadius: '0.75rem',
+                          outline: 'none',
                           transition: 'all 0.2s ease',
-                          outline: 'none'
+                          background: '#f9fafb'
                         }}
                         onFocus={(e) => {
-                          e.currentTarget.style.borderColor = '#2563eb';
-                          e.currentTarget.style.boxShadow = '0 0 0 3px rgba(37,99,235,0.1)';
+                          e.currentTarget.style.borderColor = '#93c5fd';
+                          e.currentTarget.style.background = '#ffffff';
+                          e.currentTarget.style.boxShadow = '0 0 0 3px rgba(147, 197, 253, 0.1)';
                         }}
                         onBlur={(e) => {
                           e.currentTarget.style.borderColor = '#e5e7eb';
+                          e.currentTarget.style.background = '#f9fafb';
                           e.currentTarget.style.boxShadow = 'none';
                         }}
                       />
                     </div>
-                  )}
-
-                  <div>
-                    <label style={{
-                      display: 'block',
-                      fontSize: '0.875rem',
-                      fontWeight: '500',
-                      color: '#374151',
-                      marginBottom: '0.5rem'
-                    }}>
-                      Email Address
-                    </label>
-                    <input
-                      type="email"
-                      placeholder="you@example.com"
-                      style={{
-                        width: '100%',
-                        padding: '0.875rem 1rem',
-                        border: '2px solid #e5e7eb',
-                        borderRadius: '0.75rem',
-                        fontSize: '1rem',
-                        transition: 'all 0.2s ease',
-                        outline: 'none'
-                      }}
-                      onFocus={(e) => {
-                        e.currentTarget.style.borderColor = '#667eea';
-                        e.currentTarget.style.boxShadow = '0 0 0 3px rgba(102,126,234,0.1)';
-                      }}
-                      onBlur={(e) => {
-                        e.currentTarget.style.borderColor = '#e5e7eb';
-                        e.currentTarget.style.boxShadow = 'none';
-                      }}
-                    />
                   </div>
 
+                  {/* Password */}
                   <div>
                     <label style={{
                       display: 'block',
                       fontSize: '0.875rem',
-                      fontWeight: '500',
+                      fontWeight: '600',
                       color: '#374151',
                       marginBottom: '0.5rem'
                     }}>
                       Password
                     </label>
-                    <input
-                      type="password"
-                      placeholder="••••••••"
-                      style={{
-                        width: '100%',
-                        padding: '0.875rem 1rem',
-                        border: '2px solid #e5e7eb',
-                        borderRadius: '0.75rem',
-                        fontSize: '1rem',
-                        transition: 'all 0.2s ease',
-                        outline: 'none'
-                      }}
-                      onFocus={(e) => {
-                        e.currentTarget.style.borderColor = '#667eea';
-                        e.currentTarget.style.boxShadow = '0 0 0 3px rgba(102,126,234,0.1)';
-                      }}
-                      onBlur={(e) => {
-                        e.currentTarget.style.borderColor = '#e5e7eb';
-                        e.currentTarget.style.boxShadow = 'none';
-                      }}
-                    />
+                    <div className="relative">
+                      <span style={{ 
+                        position: 'absolute', 
+                        left: '1rem', 
+                        top: '50%', 
+                        transform: 'translateY(-50%)',
+                        pointerEvents: 'none',
+                        zIndex: 1
+                      }}>
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#9ca3af" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                          <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/>
+                          <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+                        </svg>
+                      </span>
+                      <input 
+                        type="password"
+                        value={password}
+                        onChange={(e) => setPassword(e.target.value)}
+                        disabled={isSubmitting}
+                        placeholder="Enter your password"
+                        required
+                        style={{
+                          width: '100%',
+                          padding: '0.75rem 1rem 0.75rem 3rem',
+                          fontSize: '1rem',
+                          color: '#111827',
+                          border: '1px solid #e5e7eb',
+                          borderRadius: '0.75rem',
+                          outline: 'none',
+                          transition: 'all 0.2s ease',
+                          background: '#f9fafb'
+                        }}
+                        onFocus={(e) => {
+                          e.currentTarget.style.borderColor = '#93c5fd';
+                          e.currentTarget.style.background = '#ffffff';
+                          e.currentTarget.style.boxShadow = '0 0 0 3px rgba(147, 197, 253, 0.1)';
+                        }}
+                        onBlur={(e) => {
+                          e.currentTarget.style.borderColor = '#e5e7eb';
+                          e.currentTarget.style.background = '#f9fafb';
+                          e.currentTarget.style.boxShadow = 'none';
+                        }}
+                      />
+                    </div>
                   </div>
 
+                  {/* Phone (Signup only) */}
                   {!isLogin && (
                     <div>
                       <label style={{
                         display: 'block',
                         fontSize: '0.875rem',
-                        fontWeight: '500',
+                        fontWeight: '600',
                         color: '#374151',
                         marginBottom: '0.5rem'
                       }}>
-                        Confirm Password
+                        Phone Number
                       </label>
-                      <input
-                        type="password"
-                        placeholder="••••••••"
-                        style={{
-                          width: '100%',
-                          padding: '0.875rem 1rem',
-                          border: '2px solid #e5e7eb',
-                          borderRadius: '0.75rem',
-                          fontSize: '1rem',
-                          transition: 'all 0.2s ease',
-                          outline: 'none'
-                        }}
-                        onFocus={(e) => {
-                          e.currentTarget.style.borderColor = '#2563eb';
-                          e.currentTarget.style.boxShadow = '0 0 0 3px rgba(37,99,235,0.1)';
-                        }}
-                        onBlur={(e) => {
-                          e.currentTarget.style.borderColor = '#e5e7eb';
-                          e.currentTarget.style.boxShadow = 'none';
-                        }}
-                      />
+                      <div className="relative">
+                        <span style={{ 
+                          position: 'absolute', 
+                          left: '1rem', 
+                          top: '50%', 
+                          transform: 'translateY(-50%)',
+                          pointerEvents: 'none',
+                          zIndex: 1
+                        }}>
+                          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#9ca3af" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                            <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/>
+                          </svg>
+                        </span>
+                        <input 
+                          type="tel"
+                          value={phoneNumber}
+                          onChange={(e) => setPhoneNumber(e.target.value)}
+                          disabled={isSubmitting}
+                          placeholder="Enter your phone number"
+                          style={{
+                            width: '100%',
+                            padding: '0.75rem 1rem 0.75rem 3rem',
+                            fontSize: '1rem',
+                            color: '#111827',
+                            border: '1px solid #e5e7eb',
+                            borderRadius: '0.75rem',
+                            outline: 'none',
+                            transition: 'all 0.2s ease',
+                            background: '#f9fafb'
+                          }}
+                          onFocus={(e) => {
+                            e.currentTarget.style.borderColor = '#93c5fd';
+                            e.currentTarget.style.background = '#ffffff';
+                            e.currentTarget.style.boxShadow = '0 0 0 3px rgba(147, 197, 253, 0.1)';
+                          }}
+                          onBlur={(e) => {
+                            e.currentTarget.style.borderColor = '#e5e7eb';
+                            e.currentTarget.style.background = '#f9fafb';
+                            e.currentTarget.style.boxShadow = 'none';
+                          }}
+                        />
+                      </div>
                     </div>
                   )}
 
-                  {isLogin && (
-                    <div style={{ 
-                      display: 'flex', 
-                      justifyContent: 'space-between', 
-                      alignItems: 'center',
-                      marginTop: '-0.5rem'
-                    }}>
-                      <label style={{
-                        display: 'flex',
-                        alignItems: 'center',
-                        gap: '0.5rem',
-                        fontSize: '0.875rem',
-                        color: '#6b7280',
-                        cursor: 'pointer'
-                      }}>
-                        <input type="checkbox" style={{ width: '1rem', height: '1rem' }} />
-                        Remember me
-                      </label>
-                      <a 
-                        href="#"
-                        style={{
-                          fontSize: '0.875rem',
-                          color: '#2563eb',
-                          textDecoration: 'none',
-                          fontWeight: '500'
-                        }}
-                        onMouseEnter={(e) => e.currentTarget.style.textDecoration = 'underline'}
-                        onMouseLeave={(e) => e.currentTarget.style.textDecoration = 'none'}
-                      >
-                        Forgot password?
-                      </a>
-                    </div>
-                  )}
-
+                  {/* Age Range (Signup only) */}
                   {!isLogin && (
-                    <label style={{
-                      display: 'flex',
-                      alignItems: 'start',
-                      gap: '0.75rem',
-                      fontSize: '0.875rem',
-                      color: '#6b7280',
-                      cursor: 'pointer',
-                      lineHeight: '1.5'
-                    }}>
-                      <input type="checkbox" style={{ width: '1rem', height: '1rem', marginTop: '0.125rem' }} />
-                      <span>
-                        I agree to the{' '}
-                        <a href="/terms" style={{ color: '#2563eb', textDecoration: 'none' }}>Terms of Service</a>
-                        {' '}and{' '}
-                        <a href="/privacy-policy" style={{ color: '#2563eb', textDecoration: 'none' }}>Privacy Policy</a>
-                      </span>
-                    </label>
+                    <div>
+                      <label style={{
+                        display: 'block',
+                        fontSize: '0.875rem',
+                        fontWeight: '600',
+                        color: '#374151',
+                        marginBottom: '0.5rem'
+                      }}>
+                        Age Range
+                      </label>
+                      <div className="relative">
+                        <span style={{ 
+                          position: 'absolute', 
+                          left: '1rem', 
+                          top: '50%', 
+                          transform: 'translateY(-50%)',
+                          pointerEvents: 'none',
+                          zIndex: 1
+                        }}>
+                          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#9ca3af" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                            <circle cx="12" cy="12" r="10"/>
+                            <polyline points="12 6 12 12 16 14"/>
+                          </svg>
+                        </span>
+                        <select
+                          value={ageRange}
+                          onChange={(e) => setAgeRange(e.target.value)}
+                          disabled={isSubmitting}
+                          style={{
+                            width: '100%',
+                            padding: '0.75rem 3rem 0.75rem 3rem',
+                            fontSize: '1rem',
+                            color: ageRange ? '#111827' : '#9ca3af',
+                            border: '1px solid #e5e7eb',
+                            borderRadius: '0.75rem',
+                            outline: 'none',
+                            transition: 'all 0.2s ease',
+                            background: '#f9fafb',
+                            cursor: 'pointer',
+                            appearance: 'none'
+                          }}
+                          onFocus={(e) => {
+                            e.currentTarget.style.borderColor = '#93c5fd';
+                            e.currentTarget.style.background = '#ffffff';
+                            e.currentTarget.style.boxShadow = '0 0 0 3px rgba(147, 197, 253, 0.1)';
+                          }}
+                          onBlur={(e) => {
+                            e.currentTarget.style.borderColor = '#e5e7eb';
+                            e.currentTarget.style.background = '#f9fafb';
+                            e.currentTarget.style.boxShadow = 'none';
+                          }}
+                        >
+                          <option value="">Select age range</option>
+                          <option value="17-20">17-20</option>
+                          <option value="21-25">21-25</option>
+                          <option value="26-30">26-30</option>
+                          <option value="31-40">31-40</option>
+                          <option value=">40">40+</option>
+                        </select>
+                        <svg 
+                          width="18" 
+                          height="18" 
+                          viewBox="0 0 24 24" 
+                          fill="none" 
+                          stroke="#9ca3af" 
+                          strokeWidth="2.5" 
+                          strokeLinecap="round" 
+                          strokeLinejoin="round"
+                          style={{
+                            position: 'absolute',
+                            right: '1rem',
+                            top: '50%',
+                            transform: 'translateY(-50%)',
+                            pointerEvents: 'none'
+                          }}
+                        >
+                          <polyline points="6 9 12 15 18 9"/>
+                        </svg>
+                      </div>
+                    </div>
                   )}
 
+                  {/* Error Message */}
+                  {error && (
+                    <div style={{
+                      padding: '0.75rem 1rem',
+                      background: '#fef2f2',
+                      border: '1px solid #fecaca',
+                      borderRadius: '0.5rem',
+                      color: '#dc2626',
+                      fontSize: '0.875rem'
+                    }}>
+                      {error}
+                    </div>
+                  )}
+
+                  {/* Submit Button */}
                   <button
                     type="submit"
+                    disabled={isSubmitting}
+                    className="btn btn-primary"
                     style={{
                       width: '100%',
                       padding: '1rem',
-                      background: '#2563eb',
-                      color: 'white',
-                      border: 'none',
-                      borderRadius: '0.5rem',
                       fontSize: '1rem',
                       fontWeight: '600',
-                      cursor: 'pointer',
-                      transition: 'all 0.2s ease',
-                      marginTop: '0.5rem'
-                    }}
-                    onMouseEnter={(e) => {
-                      e.currentTarget.style.background = '#1d4ed8';
-                      e.currentTarget.style.transform = 'translateY(-1px)';
-                      e.currentTarget.style.boxShadow = '0 4px 12px rgba(37,99,235,0.3)';
-                    }}
-                    onMouseLeave={(e) => {
-                      e.currentTarget.style.background = '#2563eb';
-                      e.currentTarget.style.transform = 'translateY(0)';
-                      e.currentTarget.style.boxShadow = 'none';
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      gap: '0.5rem',
+                      opacity: isSubmitting ? 0.7 : 1,
+                      cursor: isSubmitting ? 'not-allowed' : 'pointer'
                     }}
                   >
-                    {isLogin ? 'Sign In' : 'Create Account'}
+                    {isSubmitting ? (
+                      <>
+                        <span className="spinner" style={{
+                          width: '16px',
+                          height: '16px',
+                          border: '2px solid rgba(255,255,255,0.3)',
+                          borderTopColor: 'white',
+                          borderRadius: '50%',
+                          animation: 'spin 0.6s linear infinite'
+                        }} />
+                        {isLogin ? 'Signing in...' : 'Creating account...'}
+                      </>
+                    ) : (
+                      isLogin ? 'Log in' : 'Create account'
+                    )}
                   </button>
                 </form>
-
               </div>
             </div>
-
           </div>
         </div>
       </main>
       <Footer />
+      
+      <style>{`
+        @keyframes spin {
+          to { transform: rotate(360deg); }
+        }
+      `}</style>
     </div>
   );
 }
-
-

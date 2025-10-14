@@ -8,6 +8,7 @@ import {
   useLoaderData
 } from "@remix-run/react";
 import stylesHref from "./styles/global.css?url";
+import { AuthProvider } from "./context/AuthContext";
 
 export const links: LinksFunction = () => [
   { rel: "stylesheet", href: stylesHref },
@@ -42,7 +43,9 @@ export default function App() {
         <Links />
       </head>
       <body>
-        <Outlet />
+        <AuthProvider>
+          <Outlet />
+        </AuthProvider>
         <ScrollRestoration />
         <script
           dangerouslySetInnerHTML={{
