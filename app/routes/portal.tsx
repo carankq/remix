@@ -1,10 +1,13 @@
 import { useEffect, useState } from 'react';
-import { useNavigate } from '@remix-run/react';
+import { useNavigate, useLoaderData } from '@remix-run/react';
+import type { LoaderFunctionArgs } from '@remix-run/node';
+import { json, redirect } from '@remix-run/node';
 import { Header } from '../components/Header';
 import { Footer } from '../components/Footer';
 import { useAuth } from '../context/AuthContext';
 import { InstructorStripeAccountSection } from '../components/InstructorStripeAccountSection';
 import { PaymentMethodSection } from '../components/PaymentMethodSection';
+import { getUserFromSession } from '../session.server';
 
 type Tab = 'overview' | 'bookings' | 'payments' | 'account' | 'instructor';
 
@@ -34,15 +37,102 @@ function getApiHost(): string {
   return typeof window !== 'undefined' ? window.location.origin : '';
 }
 
+interface InstructorInfo {
+  name: string;
+  image?: string;
+  company?: string;
+}
+
+// Server-side loader to fetch ALL portal data
+export async function loader({ request }: LoaderFunctionArgs) {
+  const userSession = await getUserFromSession(request);
+  
+  // If no session, use client-side auth (fallback)
+  if (!userSession) {
+    return json({ 
+      serverBookings: [] as BookingItem[],
+      serverInstructors: {} as Record<string, InstructorInfo>,
+      bookingsError: null as string | null,
+      useClientAuth: true
+    });
+  }
+  
+  // Get API host from environment
+  const apiHost = (process.env.API_HOST || request.url.split('/')[0] + '//' + request.url.split('/')[2]).replace(/\/$/, '');
+  
+  try {
+    // Fetch bookings based on account type
+    const bookingsUrl = userSession.accountType === 'instructor'
+      ? `${apiHost}/instructor/${encodeURIComponent(userSession.id)}/bookings`
+      : `${apiHost}/students/${encodeURIComponent(userSession.id)}/bookings`;
+    
+    const bookingsRes = await fetch(bookingsUrl, {
+      headers: {
+        'Accept-Encoding': 'gzip, deflate, br'
+      }
+    });
+    
+    let bookings: BookingItem[] = [];
+    if (bookingsRes.ok) {
+      const data = await bookingsRes.json();
+      bookings = Array.isArray(data) ? data : (Array.isArray(data?.bookings) ? data.bookings : []);
+    }
+    
+    // For students, fetch instructor details
+    const instructors: Record<string, InstructorInfo> = {};
+    if (userSession.accountType === 'student' && bookings.length > 0) {
+      const uniqueInstructorIds = Array.from(new Set(bookings.map(b => b.instructorId).filter(Boolean)));
+      
+      // Fetch all instructor details in parallel
+      await Promise.all(
+        uniqueInstructorIds.map(async (id) => {
+          try {
+            const res = await fetch(`${apiHost}/instructors/${encodeURIComponent(id)}`);
+            if (res.ok) {
+              const data = await res.json();
+              const item = data?.instructor || data;
+              instructors[id] = { 
+                name: item?.name || 'Instructor', 
+                image: item?.image, 
+                company: item?.company 
+              };
+            }
+          } catch {}
+        })
+      );
+    }
+    
+    return json({ 
+      serverBookings: bookings,
+      serverInstructors: instructors,
+      bookingsError: null,
+      useClientAuth: false
+    });
+    
+  } catch (error) {
+    return json({ 
+      serverBookings: [] as BookingItem[],
+      serverInstructors: {} as Record<string, InstructorInfo>,
+      bookingsError: 'Failed to load bookings data',
+      useClientAuth: false
+    });
+  }
+}
+
 export default function PortalRoute() {
   const { isAuthenticated, user, logout, token } = useAuth();
+  const loaderData = useLoaderData<typeof loader>();
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState<Tab>('overview');
-  const [bookings, setBookings] = useState<BookingItem[]>([]);
+  const [bookings, setBookings] = useState<BookingItem[]>(loaderData.serverBookings || []);
   const [isLoadingBookings, setIsLoadingBookings] = useState(false);
-  const [bookingsError, setBookingsError] = useState<string | null>(null);
+  const [bookingsError, setBookingsError] = useState<string | null>(loaderData.bookingsError);
+  const [bookingsLoaded, setBookingsLoaded] = useState(!loaderData.useClientAuth); // Mark as loaded if server provided data
   const [updatingById, setUpdatingById] = useState<Record<string, boolean>>({});
-  const [instructorsById, setInstructorsById] = useState<Record<string, { name: string; image?: string; company?: string }>>({});
+  const [instructorsById, setInstructorsById] = useState<Record<string, InstructorInfo>>(loaderData.serverInstructors || {});
+  
+  // Use ref to track if fetch has been initiated (prevents React strict mode double-fetch)
+  const fetchInitiatedRef = useState({ current: false })[0];
   
   // Archive modal
   const [showArchiveModal, setShowArchiveModal] = useState(false);
@@ -70,13 +160,19 @@ export default function PortalRoute() {
     }
   }, [isAuthenticated, navigate]);
 
-  // Load bookings (on mount for overview stats, and when bookings tab is active)
+  // Load bookings from client ONLY if server didn't provide data (useClientAuth fallback)
   useEffect(() => {
+    // Skip if server already loaded data OR if we've already initiated a fetch
+    if (!loaderData.useClientAuth || fetchInitiatedRef.current) return;
+    if (!isAuthenticated || !user?.id || bookingsLoaded) return;
+    
+    // Mark as initiated to prevent duplicate fetches
+    fetchInitiatedRef.current = true;
+    
+    const host = getApiHost();
+    if (!host) return;
+    
     const fetchBookings = async () => {
-      if (!isAuthenticated || !user?.id) return;
-      const host = getApiHost();
-      if (!host) return;
-      
       setIsLoadingBookings(true);
       setBookingsError(null);
       
@@ -100,18 +196,19 @@ export default function PortalRoute() {
         setBookingsError('Network error while loading your bookings.');
       } finally {
         setIsLoadingBookings(false);
+        setBookingsLoaded(true);
       }
     };
     
-    // Load bookings on initial mount or when bookings tab is active
-    if (activeTab === 'bookings' || (activeTab === 'overview' && bookings.length === 0 && !isLoadingBookings)) {
-      fetchBookings();
-    }
-  }, [isAuthenticated, user?.id, user?.accountType, activeTab]);
+    fetchBookings();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [loaderData.useClientAuth, isAuthenticated, user?.id, user?.accountType]);
 
-  // Load instructor details for bookings (students only)
+  // Load instructor details ONLY if using client auth (server already loaded them)
   useEffect(() => {
+    if (!loaderData.useClientAuth) return; // Skip if server already loaded instructors
     if (user?.accountType === 'instructor') return;
+    if (!bookingsLoaded || bookings.length === 0) return;
     const host = getApiHost();
     if (!host) return;
     
@@ -123,7 +220,7 @@ export default function PortalRoute() {
     
     let cancelled = false;
     const load = async () => {
-      const newEntries: Record<string, { name: string; image?: string; company?: string }> = {};
+      const newEntries: Record<string, InstructorInfo> = {};
       for (const id of ids) {
         try {
           const res = await fetch(`${host}/instructors/${encodeURIComponent(id)}`);
@@ -141,7 +238,7 @@ export default function PortalRoute() {
     };
     load();
     return () => { cancelled = true; };
-  }, [bookings, user?.accountType]);
+  }, [loaderData.useClientAuth, bookingsLoaded, bookings, user?.accountType, instructorsById]);
 
   const formatDateTime = (ts: number) =>
     new Date(ts).toLocaleString(undefined, { dateStyle: 'medium', timeStyle: 'short' });
