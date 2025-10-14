@@ -237,7 +237,8 @@ const InstructorCreateForm: React.FC<InstructorCreateFormProps> = ({ onCreated }
     setAvailEnd('');
   };
 
-  const submitInstructor = async () => {
+  const submitInstructor = async (e?: React.FormEvent) => {
+    if (e) e.preventDefault();
     if (!user?.id) return;
     setInstError(null);
     setInstSuccess(null);
@@ -561,7 +562,7 @@ const InstructorCreateForm: React.FC<InstructorCreateFormProps> = ({ onCreated }
           {instError}
         </div>
       )}
-      <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
+      <form onSubmit={submitInstructor} style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
         
         {/* Personal Information Section */}
         <div style={sectionStyle}>
@@ -738,12 +739,21 @@ const InstructorCreateForm: React.FC<InstructorCreateFormProps> = ({ onCreated }
               </select>
             </div>
             <div>
-              <label style={{ display: 'block', fontSize: '0.875rem', fontWeight: '500', color: '#374151', marginBottom: '0.5rem' }}>
+              <label htmlFor="instructor-price-per-hour" style={{ display: 'block', fontSize: '0.875rem', fontWeight: '500', color: '#374151', marginBottom: '0.5rem' }}>
                 Price per Hour (£)
               </label>
               <div style={{ position: 'relative' }}>
                 <span style={{ position: 'absolute', left: '1rem', top: '50%', transform: 'translateY(-50%)', color: '#6b7280', fontWeight: '500' }}>£</span>
-                <input className="input w-full" type="number" placeholder="25" value={instForm.pricePerHour} onChange={onInstChange('pricePerHour')} style={{ paddingLeft: '2rem' }} />
+                <input 
+                  id="instructor-price-per-hour"
+                  name="pricePerHour"
+                  className="input w-full" 
+                  type="number" 
+                  placeholder="25" 
+                  value={instForm.pricePerHour} 
+                  onChange={onInstChange('pricePerHour')} 
+                  style={{ paddingLeft: '2rem' }} 
+                />
               </div>
             </div>
             <div>
@@ -1093,9 +1103,8 @@ const InstructorCreateForm: React.FC<InstructorCreateFormProps> = ({ onCreated }
             />
           </div>
         </div>
-      </div>
-      
-      {/* Form Actions Footer */}
+        
+        {/* Form Actions Footer */}
       <div style={{ 
         display: 'flex', 
         alignItems: 'center', 
@@ -1118,9 +1127,9 @@ const InstructorCreateForm: React.FC<InstructorCreateFormProps> = ({ onCreated }
           </button>
         )}
         <button
+          type="submit"
           className="btn btn-primary"
           disabled={instSubmitting}
-          onClick={submitInstructor}
           style={{
             display: 'flex',
             alignItems: 'center',
@@ -1160,6 +1169,7 @@ const InstructorCreateForm: React.FC<InstructorCreateFormProps> = ({ onCreated }
           )}
         </button>
       </div>
+      </form>
     </div>
   );
 };
