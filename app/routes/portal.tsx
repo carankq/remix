@@ -7,6 +7,7 @@ import { Footer } from '../components/Footer';
 import { useAuth } from '../context/AuthContext';
 import { InstructorStripeAccountSection } from '../components/InstructorStripeAccountSection';
 import { PaymentMethodSection } from '../components/PaymentMethodSection';
+import InstructorCreateForm from '../components/InstructorCreateForm';
 import { getUserFromSession } from '../session.server';
 
 type Tab = 'overview' | 'bookings' | 'payments' | 'account' | 'instructor';
@@ -169,6 +170,13 @@ export default function PortalRoute() {
   
   // Use ref to track if fetch has been initiated (prevents React strict mode double-fetch)
   const fetchInitiatedRef = useState({ current: false })[0];
+
+  // Instructor profile state
+  const [ownerInst, setOwnerInst] = useState<any | null>(null);
+  const [ownerInstLoading, setOwnerInstLoading] = useState(false);
+  const [ownerInstError, setOwnerInstError] = useState<string | null>(null);
+  const [stripeOnboarded, setStripeOnboarded] = useState<boolean | null>(null);
+  const [stripeOnboardLoading, setStripeOnboardLoading] = useState(false);
 
   // Load more bookings function
   const loadMoreBookings = async () => {
@@ -379,6 +387,77 @@ export default function PortalRoute() {
     load();
     return () => { cancelled = true; };
   }, [loaderData.useClientAuth, bookingsLoaded, bookings, user?.accountType, instructorsById]);
+
+  // Load instructor profile for instructors
+  const loadOwnerInstructor = async () => {
+    if (!isAuthenticated || user?.accountType !== 'instructor' || !user?.id) return;
+    
+    setOwnerInstLoading(true);
+    setOwnerInstError(null);
+    try {
+      const response = await fetch(`${window.__ENV__?.API_HOST || 'http://localhost:3001'}/instructors/owner/${encodeURIComponent(user.id)}`, {
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Accept': 'application/json',
+          'Accept-Encoding': 'gzip, deflate, br'
+        }
+      });
+      
+      if (response.status === 404) {
+        setOwnerInst(null);
+        return;
+      }
+      
+      const data = await response.json();
+      if (response.ok && data) {
+        const item = data?.instructor || data;
+        setOwnerInst(item);
+      } else {
+        setOwnerInstError(data?.error || 'Unable to load your instructor listing.');
+        setOwnerInst(null);
+      }
+    } catch {
+      setOwnerInstError('Network error while loading your instructor listing.');
+      setOwnerInst(null);
+    } finally {
+      setOwnerInstLoading(false);
+    }
+  };
+
+  // Load Stripe onboarding status
+  const loadStripeOnboarding = async () => {
+    if (!isAuthenticated || user?.accountType !== 'instructor' || !user?.id) return;
+    
+    setStripeOnboardLoading(true);
+    try {
+      const response = await fetch(`${window.__ENV__?.API_HOST || 'http://localhost:3001'}/instructors/${encodeURIComponent(user.id)}/account/onboarded`, {
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Accept': 'application/json',
+          'Accept-Encoding': 'gzip, deflate, br'
+        }
+      });
+      
+      const data = await response.json().catch(() => ({}));
+      if (response.ok && typeof data?.onboarded === 'boolean') {
+        setStripeOnboarded(Boolean(data.onboarded));
+      } else if (response.status === 404) {
+        setStripeOnboarded(false);
+      }
+    } catch {
+      // ignore; keep null -> do not block
+    } finally {
+      setStripeOnboardLoading(false);
+    }
+  };
+
+  // Load instructor profile and Stripe status when user changes
+  useEffect(() => {
+    if (user?.accountType === 'instructor') {
+      loadOwnerInstructor();
+      loadStripeOnboarding();
+    }
+  }, [user?.accountType, user?.id, isAuthenticated]);
 
   const formatDateTime = (ts: number) =>
     new Date(ts).toLocaleString(undefined, { dateStyle: 'medium', timeStyle: 'short' });
@@ -1223,33 +1302,39 @@ export default function PortalRoute() {
                 {/* Instructor Profile Tab */}
                 {activeTab === 'instructor' && user.accountType === 'instructor' && (
                   <div>
-                    <h2 style={{
-                      fontSize: '1.5rem',
-                      fontWeight: '600',
-                      color: '#111827',
-                      marginBottom: '1rem',
-                      fontFamily: "'Space Grotesk', 'Poppins', sans-serif"
-                    }}>
-                      Instructor Profile
-                    </h2>
-                    <div style={{
-                      textAlign: 'center',
-                      padding: '3rem',
-                      background: '#f9fafb',
-                      borderRadius: '0.75rem',
-                      border: '1px solid #e5e7eb'
-                    }}>
-                      <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="#93c5fd" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ margin: '0 auto 1.5rem' }}>
-                        <circle cx="12" cy="12" r="10"/>
-                        <polyline points="12 6 12 12 16 14"/>
-                      </svg>
-                      <h3 style={{ fontSize: '1.25rem', fontWeight: '600', color: '#111827', marginBottom: '0.5rem' }}>
-                        Instructor Features Coming Soon
-                      </h3>
-                      <p style={{ color: '#6b7280' }}>
-                        Manage your instructor profile, availability, and pricing here.
-                      </p>
-                    </div>
+                    {/* Admin-disabled notice for instructors */}
+                    {ownerInst?.adminDisabled && (
+                      <div
+                        style={{
+                          width: '100%',
+                          backgroundColor: '#FFF7ED', /* orange-50 */
+                          color: '#9A3412', /* orange-800 */
+                          border: '1px solid #FDBA74', /* orange-300 */
+                          borderLeft: '6px solid #F97316', /* orange-500 accent */
+                        }}
+                        className="max-w-4xl mx-auto rounded-2xl p-4 mb-6"
+                      >
+                        <div className="flex items-start gap-3">
+                          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden>
+                            <path d="M12 9v4" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                            <path d="M12 17h.01" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                            <path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0Z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                          </svg>
+                          <div>
+                            <p className="font-semibold">Your instructor listing has been disabled by an administrator.</p>
+                            {ownerInst?.adminDisabledReason && (
+                              <p className="text-sm mt-1">Reason: {ownerInst.adminDisabledReason}</p>
+                            )}
+                          </div>
+                        </div>
+                      </div>
+                    )}
+
+                    <InstructorCreateForm onCreated={() => { 
+                      try { 
+                        loadOwnerInstructor(); 
+                      } catch {} 
+                    }} />
                   </div>
                 )}
 
