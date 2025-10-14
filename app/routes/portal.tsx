@@ -1308,23 +1308,58 @@ export default function PortalRoute() {
                       <div
                         style={{
                           width: '100%',
-                          backgroundColor: '#FFF7ED', /* orange-50 */
-                          color: '#9A3412', /* orange-800 */
-                          border: '1px solid #FDBA74', /* orange-300 */
-                          borderLeft: '6px solid #F97316', /* orange-500 accent */
+                          background: '#ffffff',
+                          border: '1px solid #fdba74',
+                          borderRadius: '0.75rem',
+                          padding: '1.25rem',
+                          marginBottom: '2rem',
+                          boxShadow: '0 1px 3px rgba(0,0,0,0.05)'
                         }}
-                        className="max-w-4xl mx-auto rounded-2xl p-4 mb-6"
                       >
-                        <div className="flex items-start gap-3">
-                          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden>
-                            <path d="M12 9v4" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-                            <path d="M12 17h.01" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-                            <path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0Z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-                          </svg>
-                          <div>
-                            <p className="font-semibold">Your instructor listing has been disabled by an administrator.</p>
+                        <div style={{ display: 'flex', alignItems: 'start', gap: '1rem' }}>
+                          <div style={{
+                            flexShrink: 0,
+                            width: '40px',
+                            height: '40px',
+                            borderRadius: '50%',
+                            background: '#fff7ed',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center'
+                          }}>
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#f97316" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                              <path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0Z"/>
+                              <line x1="12" y1="9" x2="12" y2="13"/>
+                              <line x1="12" y1="17" x2="12.01" y2="17"/>
+                            </svg>
+                          </div>
+                          <div style={{ flex: 1 }}>
+                            <h4 style={{
+                              fontSize: '1rem',
+                              fontWeight: '600',
+                              color: '#0f172a',
+                              marginBottom: '0.375rem',
+                              fontFamily: "'Space Grotesk', sans-serif"
+                            }}>
+                              Listing Disabled
+                            </h4>
+                            <p style={{ fontSize: '0.875rem', color: '#64748b', marginBottom: ownerInst?.adminDisabledReason ? '0.75rem' : 0, lineHeight: '1.5' }}>
+                              Your instructor listing has been disabled by an administrator.
+                            </p>
                             {ownerInst?.adminDisabledReason && (
-                              <p className="text-sm mt-1">Reason: {ownerInst.adminDisabledReason}</p>
+                              <div style={{
+                                padding: '0.75rem',
+                                background: '#fef3c7',
+                                borderRadius: '0.5rem',
+                                borderLeft: '3px solid #f59e0b'
+                              }}>
+                                <p style={{ fontSize: '0.75rem', fontWeight: '600', color: '#78350f', marginBottom: '0.25rem', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+                                  Reason
+                                </p>
+                                <p style={{ fontSize: '0.875rem', color: '#78350f', margin: 0 }}>
+                                  {ownerInst.adminDisabledReason}
+                                </p>
+                              </div>
                             )}
                           </div>
                         </div>
