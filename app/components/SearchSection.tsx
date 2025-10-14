@@ -75,11 +75,11 @@ export function SearchSection({
   };
 
   return (
-    <section className="bg-deep-navy py-12 md:py-20">
+    <section className="bg-deep-navy py-8 md:py-12">
       <div className="container mx-auto px-4">
-        <div className="max-w-6xl mx-auto gap-8 py-8" style={{ gap: '1.5em' }}>
+        <div className="max-w-6xl mx-auto py-4" style={{ gap: '1em' }}>
 
-          <h1 className="display-title text-white mb-6 brand-name">Find your perfect driving instructor.</h1>
+          <h1 className="display-title text-white mb-4 brand-name">Find your perfect driving instructor.</h1>
 
           <div className="bg-white rounded-2xl shadow-md overflow-hidden mb-6 slide-in" style={{ 
             border: '1px solid #e5e7eb'

@@ -103,43 +103,6 @@ export function Footer() {
               </ul>
             </div>
             
-            {/* For Instructors */}
-            <div>
-              <h4 style={{
-                fontSize: '1.125rem',
-                fontWeight: '600',
-                color: '#111827',
-                marginBottom: '1.25rem',
-                fontFamily: "'Space Grotesk', 'Poppins', sans-serif"
-              }}>
-                For Instructors
-              </h4>
-              <ul style={{ listStyle: 'none', padding: 0, margin: 0 }}>
-                {[
-                  { label: 'Join as Instructor', to: '/auth' },
-                  { label: 'Instructor Portal', to: '/portal' },
-                  { label: 'Pricing', to: '/#pricing' },
-                  { label: 'Resources', to: '/resources' }
-                ].map((link) => (
-                  <li key={link.to} style={{ marginBottom: '0.75rem' }}>
-                    <Link 
-                      to={link.to}
-                      className="no-underline"
-                      style={{
-                        color: '#6b7280',
-                        fontSize: '0.95rem',
-                        transition: 'color 0.2s ease'
-                      }}
-                      onMouseEnter={(e) => e.currentTarget.style.color = '#2563eb'}
-                      onMouseLeave={(e) => e.currentTarget.style.color = '#6b7280'}
-                    >
-                      {link.label}
-                    </Link>
-                  </li>
-                ))}
-              </ul>
-            </div>
-            
             {/* Legal & Support */}
             <div>
               <h4 style={{
