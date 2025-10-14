@@ -393,15 +393,17 @@ export default function ResultsRoute() {
 function InstructorCard({ instructor }: { instructor: Instructor }) {
   const hasRating = instructor.rating && instructor.rating > 0;
   const hasImage = instructor.image && instructor.image.trim() !== '';
+  const placeholder = 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><rect width="100" height="100" rx="50" fill="%23e5e7eb"/><circle cx="50" cy="38" r="18" fill="%239ca3af"/><path d="M20 86c4-18 18-28 30-28s26 10 30 28" fill="%239ca3af"/></svg>';
+  const imgSrc = hasImage ? instructor.image : placeholder;
   
   return (
     <article style={{
-      background: 'white',
-      border: '1px solid #e5e7eb',
+      background: '#ffffff',
       borderRadius: '1rem',
-      padding: '2rem',
-      transition: 'all 0.2s ease',
-      boxShadow: '0 1px 3px rgba(0,0,0,0.05)'
+      border: '1px solid #e2e8f0',
+      overflow: 'hidden',
+      boxShadow: '0 1px 3px rgba(0,0,0,0.05)',
+      transition: 'all 0.2s ease'
     }}
     onMouseEnter={(e) => {
       e.currentTarget.style.boxShadow = '0 8px 24px rgba(0,0,0,0.1)';
@@ -412,215 +414,215 @@ function InstructorCard({ instructor }: { instructor: Instructor }) {
       e.currentTarget.style.transform = 'translateY(0)';
     }}>
       
-      <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
-        
-        {/* Header Row */}
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'start', gap: '1.5rem', flexWrap: 'wrap' }}>
-          
+      {/* Hero Section with Gradient Background */}
+      <div style={{ padding: '2rem', background: 'linear-gradient(to bottom, #f8fafc 0%, #ffffff 100%)' }}>
+        <div style={{ display: 'flex', alignItems: 'start', gap: '1.5rem', flexWrap: 'wrap' }}>
           {/* Profile Image */}
-          <div style={{
-            width: '80px',
-            height: '80px',
-            borderRadius: '50%',
-            overflow: 'hidden',
-            flexShrink: 0,
-            border: '3px solid #e5e7eb',
-            background: '#f3f4f6',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center'
-          }}>
-            {hasImage ? (
-              <img 
-                src={instructor.image} 
-                alt={instructor.name}
-                style={{
-                  width: '100%',
-                  height: '100%',
-                  objectFit: 'cover'
-                }}
-                onError={(e) => {
-                  // Fallback if image fails to load
-                  e.currentTarget.style.display = 'none';
-                  if (e.currentTarget.parentElement) {
-                    e.currentTarget.parentElement.innerHTML = `
-                      <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#9ca3af" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                        <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
-                        <circle cx="12" cy="7" r="4"/>
-                      </svg>
-                    `;
-                  }
-                }}
-              />
-            ) : (
-              <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#9ca3af" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
-                <circle cx="12" cy="7" r="4"/>
-              </svg>
-            )}
+          <div style={{ position: 'relative', flexShrink: 0 }}>
+            <img
+              src={imgSrc}
+              onError={(e) => { const img = e.currentTarget as HTMLImageElement; if (img.src !== placeholder) { img.src = placeholder; } }}
+              alt={instructor.name}
+              style={{ 
+                width: '120px', 
+                height: '120px',
+                borderRadius: '50%',
+                objectFit: 'cover',
+                border: '4px solid #ffffff',
+                boxShadow: '0 4px 12px rgba(0,0,0,0.1)'
+              }}
+            />
           </div>
-
+          
           {/* Name & Info */}
-          <div style={{ flex: 1, minWidth: '250px' }}>
-            <h3 style={{ fontSize: '1.75rem', fontWeight: '700', color: '#111827', marginBottom: '0.5rem', lineHeight: '1.3' }}>
+          <div style={{ flex: 1, minWidth: 0 }}>
+            <h4 style={{ 
+              fontSize: '1.5rem', 
+              fontWeight: '700', 
+              color: '#0f172a', 
+              marginBottom: '0.375rem',
+              fontFamily: "'Space Grotesk', sans-serif"
+            }}>
               {instructor.name}
-            </h3>
+            </h4>
             {instructor.company && (
-              <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', color: '#6b7280', fontSize: '0.95rem', marginBottom: '0.5rem' }}>
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.75rem' }}>
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ color: '#64748b' }}>
                   <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>
                   <polyline points="9 22 9 12 15 12 15 22"/>
                 </svg>
-                <span>{instructor.company}</span>
+                <span style={{ fontSize: '0.875rem', color: '#64748b' }}>{instructor.company}</span>
               </div>
             )}
-            {hasRating && (
-              <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '0.25rem' }}>
-                  {[...Array(5)].map((_, i) => (
-                    <svg key={i} width="18" height="18" viewBox="0 0 24 24" fill={i < Math.floor(instructor.rating!) ? '#fbbf24' : 'none'} stroke="#fbbf24" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                      <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
-                    </svg>
-                  ))}
+            <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', flexWrap: 'wrap' }}>
+              {hasRating && (
+                <div style={{ display: 'flex', alignItems: 'center', gap: '0.375rem' }}>
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="#f59e0b" stroke="#f59e0b" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
+                  </svg>
+                  <span style={{ fontSize: '0.9375rem', fontWeight: '600', color: '#0f172a' }}>
+                    {instructor.rating?.toFixed(1)}
+                  </span>
+                  <span style={{ fontSize: '0.8125rem', color: '#64748b' }}>
+                    ({instructor.totalReviews || 0} reviews)
+                  </span>
                 </div>
-                <span style={{ color: '#6b7280', fontSize: '0.9rem' }}>
-                  {instructor.rating?.toFixed(1)} {instructor.totalReviews ? `(${instructor.totalReviews} reviews)` : ''}
-                </span>
-              </div>
-            )}
+              )}
+              {instructor.yearsOfExperience && (
+                <div style={{ display: 'flex', alignItems: 'center', gap: '0.375rem' }}>
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#64748b" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <circle cx="12" cy="12" r="10"/>
+                    <polyline points="12 6 12 12 16 14"/>
+                  </svg>
+                  <span style={{ fontSize: '0.875rem', color: '#64748b' }}>
+                    {instructor.yearsOfExperience} years experience
+                  </span>
+                </div>
+              )}
+            </div>
           </div>
           
-          {/* Price Badge */}
+          {/* Price Card */}
           {instructor.pricePerHour && (
-            <div style={{
-              background: 'linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%)',
-              padding: '1rem 1.5rem',
-              borderRadius: '0.75rem',
+            <div style={{ 
+              padding: '1.25rem 1.5rem',
+              background: 'linear-gradient(135deg, #3b82f6 0%, #2563eb 100%)',
+              borderRadius: '1rem',
               textAlign: 'center',
-              minWidth: '120px'
+              boxShadow: '0 4px 12px rgba(59, 130, 246, 0.3)',
+              minWidth: '140px'
             }}>
-              <div style={{ fontSize: '2rem', fontWeight: '700', color: 'white', lineHeight: '1' }}>
+              <div style={{ fontSize: '2rem', fontWeight: '700', color: '#ffffff', marginBottom: '0.25rem' }}>
                 £{instructor.pricePerHour}
               </div>
-              <div style={{ fontSize: '0.875rem', color: '#dbeafe', marginTop: '0.25rem' }}>
+              <div style={{ fontSize: '0.75rem', color: '#dbeafe', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
                 per hour
               </div>
             </div>
           )}
         </div>
+      </div>
 
-        {/* Info Pills */}
-        <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.75rem' }}>
-          {instructor.gender && (
-            <span style={{
-              display: 'inline-flex',
-              alignItems: 'center',
-              gap: '0.5rem',
-              padding: '0.5rem 1rem',
-              background: '#eff6ff',
-              color: '#1e40af',
-              borderRadius: '0.5rem',
-              fontSize: '0.875rem',
-              fontWeight: '500'
-            }}>
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
-                <circle cx="12" cy="7" r="4"/>
-              </svg>
-              {instructor.gender}
-            </span>
-          )}
-          
-          {instructor.vehicleType && (
-            <span style={{
-              display: 'inline-flex',
-              alignItems: 'center',
-              gap: '0.5rem',
-              padding: '0.5rem 1rem',
-              background: '#f0fdf4',
-              color: '#15803d',
-              borderRadius: '0.5rem',
-              fontSize: '0.875rem',
-              fontWeight: '500'
-            }}>
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                <path d="M5 17h2l.5-1.5h9L17 17h2"/>
-                <path d="M12 17v-6"/>
-                <path d="M9 5h6l3 6H6l3-6z"/>
-                <circle cx="8" cy="17" r="2"/>
-                <circle cx="16" cy="17" r="2"/>
-              </svg>
-              {instructor.vehicleType}
-            </span>
-          )}
-          
-          {instructor.yearsOfExperience && instructor.yearsOfExperience > 0 && (
-            <span style={{
-              display: 'inline-flex',
-              alignItems: 'center',
-              gap: '0.5rem',
-              padding: '0.5rem 1rem',
-              background: '#fef3c7',
-              color: '#92400e',
-              borderRadius: '0.5rem',
-              fontSize: '0.875rem',
-              fontWeight: '500'
-            }}>
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/>
-                <polyline points="22 4 12 14.01 9 11.01"/>
-              </svg>
-              {instructor.yearsOfExperience} years experience
-            </span>
-          )}
-          
+      {/* Content Section */}
+      <div style={{ padding: '0 2rem 2rem 2rem' }}>
+        {/* Location & Vehicle Bar */}
+        <div style={{ 
+          display: 'flex', 
+          alignItems: 'center', 
+          gap: '1.5rem', 
+          padding: '1.25rem',
+          background: '#f8fafc',
+          borderRadius: '0.75rem',
+          marginBottom: '1.5rem',
+          flexWrap: 'wrap'
+        }}>
           {instructor.postcode && instructor.postcode.length > 0 && (
-            <span style={{
-              display: 'inline-flex',
-              alignItems: 'center',
-              gap: '0.5rem',
-              padding: '0.5rem 1rem',
-              background: '#fce7f3',
-              color: '#9f1239',
-              borderRadius: '0.5rem',
-              fontSize: '0.875rem',
-              fontWeight: '500'
-            }}>
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#3b82f6" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                 <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/>
                 <circle cx="12" cy="10" r="3"/>
               </svg>
-              {instructor.postcode.join(', ')}
-            </span>
+              <span style={{ fontSize: '0.875rem', fontWeight: '500', color: '#334155' }}>
+                {instructor.postcode.join(', ')}
+              </span>
+            </div>
           )}
-          
-          {instructor.languages && instructor.languages.length > 0 && (
-            <span style={{
-              display: 'inline-flex',
-              alignItems: 'center',
-              gap: '0.5rem',
-              padding: '0.5rem 1rem',
-              background: '#f3e8ff',
-              color: '#6b21a8',
-              borderRadius: '0.5rem',
-              fontSize: '0.875rem',
-              fontWeight: '500'
-            }}>
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                <circle cx="12" cy="12" r="10"/>
-                <line x1="2" y1="12" x2="22" y2="12"/>
-                <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/>
+          {instructor.vehicleType && (
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#3b82f6" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <rect x="1" y="6" width="22" height="11" rx="2" ry="2"/>
+                <line x1="7" y1="11" x2="7" y2="11.01"/>
+                <line x1="11" y1="11" x2="17" y2="11"/>
               </svg>
-              {instructor.languages.join(', ')}
-            </span>
+              <span style={{ fontSize: '0.875rem', fontWeight: '500', color: '#334155' }}>
+                {instructor.vehicleType}
+              </span>
+            </div>
           )}
         </div>
 
         {/* Description */}
         {instructor.description && (
-          <p style={{ color: '#4b5563', fontSize: '1rem', lineHeight: '1.7', margin: 0 }}>
-            {instructor.description}
-          </p>
+          <div style={{ marginBottom: '1.5rem' }}>
+            <h5 style={{ 
+              fontSize: '0.75rem', 
+              fontWeight: '600', 
+              color: '#64748b', 
+              textTransform: 'uppercase', 
+              letterSpacing: '0.05em',
+              marginBottom: '0.75rem'
+            }}>
+              About
+            </h5>
+            <p style={{ 
+              fontSize: '0.9375rem', 
+              color: '#475569', 
+              lineHeight: '1.6',
+              margin: 0
+            }}>
+              {instructor.description}
+            </p>
+          </div>
+        )}
+
+        {/* Specializations */}
+        {instructor.specializations && instructor.specializations.length > 0 && (
+          <div style={{ marginBottom: '1.5rem' }}>
+            <h5 style={{ 
+              fontSize: '0.75rem', 
+              fontWeight: '600', 
+              color: '#64748b', 
+              textTransform: 'uppercase', 
+              letterSpacing: '0.05em',
+              marginBottom: '0.75rem'
+            }}>
+              Specializations
+            </h5>
+            <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.5rem' }}>
+              {instructor.specializations.map((spec, i) => (
+                <span key={i} style={{
+                  padding: '0.5rem 0.875rem',
+                  background: '#dbeafe',
+                  color: '#1e40af',
+                  borderRadius: '0.5rem',
+                  fontSize: '0.8125rem',
+                  fontWeight: '500'
+                }}>
+                  {spec}
+                </span>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* Languages */}
+        {instructor.languages && instructor.languages.length > 0 && (
+          <div style={{ marginBottom: '1.5rem' }}>
+            <h5 style={{ 
+              fontSize: '0.75rem', 
+              fontWeight: '600', 
+              color: '#64748b', 
+              textTransform: 'uppercase', 
+              letterSpacing: '0.05em',
+              marginBottom: '0.75rem'
+            }}>
+              Languages
+            </h5>
+            <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.5rem' }}>
+              {instructor.languages.map((lang, i) => (
+                <span key={i} style={{
+                  padding: '0.5rem 0.875rem',
+                  background: '#f3e8ff',
+                  color: '#7c3aed',
+                  borderRadius: '0.5rem',
+                  fontSize: '0.8125rem',
+                  fontWeight: '500'
+                }}>
+                  {lang}
+                </span>
+              ))}
+            </div>
+          </div>
         )}
 
         {/* Action Buttons */}
