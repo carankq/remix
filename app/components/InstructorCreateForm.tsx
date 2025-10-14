@@ -662,8 +662,32 @@ const InstructorCreateForm: React.FC<InstructorCreateFormProps> = ({ onCreated }
                 Brand Name <span style={{ color: '#dc2626' }}>*</span>
               </label>
               <input className="input w-full" placeholder="e.g., Smith Driving School" value={instForm.brandName} onChange={onInstChange('brandName')} />
-              <p className="text-xs text-gray-600 mt-1">How learners will identify you</p>
-              <p className="text-xs text-gray-500">URL: /instructors/{toBrandSlug(instForm.brandName) || 'your-brand'}</p>
+              <p style={{ fontSize: '0.8125rem', color: '#64748b', marginTop: '0.5rem', lineHeight: '1.4' }}>
+                How learners will identify you
+              </p>
+              <div style={{ 
+                marginTop: '0.5rem',
+                padding: '0.5rem 0.75rem',
+                background: '#f8fafc',
+                border: '1px solid #e2e8f0',
+                borderRadius: '0.375rem',
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '0.375rem'
+              }}>
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ color: '#64748b', flexShrink: 0 }}>
+                  <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/>
+                  <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/>
+                </svg>
+                <span style={{ 
+                  fontSize: '0.75rem',
+                  color: '#64748b',
+                  fontFamily: "'JetBrains Mono', 'Courier New', monospace",
+                  fontWeight: '500'
+                }}>
+                  /instructors/{toBrandSlug(instForm.brandName) || 'your-brand'}
+                </span>
+              </div>
             </div>
             <div>
               <label style={{ display: 'block', fontSize: '0.875rem', fontWeight: '500', color: '#374151', marginBottom: '0.5rem' }}>
@@ -690,11 +714,13 @@ const InstructorCreateForm: React.FC<InstructorCreateFormProps> = ({ onCreated }
             Service Area
           </h3>
           <div>
-            <label style={{ display: 'block', fontSize: '0.875rem', fontWeight: '500', color: '#374151', marginBottom: '0.5rem' }}>
+            <label style={{ display: 'block', fontSize: '0.875rem', fontWeight: '500', color: '#334155', marginBottom: '0.375rem' }}>
               Coverage Areas <span style={{ color: '#dc2626' }}>*</span>
             </label>
-            <p className="text-xs text-gray-600 mb-2">Add postcodes (e.g., "NW1 2AB") or areas (e.g., "NW") you cover</p>
-            <div className="flex items-center gap-2 mb-2">
+            <p style={{ fontSize: '0.8125rem', color: '#64748b', marginBottom: '0.75rem', lineHeight: '1.5' }}>
+              Add postcodes (e.g., "NW1 2AB") or areas (e.g., "NW") you cover
+            </p>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '1.25rem' }}>
               <input 
                 className="input w-full" 
                 placeholder="Enter postcode or area code" 
@@ -702,7 +728,7 @@ const InstructorCreateForm: React.FC<InstructorCreateFormProps> = ({ onCreated }
                 onChange={(e)=>setPostcodeInput(e.target.value)} 
                 onKeyDown={(e)=>{ if(e.key==='Enter'){ e.preventDefault(); addPostcode(); } }} 
               />
-              <button type="button" className="btn" onClick={addPostcode} style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+              <button type="button" className="btn" onClick={addPostcode} style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', fontSize: '0.875rem' }}>
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                   <line x1="12" y1="5" x2="12" y2="19"/>
                   <line x1="5" y1="12" x2="19" y2="12"/>
@@ -711,17 +737,23 @@ const InstructorCreateForm: React.FC<InstructorCreateFormProps> = ({ onCreated }
               </button>
             </div>
             {postcodes.length > 0 && (
-              <div className="flex flex-wrap gap-2">
+              <div style={{ 
+                display: 'flex', 
+                flexWrap: 'wrap', 
+                gap: '0.5rem',
+                paddingTop: '1rem',
+                borderTop: '1px solid #e2e8f0'
+              }}>
                 {postcodes.map(item => (
                   <span key={item} style={{
                     display: 'inline-flex',
                     alignItems: 'center',
                     gap: '0.5rem',
-                    padding: '0.5rem 0.75rem',
+                    padding: '0.5rem 0.875rem',
                     borderRadius: '0.5rem',
                     background: '#eff6ff',
                     color: '#1e40af',
-                    fontSize: '0.875rem',
+                    fontSize: '0.8125rem',
                     fontWeight: '500'
                   }}>
                     <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -729,7 +761,7 @@ const InstructorCreateForm: React.FC<InstructorCreateFormProps> = ({ onCreated }
                       <circle cx="12" cy="10" r="3"/>
                     </svg>
                     {item}
-                    <button type="button" style={{ color: '#1e40af', fontWeight: '700', fontSize: '1.25rem', cursor: 'pointer' }} onClick={()=>removeItem('pc', item)}>×</button>
+                    <button type="button" style={{ color: '#1e40af', fontWeight: '600', fontSize: '1.125rem', cursor: 'pointer', marginLeft: '0.125rem' }} onClick={()=>removeItem('pc', item)}>×</button>
                   </span>
                 ))}
               </div>
