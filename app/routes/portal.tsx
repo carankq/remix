@@ -70,7 +70,7 @@ export default function PortalRoute() {
     }
   }, [isAuthenticated, navigate]);
 
-  // Load bookings
+  // Load bookings (on mount for overview stats, and when bookings tab is active)
   useEffect(() => {
     const fetchBookings = async () => {
       if (!isAuthenticated || !user?.id) return;
@@ -103,7 +103,8 @@ export default function PortalRoute() {
       }
     };
     
-    if (activeTab === 'bookings') {
+    // Load bookings on initial mount or when bookings tab is active
+    if (activeTab === 'bookings' || (activeTab === 'overview' && bookings.length === 0 && !isLoadingBookings)) {
       fetchBookings();
     }
   }, [isAuthenticated, user?.id, user?.accountType, activeTab]);

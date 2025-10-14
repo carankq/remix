@@ -246,7 +246,9 @@ export function InstructorStripeAccountSection({ instructorId }: InstructorStrip
               display: 'inline-flex',
               alignItems: 'center',
               gap: '0.5rem',
-              opacity: isLinking ? 0.7 : 1
+              opacity: isLinking ? 0.7 : 1,
+              cursor: isLinking ? 'not-allowed' : 'pointer',
+              position: 'relative'
             }}
           >
             {isLinking ? (
@@ -259,7 +261,7 @@ export function InstructorStripeAccountSection({ instructorId }: InstructorStrip
                   borderRadius: '50%',
                   animation: 'spin 0.6s linear infinite'
                 }} />
-                Loading...
+                Redirecting to Stripe...
               </>
             ) : (
               <>
