@@ -8,6 +8,7 @@ import { useAuth } from '../context/AuthContext';
 import { InstructorStripeAccountSection } from '../components/InstructorStripeAccountSection';
 import { PaymentMethodSection } from '../components/PaymentMethodSection';
 import InstructorCreateForm from '../components/InstructorCreateForm';
+import { InstructorCard } from '../components/InstructorCard';
 import { getUserFromSession } from '../session.server';
 
 type Tab = 'overview' | 'bookings' | 'payments' | 'account' | 'instructor';
