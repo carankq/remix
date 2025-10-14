@@ -327,6 +327,27 @@ const InstructorCreateForm: React.FC<InstructorCreateFormProps> = ({ onCreated }
 
   if (user?.accountType !== 'instructor') return null;
 
+  // Section styling constants for consistency
+  const sectionStyle = {
+    padding: '1.5rem',
+    background: '#ffffff',
+    borderRadius: '0.75rem',
+    border: '1px solid #e2e8f0'
+  };
+
+  const sectionHeaderStyle = {
+    fontSize: '0.8125rem',
+    fontWeight: '600' as const,
+    color: '#0f172a',
+    marginBottom: '1.25rem',
+    display: 'flex',
+    alignItems: 'center',
+    gap: '0.625rem',
+    fontFamily: "'Space Grotesk', sans-serif",
+    textTransform: 'uppercase' as const,
+    letterSpacing: '0.05em'
+  };
+
   // Initial loading view to avoid jerky UI
   if (mode === 'loading' || ownerLoading) {
     return (
@@ -557,21 +578,25 @@ const InstructorCreateForm: React.FC<InstructorCreateFormProps> = ({ onCreated }
 
   // Edit/Create form view
   return (
-    <div style={{
-      background: '#ffffff',
-      borderRadius: '1rem',
-      padding: '2rem',
-      boxShadow: '0 1px 3px rgba(0,0,0,0.1)'
-    }}>
+    <div>
       <h2 style={{ 
-        fontSize: '1.5rem', 
-        fontWeight: '600', 
-        color: '#111827',
-        marginBottom: '1.5rem',
-        fontFamily: "'Space Grotesk', 'Poppins', sans-serif"
+        fontSize: '1.75rem', 
+        fontWeight: '700', 
+        color: '#0f172a',
+        marginBottom: '0.5rem',
+        fontFamily: "'Space Grotesk', sans-serif",
+        letterSpacing: '-0.025em'
       }}>
         {ownerInst ? 'Edit Your Listing' : 'Create Instructor Listing'}
       </h2>
+      <p style={{
+        fontSize: '0.9375rem',
+        color: '#64748b',
+        marginBottom: '2rem',
+        fontWeight: '400'
+      }}>
+        {ownerInst ? 'Update your instructor profile information below' : 'Set up your instructor profile to start connecting with students'}
+      </p>
       {ownerError && (
         <div style={{
           fontSize: '0.875rem',
@@ -617,17 +642,9 @@ const InstructorCreateForm: React.FC<InstructorCreateFormProps> = ({ onCreated }
       <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
         
         {/* Personal Information Section */}
-        <div>
-          <h3 style={{ 
-            fontSize: '1.125rem', 
-            fontWeight: '600', 
-            color: '#111827', 
-            marginBottom: '1rem',
-            display: 'flex',
-            alignItems: 'center',
-            gap: '0.5rem'
-          }}>
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+        <div style={sectionStyle}>
+          <h3 style={sectionHeaderStyle}>
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ color: '#3b82f6' }}>
               <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
               <circle cx="12" cy="7" r="4"/>
             </svg>
@@ -664,17 +681,9 @@ const InstructorCreateForm: React.FC<InstructorCreateFormProps> = ({ onCreated }
         </div>
 
         {/* Service Area Section */}
-        <div>
-          <h3 style={{ 
-            fontSize: '1.125rem', 
-            fontWeight: '600', 
-            color: '#111827', 
-            marginBottom: '1rem',
-            display: 'flex',
-            alignItems: 'center',
-            gap: '0.5rem'
-          }}>
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+        <div style={sectionStyle}>
+          <h3 style={sectionHeaderStyle}>
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ color: '#10b981' }}>
               <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/>
               <circle cx="12" cy="10" r="3"/>
             </svg>
@@ -729,19 +738,12 @@ const InstructorCreateForm: React.FC<InstructorCreateFormProps> = ({ onCreated }
         </div>
 
         {/* Vehicle & Pricing Section */}
-        <div>
-          <h3 style={{ 
-            fontSize: '1.125rem', 
-            fontWeight: '600', 
-            color: '#111827', 
-            marginBottom: '1rem',
-            display: 'flex',
-            alignItems: 'center',
-            gap: '0.5rem'
-          }}>
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-              <path d="M5 17h14v-2H5v2zm4.5-4.5h5l-1.08-3H10.58l-1.08 3zM4.5 6.5v8h15v-8h-15zM5 19h14v-1H5v1z"/>
+        <div style={sectionStyle}>
+          <h3 style={sectionHeaderStyle}>
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ color: '#f97316' }}>
               <rect x="1" y="6" width="22" height="11" rx="2" ry="2"/>
+              <line x1="7" y1="11" x2="7" y2="11.01"/>
+              <line x1="11" y1="11" x2="17" y2="11"/>
             </svg>
             Vehicle & Pricing
           </h3>
@@ -786,17 +788,9 @@ const InstructorCreateForm: React.FC<InstructorCreateFormProps> = ({ onCreated }
         </div>
 
         {/* Contact Information Section */}
-        <div>
-          <h3 style={{ 
-            fontSize: '1.125rem', 
-            fontWeight: '600', 
-            color: '#111827', 
-            marginBottom: '1rem',
-            display: 'flex',
-            alignItems: 'center',
-            gap: '0.5rem'
-          }}>
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+        <div style={sectionStyle}>
+          <h3 style={sectionHeaderStyle}>
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ color: '#06b6d4' }}>
               <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/>
             </svg>
             Contact Information
@@ -818,17 +812,9 @@ const InstructorCreateForm: React.FC<InstructorCreateFormProps> = ({ onCreated }
         </div>
 
         {/* Specializations Section */}
-        <div>
-          <h3 style={{ 
-            fontSize: '1.125rem', 
-            fontWeight: '600', 
-            color: '#111827', 
-            marginBottom: '1rem',
-            display: 'flex',
-            alignItems: 'center',
-            gap: '0.5rem'
-          }}>
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+        <div style={sectionStyle}>
+          <h3 style={sectionHeaderStyle}>
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ color: '#3b82f6' }}>
               <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/>
               <polyline points="22 4 12 14.01 9 11.01"/>
             </svg>
@@ -881,17 +867,9 @@ const InstructorCreateForm: React.FC<InstructorCreateFormProps> = ({ onCreated }
         </div>
 
         {/* Languages Section */}
-        <div>
-          <h3 style={{ 
-            fontSize: '1.125rem', 
-            fontWeight: '600', 
-            color: '#111827', 
-            marginBottom: '1rem',
-            display: 'flex',
-            alignItems: 'center',
-            gap: '0.5rem'
-          }}>
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+        <div style={sectionStyle}>
+          <h3 style={sectionHeaderStyle}>
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ color: '#8b5cf6' }}>
               <circle cx="12" cy="12" r="10"/>
               <line x1="2" y1="12" x2="22" y2="12"/>
               <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/>
@@ -947,17 +925,9 @@ const InstructorCreateForm: React.FC<InstructorCreateFormProps> = ({ onCreated }
         </div>
 
         {/* Availability Section */}
-        <div>
-          <h3 style={{ 
-            fontSize: '1.125rem', 
-            fontWeight: '600', 
-            color: '#111827', 
-            marginBottom: '1rem',
-            display: 'flex',
-            alignItems: 'center',
-            gap: '0.5rem'
-          }}>
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+        <div style={sectionStyle}>
+          <h3 style={sectionHeaderStyle}>
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ color: '#f59e0b' }}>
               <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/>
               <line x1="16" y1="2" x2="16" y2="6"/>
               <line x1="8" y1="2" x2="8" y2="6"/>
@@ -966,40 +936,44 @@ const InstructorCreateForm: React.FC<InstructorCreateFormProps> = ({ onCreated }
             Availability
           </h3>
           <div>
-            <label style={{ display: 'block', fontSize: '0.875rem', fontWeight: '500', color: '#374151', marginBottom: '0.5rem' }}>
+            <label style={{ display: 'block', fontSize: '0.875rem', fontWeight: '500', color: '#334155', marginBottom: '0.375rem' }}>
               Teaching Schedule
             </label>
-            <p className="text-xs text-gray-600 mb-2">Add time slots when you're available to teach (e.g., Monday 09:00–17:00)</p>
-            <div className="grid grid-cols-1 md:grid-cols-7 gap-2 mb-2 items-end">
-              <div className="md:col-span-3">
-                <label className="block text-xs font-medium text-gray-600 mb-1">Day</label>
-                <select className="select w-full" value={availSelect} onChange={(e)=>setAvailSelect(e.target.value)}>
-                  <option value="">Select day</option>
-                  {DAYS_OF_WEEK.map(d => (
-                    <option key={d} value={d}>{d}</option>
-                  ))}
-                </select>
+            <p style={{ fontSize: '0.8125rem', color: '#64748b', marginBottom: '1rem', lineHeight: '1.5' }}>
+              Add your available teaching hours. You can add multiple time slots for each day.
+            </p>
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr', gap: '0.75rem', marginBottom: '1rem' }}>
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(140px, 1fr))', gap: '0.75rem' }}>
+                <div>
+                  <label style={{ display: 'block', fontSize: '0.75rem', fontWeight: '500', color: '#64748b', marginBottom: '0.375rem', textTransform: 'uppercase', letterSpacing: '0.025em' }}>Day</label>
+                  <select className="select w-full" value={availSelect} onChange={(e)=>setAvailSelect(e.target.value)}>
+                    <option value="">Choose day</option>
+                    {DAYS_OF_WEEK.map(d => (
+                      <option key={d} value={d}>{d}</option>
+                    ))}
+                  </select>
+                </div>
+                <div>
+                  <label style={{ display: 'block', fontSize: '0.75rem', fontWeight: '500', color: '#64748b', marginBottom: '0.375rem', textTransform: 'uppercase', letterSpacing: '0.025em' }}>Start</label>
+                  <input type="time" className="input w-full" value={availStart} onChange={(e)=>setAvailStart(e.target.value)} />
+                </div>
+                <div>
+                  <label style={{ display: 'block', fontSize: '0.75rem', fontWeight: '500', color: '#64748b', marginBottom: '0.375rem', textTransform: 'uppercase', letterSpacing: '0.025em' }}>End</label>
+                  <input type="time" className="input w-full" value={availEnd} onChange={(e)=>setAvailEnd(e.target.value)} />
+                </div>
               </div>
-              <div className="md:col-span-2">
-                <label className="block text-xs font-medium text-gray-600 mb-1">Start time</label>
-                <input type="time" className="input w-full" value={availStart} onChange={(e)=>setAvailStart(e.target.value)} placeholder="Start" />
+              <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
+                <button type="button" className="btn" onClick={addAvailability} style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', fontSize: '0.875rem' }}>
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <line x1="12" y1="5" x2="12" y2="19"/>
+                    <line x1="5" y1="12" x2="19" y2="12"/>
+                  </svg>
+                  Add Slot
+                </button>
               </div>
-              <div className="md:col-span-2">
-                <label className="block text-xs font-medium text-gray-600 mb-1">End time</label>
-                <input type="time" className="input w-full" value={availEnd} onChange={(e)=>setAvailEnd(e.target.value)} placeholder="End" />
-              </div>
-            </div>
-            <div className="flex items-center justify-end mb-2">
-              <button type="button" className="btn" onClick={addAvailability} style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                  <line x1="12" y1="5" x2="12" y2="19"/>
-                  <line x1="5" y1="12" x2="19" y2="12"/>
-                </svg>
-                Add Time Slot
-              </button>
             </div>
             {availability.length > 0 && (
-              <div className="flex flex-wrap gap-2">
+              <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.5rem', paddingTop: '0.75rem', borderTop: '1px solid #e2e8f0' }}>
                 {availability.map(a => {
                   const key = `${a.day}-${a.start}-${a.end}`;
                   return (
@@ -1007,19 +981,20 @@ const InstructorCreateForm: React.FC<InstructorCreateFormProps> = ({ onCreated }
                       display: 'inline-flex',
                       alignItems: 'center',
                       gap: '0.5rem',
-                      padding: '0.5rem 0.75rem',
+                      padding: '0.5rem 0.875rem',
                       borderRadius: '0.5rem',
                       background: '#fef3c7',
-                      color: '#92400e',
-                      fontSize: '0.875rem',
-                      fontWeight: '500'
+                      color: '#78350f',
+                      fontSize: '0.8125rem',
+                      fontWeight: '500',
+                      fontFamily: "'Inter', sans-serif"
                     }}>
                       <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                         <circle cx="12" cy="12" r="10"/>
                         <polyline points="12 6 12 12 16 14"/>
                       </svg>
-                      {a.day} {a.start}–{a.end}
-                      <button type="button" style={{ color: '#92400e', fontWeight: '700', fontSize: '1.25rem', cursor: 'pointer' }} onClick={()=>removeItem('av', key)}>×</button>
+                      {a.day.slice(0, 3)} {a.start}–{a.end}
+                      <button type="button" style={{ color: '#78350f', fontWeight: '600', fontSize: '1.125rem', cursor: 'pointer', marginLeft: '0.125rem' }} onClick={()=>removeItem('av', key)}>×</button>
                     </span>
                   );
                 })}
@@ -1029,56 +1004,56 @@ const InstructorCreateForm: React.FC<InstructorCreateFormProps> = ({ onCreated }
         </div>
 
         {/* Description Section */}
-        <div>
-          <h3 style={{ 
-            fontSize: '1.125rem', 
-            fontWeight: '600', 
-            color: '#111827', 
-            marginBottom: '1rem',
-            display: 'flex',
-            alignItems: 'center',
-            gap: '0.5rem'
-          }}>
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+        <div style={sectionStyle}>
+          <h3 style={sectionHeaderStyle}>
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ color: '#8b5cf6' }}>
               <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
               <polyline points="14 2 14 8 20 8"/>
               <line x1="16" y1="13" x2="8" y2="13"/>
               <line x1="16" y1="17" x2="8" y2="17"/>
-              <polyline points="10 9 9 9 8 9"/>
             </svg>
             About You
           </h3>
           <div>
-            <label style={{ display: 'block', fontSize: '0.875rem', fontWeight: '500', color: '#374151', marginBottom: '0.5rem' }}>
+            <label style={{ display: 'block', fontSize: '0.875rem', fontWeight: '500', color: '#334155', marginBottom: '0.375rem' }}>
               Profile Description
             </label>
-            <p className="text-xs text-gray-600 mb-2">Tell potential students about your teaching style, experience, and what makes you a great instructor</p>
+            <p style={{ fontSize: '0.8125rem', color: '#64748b', marginBottom: '0.75rem', lineHeight: '1.5' }}>
+              Share your teaching philosophy, experience, and what makes you a great instructor
+            </p>
             <textarea 
               className="input w-full" 
-              rows={5} 
-              placeholder="I'm a patient and experienced driving instructor with over 10 years of teaching. I specialize in helping nervous drivers build confidence and have an excellent first-time pass rate..." 
+              rows={6} 
+              placeholder="Example: I'm a patient and enthusiastic driving instructor with 10+ years of experience. I specialize in helping nervous learners build confidence and have a 95% first-time pass rate. My calm teaching approach and flexible schedule make learning to drive stress-free and enjoyable." 
               value={instForm.description} 
               onChange={onInstChange('description')}
-              style={{ resize: 'vertical', minHeight: '120px' }}
+              style={{ 
+                resize: 'vertical', 
+                minHeight: '140px',
+                fontFamily: "'Inter', sans-serif",
+                fontSize: '0.9375rem',
+                lineHeight: '1.6'
+              }}
             />
           </div>
         </div>
       </div>
+      
+      {/* Form Actions Footer */}
       <div style={{ 
         display: 'flex', 
         alignItems: 'center', 
-        justifyContent: 'space-between', 
+        justifyContent: 'flex-end',
         marginTop: '2rem',
         paddingTop: '1.5rem',
-        borderTop: '1px solid #e5e7eb',
-        flexWrap: 'wrap',
-        gap: '1rem'
+        borderTop: '2px solid #e2e8f0',
+        gap: '0.75rem'
       }}>
         {ownerInst && (
-          <button 
-            className="btn btn-secondary" 
+          <button
+            className="btn btn-secondary"
             onClick={() => setMode('summary')}
-            style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}
+            style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', fontSize: '0.875rem' }}
           >
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
               <polyline points="15 18 9 12 15 6"/>
@@ -1086,17 +1061,18 @@ const InstructorCreateForm: React.FC<InstructorCreateFormProps> = ({ onCreated }
             Cancel
           </button>
         )}
-        <div style={{ flex: 1 }} />
-        <button 
-          className="btn btn-primary" 
-          disabled={instSubmitting} 
+        <button
+          className="btn btn-primary"
+          disabled={instSubmitting}
           onClick={submitInstructor}
-          style={{ 
-            display: 'flex', 
-            alignItems: 'center', 
+          style={{
+            display: 'flex',
+            alignItems: 'center',
             gap: '0.5rem',
             minWidth: '150px',
-            justifyContent: 'center'
+            justifyContent: 'center',
+            fontSize: '0.875rem',
+            fontWeight: '600'
           }}
         >
           {instSubmitting ? (
