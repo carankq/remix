@@ -330,9 +330,29 @@ const InstructorCreateForm: React.FC<InstructorCreateFormProps> = ({ onCreated }
   // Initial loading view to avoid jerky UI
   if (mode === 'loading' || ownerLoading) {
     return (
-      <div style={{width: '100%'}} className="max-w-4xl mx-auto bg-white rounded-2xl shadow p-6">
-        <h2 className="text-xl font-bold text-gray-900 mb-4">Checking your instructor listing…</h2>
-        <p className="text-sm text-gray-600">Please wait a moment.</p>
+      <div style={{
+        background: '#ffffff',
+        borderRadius: '1rem',
+        padding: '2rem',
+        boxShadow: '0 1px 3px rgba(0,0,0,0.1)'
+      }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+          <svg className="animate-spin" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <path d="M21 12a9 9 0 11-6.219-8.56"/>
+          </svg>
+          <div>
+            <h2 style={{ 
+              fontSize: '1.25rem', 
+              fontWeight: '600', 
+              color: '#111827',
+              marginBottom: '0.25rem',
+              fontFamily: "'Space Grotesk', 'Poppins', sans-serif"
+            }}>
+              Loading your instructor profile
+            </h2>
+            <p style={{ fontSize: '0.875rem', color: '#6b7280' }}>Please wait a moment...</p>
+          </div>
+        </div>
       </div>
     );
   }
@@ -340,23 +360,64 @@ const InstructorCreateForm: React.FC<InstructorCreateFormProps> = ({ onCreated }
   // If not fully onboarded, disable listing UI and prompt to complete onboarding
   if (user?.accountType === 'instructor' && onboarded === false) {
     return (
-      <div style={{width: '100%'}} className="max-w-4xl mx-auto bg-white rounded-2xl shadow p-6">
-        <h2 className="text-xl font-bold text-gray-900 mb-4">Instructor listing disabled</h2>
-        <div
-          className="rounded-2xl p-4 mb-4"
-          style={{
-            backgroundColor: '#FFF7ED', // orange-50
-            color: '#9A3412', // orange-800
-            border: '1px solid #FDBA74', // orange-300
-            borderLeft: '6px solid #F97316', // orange-500
-          }}
-        >
-          <p className="font-semibold">Complete your Stripe onboarding to enable your instructor listing.</p>
-          <p className="text-sm mt-1">You won't be discoverable by students until onboarding is finished.</p>
+      <div style={{
+        background: '#ffffff',
+        borderRadius: '1rem',
+        padding: '2rem',
+        boxShadow: '0 1px 3px rgba(0,0,0,0.1)'
+      }}>
+        <h2 style={{ 
+          fontSize: '1.5rem', 
+          fontWeight: '600', 
+          color: '#111827',
+          marginBottom: '1.5rem',
+          fontFamily: "'Space Grotesk', 'Poppins', sans-serif"
+        }}>
+          Complete Stripe Onboarding
+        </h2>
+        <div style={{
+          backgroundColor: '#FFF7ED',
+          color: '#9A3412',
+          border: '1px solid #FDBA74',
+          borderLeft: '6px solid #F97316',
+          borderRadius: '0.75rem',
+          padding: '1.25rem',
+          marginBottom: '1.5rem'
+        }}>
+          <div style={{ display: 'flex', alignItems: 'start', gap: '0.75rem' }}>
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden style={{ flexShrink: 0, marginTop: '0.125rem' }}>
+              <path d="M12 9v4" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+              <path d="M12 17h.01" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+              <path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0Z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+            </svg>
+            <div>
+              <p style={{ fontWeight: '600', marginBottom: '0.25rem' }}>Stripe account setup required</p>
+              <p style={{ fontSize: '0.875rem' }}>Complete your Stripe onboarding to enable your instructor listing and start receiving payments from students.</p>
+            </div>
+          </div>
         </div>
-        <div className="flex items-center gap-3">
-          <button className="btn btn-primary" onClick={() => window.location.href = '/portal'}>Manage Stripe account</button>
-          <button className="btn" disabled title="Complete onboarding to edit your listing">Edit listing</button>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', flexWrap: 'wrap' }}>
+          <button 
+            className="btn btn-primary" 
+            onClick={() => {
+              const tabButtons = document.querySelectorAll('[data-tab]');
+              tabButtons.forEach(btn => {
+                if (btn.getAttribute('data-tab') === 'payments') {
+                  (btn as HTMLButtonElement).click();
+                }
+              });
+            }}
+            style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}
+          >
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <rect x="1" y="4" width="22" height="16" rx="2" ry="2"/>
+              <line x1="1" y1="10" x2="23" y2="10"/>
+            </svg>
+            Go to Payments
+          </button>
+          <button className="btn" disabled title="Complete onboarding to edit your listing">
+            Edit listing
+          </button>
         </div>
       </div>
     );
@@ -367,12 +428,37 @@ const InstructorCreateForm: React.FC<InstructorCreateFormProps> = ({ onCreated }
     const placeholder = 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><rect width="100" height="100" rx="50" fill="%23e5e7eb"/><circle cx="50" cy="38" r="18" fill="%239ca3af"/><path d="M20 86c4-18 18-28 30-28s26 10 30 28" fill="%239ca3af"/></svg>';
     const imgSrc = ownerInst.image && ownerInst.image.trim().length > 0 ? ownerInst.image : placeholder;
     return (
-      <div style={{width: '100%'}} className="max-w-4xl mx-auto bg-white rounded-2xl shadow p-6">
-        <div className="flex items-center justify-between mb-4">
-          <h2 className="text-xl font-bold text-gray-900">Your instructor listing (preview)</h2>
-          <div className="flex items-center gap-3">
-            <button className="btn btn-secondary" onClick={() => refreshOwner()}>Refresh</button>
-            <button className="btn" onClick={() => setMode('edit')}>Edit listing</button>
+      <div style={{
+        background: '#ffffff',
+        borderRadius: '1rem',
+        padding: '2rem',
+        boxShadow: '0 1px 3px rgba(0,0,0,0.1)'
+      }}>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '1.5rem', flexWrap: 'wrap', gap: '1rem' }}>
+          <h2 style={{ 
+            fontSize: '1.5rem', 
+            fontWeight: '600', 
+            color: '#111827',
+            margin: 0,
+            fontFamily: "'Space Grotesk', 'Poppins', sans-serif"
+          }}>
+            Your Instructor Listing
+          </h2>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+            <button 
+              className="btn btn-secondary" 
+              onClick={() => refreshOwner()}
+              style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}
+            >
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <polyline points="23 4 23 10 17 10"/>
+                <path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/>
+              </svg>
+              Refresh
+            </button>
+            <button className="btn" onClick={() => setMode('edit')}>
+              Edit listing
+            </button>
           </div>
         </div>
         <div className="p-3">
@@ -471,21 +557,62 @@ const InstructorCreateForm: React.FC<InstructorCreateFormProps> = ({ onCreated }
 
   // Edit/Create form view
   return (
-    <div style={{width: '100%'}} className="max-w-4xl mx-auto bg-white rounded-2xl shadow p-6">
-      <h2 className="text-xl font-bold text-gray-900 mb-4">{ownerInst ? 'Edit your listing' : 'Create instructor listing'}</h2>
+    <div style={{
+      background: '#ffffff',
+      borderRadius: '1rem',
+      padding: '2rem',
+      boxShadow: '0 1px 3px rgba(0,0,0,0.1)'
+    }}>
+      <h2 style={{ 
+        fontSize: '1.5rem', 
+        fontWeight: '600', 
+        color: '#111827',
+        marginBottom: '1.5rem',
+        fontFamily: "'Space Grotesk', 'Poppins', sans-serif"
+      }}>
+        {ownerInst ? 'Edit Your Listing' : 'Create Instructor Listing'}
+      </h2>
       {ownerError && (
-        <div className="text-sm text-red-700 bg-red-50 border border-red-200 rounded-md px-3 py-2 mb-3">
+        <div style={{
+          fontSize: '0.875rem',
+          color: '#dc2626',
+          background: '#fef2f2',
+          border: '1px solid #fecaca',
+          borderRadius: '0.5rem',
+          padding: '0.75rem 1rem',
+          marginBottom: '1rem'
+        }}>
           {ownerError}
-          <div className="mt-2">
+          <div style={{ marginTop: '0.5rem' }}>
             <button type="button" className="btn btn-secondary" onClick={refreshOwner}>Retry</button>
           </div>
         </div>
       )}
       {instSuccess && (
-        <div className="text-sm text-green-700 bg-green-50 border border-green-200 rounded-md px-3 py-2 mb-3">{instSuccess}</div>
+        <div style={{
+          fontSize: '0.875rem',
+          color: '#059669',
+          background: '#f0fdf4',
+          border: '1px solid #86efac',
+          borderRadius: '0.5rem',
+          padding: '0.75rem 1rem',
+          marginBottom: '1rem'
+        }}>
+          {instSuccess}
+        </div>
       )}
       {instError && (
-        <div className="text-sm text-red-700 bg-red-50 border border-red-200 rounded-md px-3 py-2 mb-3">{instError}</div>
+        <div style={{
+          fontSize: '0.875rem',
+          color: '#dc2626',
+          background: '#fef2f2',
+          border: '1px solid #fecaca',
+          borderRadius: '0.5rem',
+          padding: '0.75rem 1rem',
+          marginBottom: '1rem'
+        }}>
+          {instError}
+        </div>
       )}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <input className="input w-full" placeholder="Name (required)" value={instForm.name} onChange={onInstChange('name')} />
@@ -624,13 +751,68 @@ const InstructorCreateForm: React.FC<InstructorCreateFormProps> = ({ onCreated }
 
         <textarea className="input w-full md:col-span-2" rows={4} placeholder="Description" value={instForm.description} onChange={onInstChange('description')} />
       </div>
-      <div className="flex items-center justify-between mt-4">
+      <div style={{ 
+        display: 'flex', 
+        alignItems: 'center', 
+        justifyContent: 'space-between', 
+        marginTop: '2rem',
+        paddingTop: '1.5rem',
+        borderTop: '1px solid #e5e7eb',
+        flexWrap: 'wrap',
+        gap: '1rem'
+      }}>
         {ownerInst && (
-          <button className="btn btn-secondary" onClick={() => setMode('summary')}>Cancel</button>
+          <button 
+            className="btn btn-secondary" 
+            onClick={() => setMode('summary')}
+            style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}
+          >
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <polyline points="15 18 9 12 15 6"/>
+            </svg>
+            Cancel
+          </button>
         )}
-        <div className="flex-1" />
-        <button className="btn btn-primary" disabled={instSubmitting} onClick={submitInstructor}>
-          {instSubmitting ? 'Saving…' : (ownerInst ? 'Save changes' : 'Create listing')}
+        <div style={{ flex: 1 }} />
+        <button 
+          className="btn btn-primary" 
+          disabled={instSubmitting} 
+          onClick={submitInstructor}
+          style={{ 
+            display: 'flex', 
+            alignItems: 'center', 
+            gap: '0.5rem',
+            minWidth: '150px',
+            justifyContent: 'center'
+          }}
+        >
+          {instSubmitting ? (
+            <>
+              <svg className="animate-spin" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M21 12a9 9 0 11-6.219-8.56"/>
+              </svg>
+              Saving...
+            </>
+          ) : (
+            <>
+              {ownerInst ? (
+                <>
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <polyline points="20 6 9 17 4 12"/>
+                  </svg>
+                  Save Changes
+                </>
+              ) : (
+                <>
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <line x1="12" y1="5" x2="12" y2="19"/>
+                    <line x1="5" y1="12" x2="19" y2="12"/>
+                  </svg>
+                  Create Listing
+                </>
+              )}
+            </>
+          )}
         </button>
       </div>
     </div>

@@ -687,6 +687,7 @@ export default function PortalRoute() {
                 {tabs.map(tab => (
                   <button
                     key={tab.id}
+                    data-tab={tab.id}
                     onClick={() => setActiveTab(tab.id)}
                     style={{
                       flex: '1',
