@@ -761,7 +761,31 @@ const InstructorCreateForm: React.FC<InstructorCreateFormProps> = ({ onCreated }
                       <circle cx="12" cy="10" r="3"/>
                     </svg>
                     {item}
-                    <button type="button" style={{ color: '#1e40af', fontWeight: '600', fontSize: '1.125rem', cursor: 'pointer', marginLeft: '0.125rem' }} onClick={()=>removeItem('pc', item)}>×</button>
+                    <button 
+                      type="button" 
+                      onClick={()=>removeItem('pc', item)}
+                      style={{ 
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        width: '18px',
+                        height: '18px',
+                        borderRadius: '50%',
+                        background: 'transparent',
+                        border: 'none',
+                        cursor: 'pointer',
+                        transition: 'background 0.2s',
+                        marginLeft: '0.25rem',
+                        padding: 0
+                      }}
+                      onMouseEnter={(e) => e.currentTarget.style.background = '#dbeafe'}
+                      onMouseLeave={(e) => e.currentTarget.style.background = 'transparent'}
+                    >
+                      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" style={{ color: '#1e40af' }}>
+                        <line x1="18" y1="6" x2="6" y2="18"/>
+                        <line x1="6" y1="6" x2="18" y2="18"/>
+                      </svg>
+                    </button>
                   </span>
                 ))}
               </div>
@@ -789,16 +813,6 @@ const InstructorCreateForm: React.FC<InstructorCreateFormProps> = ({ onCreated }
                 <option value="Manual">Manual</option>
                 <option value="Automatic">Automatic</option>
                 <option value="Both">Both Manual & Automatic</option>
-              </select>
-            </div>
-            <div>
-              <label style={{ display: 'block', fontSize: '0.875rem', fontWeight: '500', color: '#374151', marginBottom: '0.5rem' }}>
-                Gender Preference
-              </label>
-              <select className="select w-full" value={instForm.gender} onChange={onInstChange('gender')}>
-                <option value="">Not specified</option>
-                <option value="Male">Male</option>
-                <option value="Female">Female</option>
               </select>
             </div>
             <div>
@@ -853,18 +867,20 @@ const InstructorCreateForm: React.FC<InstructorCreateFormProps> = ({ onCreated }
             Specializations
           </h3>
           <div>
-            <label style={{ display: 'block', fontSize: '0.875rem', fontWeight: '500', color: '#374151', marginBottom: '0.5rem' }}>
+            <label style={{ display: 'block', fontSize: '0.875rem', fontWeight: '500', color: '#334155', marginBottom: '0.375rem' }}>
               Teaching Specializations
             </label>
-            <p className="text-xs text-gray-600 mb-2">Select areas where you have expertise</p>
-            <div className="flex items-center gap-2 mb-2">
+            <p style={{ fontSize: '0.8125rem', color: '#64748b', marginBottom: '0.75rem', lineHeight: '1.5' }}>
+              Select areas where you have expertise
+            </p>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '1.25rem' }}>
               <select className="select w-full" value={specSelect} onChange={(e)=>setSpecSelect(e.target.value)}>
                 <option value="">Choose a specialization</option>
                 {PRESET_SPECIALIZATIONS.map(s => (
                   <option key={s} value={s}>{s}</option>
                 ))}
               </select>
-              <button type="button" className="btn" onClick={addSpec} style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+              <button type="button" className="btn" onClick={addSpec} style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', fontSize: '0.875rem' }}>
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                   <line x1="12" y1="5" x2="12" y2="19"/>
                   <line x1="5" y1="12" x2="19" y2="12"/>
@@ -873,24 +889,54 @@ const InstructorCreateForm: React.FC<InstructorCreateFormProps> = ({ onCreated }
               </button>
             </div>
             {specializations.length > 0 && (
-              <div className="flex flex-wrap gap-2">
+              <div style={{ 
+                display: 'flex', 
+                flexWrap: 'wrap', 
+                gap: '0.5rem',
+                paddingTop: '1rem',
+                borderTop: '1px solid #e2e8f0'
+              }}>
                 {specializations.map(item => (
                   <span key={item} style={{
                     display: 'inline-flex',
                     alignItems: 'center',
                     gap: '0.5rem',
-                    padding: '0.5rem 0.75rem',
+                    padding: '0.5rem 0.875rem',
                     borderRadius: '0.5rem',
                     background: '#dbeafe',
                     color: '#1e40af',
-                    fontSize: '0.875rem',
+                    fontSize: '0.8125rem',
                     fontWeight: '500'
                   }}>
                     <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                       <polyline points="20 6 9 17 4 12"/>
                     </svg>
                     {item}
-                    <button type="button" style={{ color: '#1e40af', fontWeight: '700', fontSize: '1.25rem', cursor: 'pointer' }} onClick={()=>removeItem('spec', item)}>×</button>
+                    <button 
+                      type="button" 
+                      onClick={()=>removeItem('spec', item)}
+                      style={{ 
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        width: '18px',
+                        height: '18px',
+                        borderRadius: '50%',
+                        background: 'transparent',
+                        border: 'none',
+                        cursor: 'pointer',
+                        transition: 'background 0.2s',
+                        marginLeft: '0.25rem',
+                        padding: 0
+                      }}
+                      onMouseEnter={(e) => e.currentTarget.style.background = '#bfdbfe'}
+                      onMouseLeave={(e) => e.currentTarget.style.background = 'transparent'}
+                    >
+                      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" style={{ color: '#1e40af' }}>
+                        <line x1="18" y1="6" x2="6" y2="18"/>
+                        <line x1="6" y1="6" x2="18" y2="18"/>
+                      </svg>
+                    </button>
                   </span>
                 ))}
               </div>
@@ -909,18 +955,20 @@ const InstructorCreateForm: React.FC<InstructorCreateFormProps> = ({ onCreated }
             Languages
           </h3>
           <div>
-            <label style={{ display: 'block', fontSize: '0.875rem', fontWeight: '500', color: '#374151', marginBottom: '0.5rem' }}>
+            <label style={{ display: 'block', fontSize: '0.875rem', fontWeight: '500', color: '#334155', marginBottom: '0.375rem' }}>
               Languages Spoken
             </label>
-            <p className="text-xs text-gray-600 mb-2">Add languages you can teach in</p>
-            <div className="flex items-center gap-2 mb-2">
+            <p style={{ fontSize: '0.8125rem', color: '#64748b', marginBottom: '0.75rem', lineHeight: '1.5' }}>
+              Add languages you can teach in
+            </p>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '1.25rem' }}>
               <select className="select w-full" value={langSelect} onChange={(e)=>setLangSelect(e.target.value)}>
                 <option value="">Choose a language</option>
                 {PRESET_LANGUAGES.map(l => (
                   <option key={l} value={l}>{l}</option>
                 ))}
               </select>
-              <button type="button" className="btn" onClick={addLanguage} style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+              <button type="button" className="btn" onClick={addLanguage} style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', fontSize: '0.875rem' }}>
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                   <line x1="12" y1="5" x2="12" y2="19"/>
                   <line x1="5" y1="12" x2="19" y2="12"/>
@@ -929,17 +977,23 @@ const InstructorCreateForm: React.FC<InstructorCreateFormProps> = ({ onCreated }
               </button>
             </div>
             {languages.length > 0 && (
-              <div className="flex flex-wrap gap-2">
+              <div style={{ 
+                display: 'flex', 
+                flexWrap: 'wrap', 
+                gap: '0.5rem',
+                paddingTop: '1rem',
+                borderTop: '1px solid #e2e8f0'
+              }}>
                 {languages.map(item => (
                   <span key={item} style={{
                     display: 'inline-flex',
                     alignItems: 'center',
                     gap: '0.5rem',
-                    padding: '0.5rem 0.75rem',
+                    padding: '0.5rem 0.875rem',
                     borderRadius: '0.5rem',
                     background: '#f3e8ff',
                     color: '#7c3aed',
-                    fontSize: '0.875rem',
+                    fontSize: '0.8125rem',
                     fontWeight: '500'
                   }}>
                     <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -948,7 +1002,31 @@ const InstructorCreateForm: React.FC<InstructorCreateFormProps> = ({ onCreated }
                       <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/>
                     </svg>
                     {item}
-                    <button type="button" style={{ color: '#7c3aed', fontWeight: '700', fontSize: '1.25rem', cursor: 'pointer' }} onClick={()=>removeItem('lang', item)}>×</button>
+                    <button 
+                      type="button" 
+                      onClick={()=>removeItem('lang', item)}
+                      style={{ 
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        width: '18px',
+                        height: '18px',
+                        borderRadius: '50%',
+                        background: 'transparent',
+                        border: 'none',
+                        cursor: 'pointer',
+                        transition: 'background 0.2s',
+                        marginLeft: '0.25rem',
+                        padding: 0
+                      }}
+                      onMouseEnter={(e) => e.currentTarget.style.background = '#e9d5ff'}
+                      onMouseLeave={(e) => e.currentTarget.style.background = 'transparent'}
+                    >
+                      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" style={{ color: '#7c3aed' }}>
+                        <line x1="18" y1="6" x2="6" y2="18"/>
+                        <line x1="6" y1="6" x2="18" y2="18"/>
+                      </svg>
+                    </button>
                   </span>
                 ))}
               </div>
@@ -1026,7 +1104,31 @@ const InstructorCreateForm: React.FC<InstructorCreateFormProps> = ({ onCreated }
                         <polyline points="12 6 12 12 16 14"/>
                       </svg>
                       {a.day.slice(0, 3)} {a.start}–{a.end}
-                      <button type="button" style={{ color: '#78350f', fontWeight: '600', fontSize: '1.125rem', cursor: 'pointer', marginLeft: '0.125rem' }} onClick={()=>removeItem('av', key)}>×</button>
+                      <button 
+                        type="button" 
+                        onClick={()=>removeItem('av', key)}
+                        style={{ 
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          width: '18px',
+                          height: '18px',
+                          borderRadius: '50%',
+                          background: 'transparent',
+                          border: 'none',
+                          cursor: 'pointer',
+                          transition: 'background 0.2s',
+                          marginLeft: '0.25rem',
+                          padding: 0
+                        }}
+                        onMouseEnter={(e) => e.currentTarget.style.background = '#fde68a'}
+                        onMouseLeave={(e) => e.currentTarget.style.background = 'transparent'}
+                      >
+                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" style={{ color: '#78350f' }}>
+                          <line x1="18" y1="6" x2="6" y2="18"/>
+                          <line x1="6" y1="6" x2="18" y2="18"/>
+                        </svg>
+                      </button>
                     </span>
                   );
                 })}
