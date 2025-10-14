@@ -43,9 +43,14 @@ interface InstructorInfo {
   company?: string;
 }
 
-// Server-side loader to fetch ALL portal data
+// Server-side loader to fetch ALL portal data with pagination
 export async function loader({ request }: LoaderFunctionArgs) {
   const userSession = await getUserFromSession(request);
+  
+  // Parse pagination params from URL
+  const url = new URL(request.url);
+  const page = parseInt(url.searchParams.get('page') || '1', 10);
+  const limit = Math.min(parseInt(url.searchParams.get('limit') || '5', 10), 5);
   
   // If no session, use client-side auth (fallback)
   if (!userSession) {
@@ -53,7 +58,8 @@ export async function loader({ request }: LoaderFunctionArgs) {
       serverBookings: [] as BookingItem[],
       serverInstructors: {} as Record<string, InstructorInfo>,
       bookingsError: null as string | null,
-      useClientAuth: true
+      useClientAuth: true,
+      pagination: { page: 1, limit: 5, hasResults: false, hasMore: false }
     });
   }
   
@@ -61,10 +67,10 @@ export async function loader({ request }: LoaderFunctionArgs) {
   const apiHost = (process.env.API_HOST || request.url.split('/')[0] + '//' + request.url.split('/')[2]).replace(/\/$/, '');
   
   try {
-    // Fetch bookings based on account type
+    // Fetch bookings based on account type with pagination
     const bookingsUrl = userSession.accountType === 'instructor'
-      ? `${apiHost}/instructor/${encodeURIComponent(userSession.id)}/bookings`
-      : `${apiHost}/students/${encodeURIComponent(userSession.id)}/bookings`;
+      ? `${apiHost}/instructor/${encodeURIComponent(userSession.id)}/bookings?page=${page}&limit=${limit}`
+      : `${apiHost}/students/${encodeURIComponent(userSession.id)}/bookings?page=${page}&limit=${limit}`;
     
     const bookingsRes = await fetch(bookingsUrl, {
       headers: {
@@ -73,10 +79,22 @@ export async function loader({ request }: LoaderFunctionArgs) {
     });
     
     let bookings: BookingItem[] = [];
+    
     if (bookingsRes.ok) {
       const data = await bookingsRes.json();
-      bookings = Array.isArray(data) ? data : (Array.isArray(data?.bookings) ? data.bookings : []);
+      // Handle both array response and paginated response
+      if (Array.isArray(data)) {
+        bookings = data;
+      } else if (data?.bookings && Array.isArray(data.bookings)) {
+        bookings = data.bookings;
+      } else if (Array.isArray(data?.data)) {
+        bookings = data.data;
+      }
     }
+    
+    // Determine if there are more results
+    const hasResults = bookings.length > 0;
+    const hasMore = bookings.length === limit; // If we got a full page, there might be more
     
     // For students, fetch instructor details
     const instructors: Record<string, InstructorInfo> = {};
@@ -106,7 +124,8 @@ export async function loader({ request }: LoaderFunctionArgs) {
       serverBookings: bookings,
       serverInstructors: instructors,
       bookingsError: null,
-      useClientAuth: false
+      useClientAuth: false,
+      pagination: { page, limit, hasResults, hasMore }
     });
     
   } catch (error) {
@@ -114,7 +133,8 @@ export async function loader({ request }: LoaderFunctionArgs) {
       serverBookings: [] as BookingItem[],
       serverInstructors: {} as Record<string, InstructorInfo>,
       bookingsError: 'Failed to load bookings data',
-      useClientAuth: false
+      useClientAuth: false,
+      pagination: { page: 1, limit: 5, hasResults: false, hasMore: false }
     });
   }
 }
@@ -123,16 +143,122 @@ export default function PortalRoute() {
   const { isAuthenticated, user, logout, token } = useAuth();
   const loaderData = useLoaderData<typeof loader>();
   const navigate = useNavigate();
-  const [activeTab, setActiveTab] = useState<Tab>('overview');
+  
+  // If there's a page param in URL, default to bookings tab
+  const [searchParams] = useState(() => {
+    if (typeof window !== 'undefined') {
+      return new URLSearchParams(window.location.search);
+    }
+    return new URLSearchParams();
+  });
+  const hasPageParam = searchParams.has('page');
+  
+  const [activeTab, setActiveTab] = useState<Tab>(hasPageParam ? 'bookings' : 'overview');
   const [bookings, setBookings] = useState<BookingItem[]>(loaderData.serverBookings || []);
-  const [isLoadingBookings, setIsLoadingBookings] = useState(false);
+  const [isLoadingMore, setIsLoadingMore] = useState(false);
   const [bookingsError, setBookingsError] = useState<string | null>(loaderData.bookingsError);
   const [bookingsLoaded, setBookingsLoaded] = useState(!loaderData.useClientAuth); // Mark as loaded if server provided data
   const [updatingById, setUpdatingById] = useState<Record<string, boolean>>({});
   const [instructorsById, setInstructorsById] = useState<Record<string, InstructorInfo>>(loaderData.serverInstructors || {});
+  const [pagination, setPagination] = useState({
+    page: loaderData.pagination?.page || 1,
+    limit: loaderData.pagination?.limit || 5,
+    hasResults: loaderData.pagination?.hasResults || false,
+    hasMore: loaderData.pagination?.hasMore || false
+  });
   
   // Use ref to track if fetch has been initiated (prevents React strict mode double-fetch)
   const fetchInitiatedRef = useState({ current: false })[0];
+
+  // Load more bookings function
+  const loadMoreBookings = async () => {
+    if (!isAuthenticated || !user?.id || isLoadingMore || !pagination.hasMore) return;
+    
+    setIsLoadingMore(true);
+    setBookingsError(null);
+    
+    try {
+      const nextPage = pagination.page + 1;
+      const response = await fetch(`${window.__ENV__?.API_HOST || 'http://localhost:3001'}/bookings?page=${nextPage}&limit=${pagination.limit}`, {
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Accept': 'application/json',
+          'Accept-Encoding': 'gzip, deflate, br'
+        }
+      });
+      
+      if (!response.ok) {
+        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+      }
+      
+      const data = await response.json();
+      const newBookings = data.bookings || [];
+      
+      // Append new bookings to existing list
+      setBookings(prev => [...prev, ...newBookings]);
+      
+      // Update pagination state
+      setPagination(prev => ({
+        ...prev,
+        page: nextPage,
+        hasMore: newBookings.length === pagination.limit
+      }));
+      
+      // Fetch instructor details for new bookings
+      if (newBookings.length > 0) {
+        const instructorIds = [...new Set(newBookings.map((booking: BookingItem) => booking.instructorId))] as string[];
+        const missingInstructorIds = instructorIds.filter((id: string) => !instructorsById[id]);
+        
+        if (missingInstructorIds.length > 0) {
+          const instructorPromises = missingInstructorIds.map(async (id: string) => {
+            try {
+              const instructorResponse = await fetch(`${window.__ENV__?.API_HOST || 'http://localhost:3001'}/instructors/${id}`, {
+                headers: {
+                  'Authorization': `Bearer ${token}`,
+                  'Accept': 'application/json',
+                  'Accept-Encoding': 'gzip, deflate, br'
+                }
+              });
+              
+              if (instructorResponse.ok) {
+                const instructorData = await instructorResponse.json();
+                return { id, data: instructorData };
+              }
+            } catch (error) {
+              console.error(`Failed to fetch instructor ${id}:`, error);
+            }
+            return null;
+          });
+          
+          const instructorResults = await Promise.all(instructorPromises);
+          const newInstructors = instructorResults
+            .filter(result => result !== null)
+            .reduce((acc, result) => {
+              if (result) acc[result.id] = result.data;
+              return acc;
+            }, {} as Record<string, InstructorInfo>);
+          
+          setInstructorsById(prev => ({ ...prev, ...newInstructors }));
+        }
+      }
+      
+    } catch (error) {
+      console.error('Failed to load more bookings:', error);
+      setBookingsError('Failed to load more bookings');
+    } finally {
+      setIsLoadingMore(false);
+    }
+  };
+  
+  // Sync loader data with state when page changes
+  useEffect(() => {
+    if (!loaderData.useClientAuth) {
+      setBookings(loaderData.serverBookings || []);
+      setInstructorsById(loaderData.serverInstructors || {});
+      setPagination(loaderData.pagination || { page: 1, limit: 5, hasResults: false, hasMore: false });
+      setBookingsError(loaderData.bookingsError);
+    }
+  }, [loaderData]);
   
   // Archive modal
   const [showArchiveModal, setShowArchiveModal] = useState(false);
@@ -173,29 +299,43 @@ export default function PortalRoute() {
     if (!host) return;
     
     const fetchBookings = async () => {
-      setIsLoadingBookings(true);
+      setIsLoadingMore(true);
       setBookingsError(null);
       
       try {
         const url = user?.accountType === 'instructor'
-          ? `${host}/instructor/${encodeURIComponent(user.id)}/bookings`
-          : `${host}/students/${encodeURIComponent(user.id)}/bookings`;
+          ? `${host}/instructor/${encodeURIComponent(user.id)}/bookings?page=${pagination.page}&limit=${pagination.limit}`
+          : `${host}/students/${encodeURIComponent(user.id)}/bookings?page=${pagination.page}&limit=${pagination.limit}`;
         
         const res = await fetch(url);
         let data: any = null;
         try { data = await res.json(); } catch {}
         
-        if (res.ok && Array.isArray(data)) {
-          setBookings(data as BookingItem[]);
-        } else if (res.ok && Array.isArray(data?.bookings)) {
-          setBookings(data.bookings as BookingItem[]);
+        if (res.ok) {
+          let bookingsData: BookingItem[] = [];
+          // Handle both array response and paginated response
+          if (Array.isArray(data)) {
+            bookingsData = data;
+          } else if (data?.bookings && Array.isArray(data.bookings)) {
+            bookingsData = data.bookings;
+          } else if (Array.isArray(data?.data)) {
+            bookingsData = data.data;
+          }
+          
+          setBookings(bookingsData);
+          setPagination({ 
+            page: pagination.page, 
+            limit: pagination.limit, 
+            hasResults: bookingsData.length > 0,
+            hasMore: bookingsData.length === pagination.limit
+          });
         } else {
           setBookingsError(data?.error || 'Could not load your bookings.');
         }
       } catch {
         setBookingsError('Network error while loading your bookings.');
       } finally {
-        setIsLoadingBookings(false);
+        setIsLoadingMore(false);
         setBookingsLoaded(true);
       }
     };
@@ -529,68 +669,34 @@ export default function PortalRoute() {
                       </p>
                     </div>
 
-                    {/* Quick Stats */}
+                    {/* Account Type Card */}
                     <div style={{
-                      display: 'grid',
-                      gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))',
-                      gap: '1.5rem'
+                      padding: '1.5rem',
+                      background: 'linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%)',
+                      borderRadius: '0.75rem',
+                      border: '1px solid #bfdbfe',
+                      maxWidth: '400px'
                     }}>
-                      <div style={{
-                        padding: '1.5rem',
-                        background: 'linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%)',
-                        borderRadius: '0.75rem',
-                        border: '1px solid #bfdbfe'
-                      }}>
-                        <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginBottom: '0.75rem' }}>
-                          <div style={{
-                            width: '48px',
-                            height: '48px',
-                            borderRadius: '0.75rem',
-                            background: '#2563eb',
-                            display: 'flex',
-                            alignItems: 'center',
-                            justifyContent: 'center'
-                          }}>
-                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                              <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
-                              <circle cx="12" cy="7" r="4"/>
-                            </svg>
-                          </div>
-                          <div>
-                            <p style={{ fontSize: '0.875rem', color: '#1e40af', marginBottom: '0.25rem' }}>Account Type</p>
-                            <p style={{ fontSize: '1.5rem', fontWeight: '700', color: '#1e3a8a', textTransform: 'capitalize' }}>
-                              {user.accountType}
-                            </p>
-                          </div>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginBottom: '0.75rem' }}>
+                        <div style={{
+                          width: '48px',
+                          height: '48px',
+                          borderRadius: '0.75rem',
+                          background: '#2563eb',
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center'
+                        }}>
+                          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+                            <circle cx="12" cy="7" r="4"/>
+                          </svg>
                         </div>
-                      </div>
-
-                      <div style={{
-                        padding: '1.5rem',
-                        background: 'linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%)',
-                        borderRadius: '0.75rem',
-                        border: '1px solid #bbf7d0'
-                      }}>
-                        <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginBottom: '0.75rem' }}>
-                          <div style={{
-                            width: '48px',
-                            height: '48px',
-                            borderRadius: '0.75rem',
-                            background: '#16a34a',
-                            display: 'flex',
-                            alignItems: 'center',
-                            justifyContent: 'center'
-                          }}>
-                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                              <path d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
-                            </svg>
-                          </div>
-                          <div>
-                            <p style={{ fontSize: '0.875rem', color: '#15803d', marginBottom: '0.25rem' }}>Active Bookings</p>
-                            <p style={{ fontSize: '1.5rem', fontWeight: '700', color: '#14532d' }}>
-                              {bookings.filter(b => !b.archived ).length}
-                            </p>
-                          </div>
+                        <div>
+                          <p style={{ fontSize: '0.875rem', color: '#1e40af', marginBottom: '0.25rem' }}>Account Type</p>
+                          <p style={{ fontSize: '1.5rem', fontWeight: '700', color: '#1e3a8a', textTransform: 'capitalize' }}>
+                            {user.accountType}
+                          </p>
                         </div>
                       </div>
                     </div>
@@ -655,19 +761,24 @@ export default function PortalRoute() {
                     </div>
                   </div>
                 )}
-
+                
                 {/* Bookings Tab */}
                 {activeTab === 'bookings' && (
                   <div>
-                    <h2 style={{
-                      fontSize: '1.5rem',
-                      fontWeight: '600',
-                      color: '#111827',
-                      marginBottom: '1.5rem',
-                      fontFamily: "'Space Grotesk', 'Poppins', sans-serif"
-                    }}>
-                      {user?.accountType === 'instructor' ? 'Booking Requests' : 'My Bookings'}
-                    </h2>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem' }}>
+                      <h2 style={{
+                        fontSize: '1.5rem',
+                        fontWeight: '600',
+                        color: '#111827',
+                        margin: 0,
+                        fontFamily: "'Space Grotesk', 'Poppins', sans-serif"
+                      }}>
+                        {user?.accountType === 'instructor' ? 'Booking Requests' : 'My Bookings'}
+                      </h2>
+                      <div style={{ fontSize: '0.875rem', color: '#6b7280' }}>
+                        {pagination.hasResults ? `${bookings.length} booking${bookings.length !== 1 ? 's' : ''}` : 'No bookings'}
+                      </div>
+                    </div>
 
                     {bookingsError && (
                       <div style={{
@@ -682,11 +793,11 @@ export default function PortalRoute() {
                       </div>
                     )}
 
-                    {isLoadingBookings && (
+                    {isLoadingMore && (
                       <p style={{ color: '#6b7280' }}>Loading bookings...</p>
                     )}
 
-                    {!isLoadingBookings && bookings.length === 0 && !bookingsError && (
+                    {!isLoadingMore && bookings.length === 0 && !bookingsError && (
                       <div style={{
                         textAlign: 'center',
                         padding: '3rem',
@@ -706,7 +817,7 @@ export default function PortalRoute() {
                       </div>
                     )}
 
-                    {!isLoadingBookings && bookings.length > 0 && (
+                    {!isLoadingMore && bookings.length > 0 && (
                       <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
                         {bookings.map((booking, idx) => {
                           const lessonId = booking._id ? String(booking._id) : (booking.id ? String(booking.id) : null);
@@ -940,6 +1051,60 @@ export default function PortalRoute() {
                             </div>
                           );
                         })}
+                      </div>
+                    )}
+                    
+                    {/* Load More Button */}
+                    {pagination.hasResults && pagination.hasMore && (
+                      <div style={{
+                        display: 'flex',
+                        justifyContent: 'center',
+                        alignItems: 'center',
+                        marginTop: '2rem'
+                      }}>
+                        <button
+                          onClick={loadMoreBookings}
+                          disabled={isLoadingMore}
+                          className="btn"
+                          style={{
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: '0.5rem',
+                            padding: '0.75rem 2rem',
+                            fontSize: '1rem',
+                            opacity: isLoadingMore ? 0.7 : 1,
+                            cursor: isLoadingMore ? 'not-allowed' : 'pointer'
+                          }}
+                        >
+                          {isLoadingMore ? (
+                            <>
+                              <svg className="animate-spin" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                <path d="M21 12a9 9 0 11-6.219-8.56"/>
+                              </svg>
+                              Loading...
+                            </>
+                          ) : (
+                            <>
+                              Load More
+                              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                <polyline points="6 9 12 15 18 9"/>
+                              </svg>
+                            </>
+                          )}
+                        </button>
+                      </div>
+                    )}
+                    
+                    {/* Results Summary */}
+                    {pagination.hasResults && (
+                      <div style={{
+                        textAlign: 'center',
+                        marginTop: '1rem',
+                        fontSize: '0.875rem',
+                        color: '#6b7280'
+                      }}>
+                        Showing {bookings.length} booking{bookings.length !== 1 ? 's' : ''}
+                        {!pagination.hasMore && bookings.length > 0 && ' (all loaded)'}
                       </div>
                     )}
                   </div>

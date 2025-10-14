@@ -401,6 +401,20 @@ select {
   }
 }
 
+/* Spinning animation for load more button */
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.animate-spin {
+  animation: spin 1s linear infinite;
+}
+
 /* Mobile-optimized Homepage & Search Section */
 @media (max-width: 768px) {
   /* Latest Insights Blog Cards - Stack vertically on mobile */
