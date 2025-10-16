@@ -29,6 +29,7 @@ interface BookingItem {
   archivedAt?: string | number | null;
   archivedReason?: string;
   reason?: string;
+  instructorConsensus?: boolean;
 }
 
 function getApiHost(): string {
@@ -161,6 +162,7 @@ export default function PortalRoute() {
   const [bookingsError, setBookingsError] = useState<string | null>(loaderData.bookingsError);
   const [bookingsLoaded, setBookingsLoaded] = useState(!loaderData.useClientAuth); // Mark as loaded if server provided data
   const [updatingById, setUpdatingById] = useState<Record<string, boolean>>({});
+  const [payoutLoadingById, setPayoutLoadingById] = useState<Record<string, boolean>>({});
   const [instructorsById, setInstructorsById] = useState<Record<string, InstructorInfo>>(loaderData.serverInstructors || {});
   const [pagination, setPagination] = useState({
     page: loaderData.pagination?.page || 1,
@@ -505,6 +507,51 @@ export default function PortalRoute() {
     } catch {
     } finally {
       setUpdatingById(prev => ({ ...prev, [lessonId]: false }));
+    }
+  };
+
+  const forceRetryPayout = async (lessonId: string) => {
+    const host = getApiHost();
+    if (!host) return;
+    if (!token) {
+      alert('You must be signed in to retry payout.');
+      return;
+    }
+    
+    if (!confirm('Are you sure you want to retry the payout for this lesson? This should only be done if the initial payout failed.')) {
+      return;
+    }
+    
+    try {
+      setPayoutLoadingById(prev => ({ ...prev, [lessonId]: true }));
+      const res = await fetch(`${host}/lessons/${encodeURIComponent(lessonId)}/retry-payout`, {
+        method: 'POST',
+        headers: { 
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        }
+      });
+      
+      if (res.ok) {
+        alert('Payout processed successfully! The lesson has been archived.');
+        // Refresh bookings to reflect the archived state
+        setBookings(prev => prev.map(b => {
+          const id = String(b._id || b.id || b.bookingId || '');
+          if (id !== lessonId) return b;
+          return { ...b, archived: true, isArchived: true, archivedAt: Date.now() } as BookingItem;
+        }));
+      } else {
+        let msg = 'Failed to process payout. Please try again.';
+        try {
+          const data = await res.json();
+          if (data?.error) msg = data.error;
+        } catch {}
+        alert(msg);
+      }
+    } catch {
+      alert('Network error while processing payout. Please try again.');
+    } finally {
+      setPayoutLoadingById(prev => ({ ...prev, [lessonId]: false }));
     }
   };
 
@@ -1085,6 +1132,41 @@ export default function PortalRoute() {
                                         style={{ fontSize: '0.875rem', padding: '0.5rem 1rem' }}
                                       >
                                         Enter lesson code
+                                      </button>
+                                    )}
+                                    
+                                    {/* Instructor: Force Retry Payout */}
+                                    {user?.accountType === 'instructor' && booking.instructorConsensus && !isArchived && (
+                                      <button
+                                        onClick={() => lessonId && forceRetryPayout(lessonId)}
+                                        disabled={!lessonId || Boolean(payoutLoadingById[lessonId || ''])}
+                                        className="btn"
+                                        style={{ 
+                                          fontSize: '0.875rem', 
+                                          padding: '0.5rem 1rem',
+                                          background: '#fef3c7',
+                                          color: '#92400e',
+                                          border: '1px solid #fde68a',
+                                          display: 'flex',
+                                          alignItems: 'center',
+                                          gap: '0.5rem'
+                                        }}
+                                      >
+                                        {lessonId && payoutLoadingById[lessonId] ? (
+                                          <>
+                                            <svg className="animate-spin" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                              <path d="M21 12a9 9 0 11-6.219-8.56"/>
+                                            </svg>
+                                            Processing...
+                                          </>
+                                        ) : (
+                                          <>
+                                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                              <path d="M12 1v22m5-18H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/>
+                                            </svg>
+                                            Force Payout
+                                          </>
+                                        )}
                                       </button>
                                     )}
                                   </div>
