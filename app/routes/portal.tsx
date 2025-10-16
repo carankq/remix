@@ -542,11 +542,30 @@ export default function PortalRoute() {
         }));
       } else {
         let msg = 'Failed to process payout. Please try again.';
+        let reasonAccountedFor = false;
+        
         try {
           const data = await res.json();
-          if (data?.error) msg = data.error;
+          if (data?.reasonAccountedFor === true) {
+            reasonAccountedFor = true;
+          }
+          if (data?.error) {
+            msg = data.error;
+          }
         } catch {}
-        alert(msg);
+        
+        // If reasonAccountedFor is true, provide reassurance about future payout
+        if (reasonAccountedFor) {
+          alert(
+            `${msg}\n\n` +
+            `✓ Your funds have been accounted for and are safe.\n\n` +
+            `Don't worry - even though the payout didn't process this time, you will receive your payment at a later stage. ` +
+            `This will happen either through another manual retry or via admin intervention. ` +
+            `Your earnings are secure and will be transferred to you.`
+          );
+        } else {
+          alert(msg);
+        }
       }
     } catch {
       alert('Network error while processing payout. Please try again.');
@@ -666,8 +685,30 @@ export default function PortalRoute() {
         setShowCodeModal(false);
       } else {
         let msg = 'Invalid or rejected code.';
-        try { const data = await res.json(); if (data?.error) msg = data.error; } catch {}
-        setCodeSubmitError(msg);
+        let reasonAccountedFor = false;
+        
+        try {
+          const data = await res.json();
+          if (data?.reasonAccountedFor === true) {
+            reasonAccountedFor = true;
+          }
+          if (data?.error) {
+            msg = data.error;
+          }
+        } catch {}
+        
+        // If reasonAccountedFor is true, provide reassurance about future payout
+        if (reasonAccountedFor) {
+          setCodeSubmitError(
+            `${msg}\n\n` +
+            `✓ Your funds have been accounted for and are safe.\n\n` +
+            `Don't worry - even though the payout didn't process this time, you will receive your payment at a later stage. ` +
+            `This will happen either through another manual retry or via admin intervention. ` +
+            `Your earnings are secure and will be transferred to you.`
+          );
+        } else {
+          setCodeSubmitError(msg);
+        }
       }
     } catch {
       setCodeSubmitError('Network error while submitting code.');
@@ -1601,11 +1642,13 @@ export default function PortalRoute() {
               <div style={{
                 marginTop: '1rem',
                 padding: '0.75rem',
-                background: '#fef2f2',
-                border: '1px solid #fecaca',
+                background: codeSubmitError.includes('✓') ? '#fef3c7' : '#fef2f2',
+                border: codeSubmitError.includes('✓') ? '1px solid #fde68a' : '1px solid #fecaca',
                 borderRadius: '0.5rem',
-                color: '#dc2626',
-                fontSize: '0.875rem'
+                color: codeSubmitError.includes('✓') ? '#78350f' : '#dc2626',
+                fontSize: '0.875rem',
+                whiteSpace: 'pre-line',
+                lineHeight: '1.5'
               }}>
                 {codeSubmitError}
               </div>
