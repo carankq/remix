@@ -9,6 +9,7 @@ import { InstructorStripeAccountSection } from '../components/InstructorStripeAc
 import { PaymentMethodSection } from '../components/PaymentMethodSection';
 import InstructorCreateForm from '../components/InstructorCreateForm';
 import { InstructorCard } from '../components/InstructorCard';
+import { MessageContainer, MessageType } from '../components/MessageContainer';
 import { getUserFromSession } from '../session.server';
 
 type Tab = 'overview' | 'bookings' | 'payments' | 'account' | 'instructor';
@@ -164,6 +165,15 @@ export default function PortalRoute() {
   const [updatingById, setUpdatingById] = useState<Record<string, boolean>>({});
   const [payoutLoadingById, setPayoutLoadingById] = useState<Record<string, boolean>>({});
   const [instructorsById, setInstructorsById] = useState<Record<string, InstructorInfo>>(loaderData.serverInstructors || {});
+  
+  // Message container state
+  const [message, setMessage] = useState<{ text: string; type: MessageType } | null>(null);
+  
+  // Helper function to show messages
+  const showMessage = (text: string, type: MessageType) => {
+    setMessage({ text, type });
+  };
+  
   const [pagination, setPagination] = useState({
     page: loaderData.pagination?.page || 1,
     limit: loaderData.pagination?.limit || 5,
@@ -514,7 +524,7 @@ export default function PortalRoute() {
     const host = getApiHost();
     if (!host) return;
     if (!token) {
-      alert('You must be signed in to retry payout.');
+      showMessage('You must be signed in to retry payout.', 'error');
       return;
     }
     
@@ -533,7 +543,7 @@ export default function PortalRoute() {
       });
       
       if (res.ok) {
-        alert('Payout processed successfully! The lesson has been archived.');
+        showMessage('Payout processed successfully! The lesson has been archived.', 'success');
         // Refresh bookings to reflect the archived state
         setBookings(prev => prev.map(b => {
           const id = String(b._id || b.id || b.bookingId || '');
@@ -556,19 +566,20 @@ export default function PortalRoute() {
         
         // If reasonAccountedFor is true, provide reassurance about future payout
         if (reasonAccountedFor) {
-          alert(
+          showMessage(
             `${msg}\n\n` +
             `✓ Your funds have been accounted for and are safe.\n\n` +
             `Don't worry - even though the payout didn't process this time, you will receive your payment at a later stage. ` +
             `This will happen either through another manual retry or via admin intervention. ` +
-            `Your earnings are secure and will be transferred to you.`
+            `Your earnings are secure and will be transferred to you.`,
+            'warning'
           );
         } else {
-          alert(msg);
+          showMessage(msg, 'error');
         }
       }
     } catch {
-      alert('Network error while processing payout. Please try again.');
+      showMessage('Network error while processing payout. Please try again.', 'error');
     } finally {
       setPayoutLoadingById(prev => ({ ...prev, [lessonId]: false }));
     }
@@ -598,10 +609,10 @@ export default function PortalRoute() {
       } else {
         let msg = 'Unable to cancel this lesson. Please try again.';
         try { const data = await res.json(); if (data?.error) msg = data.error; } catch {}
-        alert(msg);
+        showMessage(msg, 'error');
       }
     } catch {
-      alert('Network error while cancelling the lesson.');
+      showMessage('Network error while cancelling the lesson.', 'error');
     } finally {
       setUpdatingById(prev => ({ ...prev, [lessonId]: false }));
     }
@@ -1671,6 +1682,17 @@ export default function PortalRoute() {
             </div>
           </div>
         </div>
+      )}
+      
+      {/* Message Container */}
+      {message && (
+        <MessageContainer
+          message={message.text}
+          type={message.type}
+          onClose={() => setMessage(null)}
+          autoClose={message.type === 'success'}
+          autoCloseDelay={5000}
+        />
       )}
     </div>
   );
