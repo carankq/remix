@@ -374,6 +374,8 @@ export default function PortalRoute() {
     const host = getApiHost();
     if (!host) return;
     
+    let cancelled = false;
+    
     const fetchBookings = async () => {
       setIsLoadingMore(true);
       setBookingsError(null);
@@ -391,8 +393,12 @@ export default function PortalRoute() {
         console.log('Client-side fetch to:', url);
         
         const res = await fetch(url);
+        if (cancelled) return;
+        
         let data: any = null;
         try { data = await res.json(); } catch {}
+        
+        if (cancelled) return;
         
         if (res.ok) {
           let bookingsData: BookingItem[] = [];
@@ -416,13 +422,21 @@ export default function PortalRoute() {
           setBookingsError(data?.error || 'Could not load your bookings.');
         }
       } catch {
-        setBookingsError('Network error while loading your bookings.');
+        if (!cancelled) {
+          setBookingsError('Network error while loading your bookings.');
+        }
       } finally {
-        setIsLoadingMore(false);
+        if (!cancelled) {
+          setIsLoadingMore(false);
+        }
       }
     };
     
     fetchBookings();
+    
+    return () => {
+      cancelled = true;
+    };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [loaderData.useClientAuth, isAuthenticated, user?.id, user?.accountType, searchParams]);
 
