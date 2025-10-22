@@ -1149,27 +1149,64 @@ export default function PortalRoute() {
                     )}
 
                     {!isLoadingMore && displayedBookings.length === 0 && !bookingsError && (
-                      <div style={{
-                        textAlign: 'center',
-                        padding: '3rem',
-                        background: '#f9fafb',
-                        borderRadius: '0.75rem',
-                        border: '1px solid #e5e7eb'
-                      }}>
-                        <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="#d1d5db" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ margin: '0 auto 1rem' }}>
-                          <path d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
-                        </svg>
-                        <h3 style={{ fontSize: '1.25rem', fontWeight: '600', color: '#111827', marginBottom: '0.5rem' }}>
-                          {bookingFilter === 'archived' ? 'No archived lessons' : (bookingFilter === 'active' ? 'No active lessons' : 'No bookings yet')}
-                        </h3>
-                        <p style={{ color: '#6b7280' }}>
-                          {bookingFilter === 'archived'
-                            ? 'You have no archived lessons.'
-                            : bookingFilter === 'active'
-                              ? 'You have no active lessons.'
-                              : (user?.accountType === 'instructor' ? 'You have no booking requests yet.' : 'You have no bookings yet.')}
-                        </p>
-                      </div>
+                      <>
+                        <div style={{
+                          textAlign: 'center',
+                          padding: '3rem',
+                          background: '#f9fafb',
+                          borderRadius: '0.75rem',
+                          border: '1px solid #e5e7eb'
+                        }}>
+                          <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="#d1d5db" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ margin: '0 auto 1rem' }}>
+                            <path d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                          </svg>
+                          <h3 style={{ fontSize: '1.25rem', fontWeight: '600', color: '#111827', marginBottom: '0.5rem' }}>
+                            {pagination.page > 1 
+                              ? 'No more bookings' 
+                              : (bookingFilter === 'archived' ? 'No archived lessons' : (bookingFilter === 'active' ? 'No active lessons' : 'No bookings yet'))}
+                          </h3>
+                          <p style={{ color: '#6b7280' }}>
+                            {pagination.page > 1
+                              ? 'You\'ve reached the end of your bookings list.'
+                              : (bookingFilter === 'archived'
+                                ? 'You have no archived lessons.'
+                                : bookingFilter === 'active'
+                                  ? 'You have no active lessons.'
+                                  : (user?.accountType === 'instructor' ? 'You have no booking requests yet.' : 'You have no bookings yet.'))}
+                          </p>
+                        </div>
+                        
+                        {/* Show pagination controls if we're beyond page 1 */}
+                        {pagination.page > 1 && (
+                          <div style={{
+                            display: 'flex',
+                            justifyContent: 'space-between',
+                            alignItems: 'center',
+                            marginTop: '2rem',
+                            gap: '1rem'
+                          }}>
+                            <button
+                              onClick={() => goToPage(Math.max(1, pagination.page - 1))}
+                              disabled={pagination.page <= 1}
+                              className="btn btn-secondary"
+                              style={{ minWidth: '120px' }}
+                            >
+                              Prev
+                            </button>
+                            <div style={{ fontSize: '0.875rem', color: '#6b7280' }}>
+                              Page {pagination.page}
+                            </div>
+                            <button
+                              onClick={() => goToPage(pagination.page + 1)}
+                              disabled={true}
+                              className="btn"
+                              style={{ minWidth: '120px' }}
+                            >
+                              Next
+                            </button>
+                          </div>
+                        )}
+                      </>
                     )}
 
                     {!isLoadingMore && displayedBookings.length > 0 && (
