@@ -20,6 +20,8 @@ interface BookingItem {
   _id?: string;
   instructorId: string;
   studentId?: string;
+  instructorName?: string;
+  studentName?: string;
   start: number;
   end: number;
   notes?: string;
@@ -1024,6 +1026,17 @@ export default function PortalRoute() {
                                     Lesson Details
                                   </h4>
                                   <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem', fontSize: '0.95rem', color: '#6b7280' }}>
+                                    {/* Show the other party's name */}
+                                    {user?.accountType === 'instructor' && booking.studentName && (
+                                      <div>
+                                        <strong style={{ color: '#374151' }}>Student:</strong> {booking.studentName}
+                                      </div>
+                                    )}
+                                    {user?.accountType !== 'instructor' && booking.instructorName && (
+                                      <div>
+                                        <strong style={{ color: '#374151' }}>Instructor:</strong> {booking.instructorName}
+                                      </div>
+                                    )}
                                     <div>
                                       <strong style={{ color: '#374151' }}>Start:</strong> {formatDateTime(booking.start)}
                                     </div>
@@ -1094,43 +1107,51 @@ export default function PortalRoute() {
 
                                   {/* Actions */}
                                   <div style={{ display: 'flex', gap: '0.75rem', marginTop: '1rem', flexWrap: 'wrap' }}>
-                                    <button
-                                      onClick={() => lessonId && updateAgreement(lessonId, true)}
-                                      disabled={disableActions || youAgreed}
-                                      className="btn btn-primary"
-                                      style={{ fontSize: '0.875rem', padding: '0.5rem 1rem' }}
-                                    >
-                                      {updating ? 'Saving...' : 'I agree'}
-                                    </button>
-                                    <button
-                                      onClick={() => lessonId && updateAgreement(lessonId, false)}
-                                      disabled={disableActions || !youAgreed}
-                                      className="btn btn-secondary"
-                                      style={{ fontSize: '0.875rem', padding: '0.5rem 1rem' }}
-                                    >
-                                      {updating ? 'Saving...' : 'I disagree'}
-                                    </button>
-                                    <button
-                                      onClick={() => {
-                                        if (lessonId) {
-                                          setArchiveLessonId(lessonId);
-                                          setArchiveReason('');
-                                          setArchiveError(null);
-                                          setShowArchiveModal(true);
-                                        }
-                                      }}
-                                      disabled={!lessonId || updating || isArchived}
-                                      className="btn"
-                                      style={{ 
-                                        fontSize: '0.875rem', 
-                                        padding: '0.5rem 1rem',
-                                        background: '#fef2f2',
-                                        color: '#dc2626',
-                                        border: '1px solid #fecaca'
-                                      }}
-                                    >
-                                      {updating ? 'Cancelling...' : 'Cancel lesson'}
-                                    </button>
+                                    {/* Hide agree/disagree buttons after instructor consensus */}
+                                    {!booking.instructorConsensus && (
+                                      <>
+                                        <button
+                                          onClick={() => lessonId && updateAgreement(lessonId, true)}
+                                          disabled={disableActions || youAgreed}
+                                          className="btn btn-primary"
+                                          style={{ fontSize: '0.875rem', padding: '0.5rem 1rem' }}
+                                        >
+                                          {updating ? 'Saving...' : 'I agree'}
+                                        </button>
+                                        <button
+                                          onClick={() => lessonId && updateAgreement(lessonId, false)}
+                                          disabled={disableActions || !youAgreed}
+                                          className="btn btn-secondary"
+                                          style={{ fontSize: '0.875rem', padding: '0.5rem 1rem' }}
+                                        >
+                                          {updating ? 'Saving...' : 'I disagree'}
+                                        </button>
+                                      </>
+                                    )}
+                                    {/* Only show cancel button if instructorConsensus is not true */}
+                                    {!booking.instructorConsensus && (
+                                      <button
+                                        onClick={() => {
+                                          if (lessonId) {
+                                            setArchiveLessonId(lessonId);
+                                            setArchiveReason('');
+                                            setArchiveError(null);
+                                            setShowArchiveModal(true);
+                                          }
+                                        }}
+                                        disabled={!lessonId || updating || isArchived}
+                                        className="btn"
+                                        style={{ 
+                                          fontSize: '0.875rem', 
+                                          padding: '0.5rem 1rem',
+                                          background: '#fef2f2',
+                                          color: '#dc2626',
+                                          border: '1px solid #fecaca'
+                                        }}
+                                      >
+                                        {updating ? 'Cancelling...' : 'Cancel lesson'}
+                                      </button>
+                                    )}
                                     
                                     {/* Student: Get code */}
                                     {user?.accountType !== 'instructor' && (
