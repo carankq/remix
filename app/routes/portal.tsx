@@ -13,6 +13,7 @@ import { MessageContainer, MessageType } from '../components/MessageContainer';
 import { getUserFromSession } from '../session.server';
 
 type Tab = 'overview' | 'bookings' | 'payments' | 'account' | 'instructor';
+type BookingFilter = 'all' | 'active' | 'archived';
 
 interface BookingItem {
   id?: string;
@@ -167,6 +168,7 @@ export default function PortalRoute() {
   const [updatingById, setUpdatingById] = useState<Record<string, boolean>>({});
   const [payoutLoadingById, setPayoutLoadingById] = useState<Record<string, boolean>>({});
   const [instructorsById, setInstructorsById] = useState<Record<string, InstructorInfo>>(loaderData.serverInstructors || {});
+  const [bookingFilter, setBookingFilter] = useState<BookingFilter>('all');
   
   // Message container state
   const [message, setMessage] = useState<{ text: string; type: MessageType } | null>(null);
@@ -489,6 +491,14 @@ export default function PortalRoute() {
     if (seconds < 604800) return `${Math.floor(seconds / 86400)}d ago`;
     return `${Math.floor(seconds / 604800)}w ago`;
   };
+
+  const isLessonArchived = (b: BookingItem) => Boolean(b.archived || b.isArchived || b.archivedAt);
+  const displayedBookings = bookings.filter(b => {
+    const archived = isLessonArchived(b);
+    if (bookingFilter === 'archived') return archived;
+    if (bookingFilter === 'active') return !archived;
+    return true;
+  });
 
   const updateAgreement = async (lessonId: string, agree: boolean) => {
     const host = getApiHost();
@@ -957,8 +967,62 @@ export default function PortalRoute() {
                       }}>
                         {user?.accountType === 'instructor' ? 'Booking Requests' : 'My Bookings'}
                       </h2>
-                      <div style={{ fontSize: '0.875rem', color: '#6b7280' }}>
-                        {pagination.hasResults ? `${bookings.length} booking${bookings.length !== 1 ? 's' : ''}` : 'No bookings'}
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+                        <div style={{ fontSize: '0.875rem', color: '#6b7280' }}>
+                          {pagination.hasResults ? `${displayedBookings.length} booking${displayedBookings.length !== 1 ? 's' : ''}` : 'No bookings'}
+                        </div>
+                        <div style={{ display: 'inline-flex', background: '#f9fafb', border: '1px solid #e5e7eb', borderRadius: '0.5rem', overflow: 'hidden' }}>
+                          <button
+                            type="button"
+                            aria-pressed={bookingFilter === 'all'}
+                            onClick={() => setBookingFilter('all')}
+                            style={{
+                              padding: '0.5rem 0.75rem',
+                              fontSize: '0.875rem',
+                              background: bookingFilter === 'all' ? 'white' : 'transparent',
+                              color: bookingFilter === 'all' ? '#2563eb' : '#6b7280',
+                              fontWeight: bookingFilter === 'all' ? '600' : '500',
+                              border: 'none',
+                              borderRight: '1px solid #e5e7eb',
+                              cursor: 'pointer'
+                            }}
+                          >
+                            All
+                          </button>
+                          <button
+                            type="button"
+                            aria-pressed={bookingFilter === 'active'}
+                            onClick={() => setBookingFilter('active')}
+                            style={{
+                              padding: '0.5rem 0.75rem',
+                              fontSize: '0.875rem',
+                              background: bookingFilter === 'active' ? 'white' : 'transparent',
+                              color: bookingFilter === 'active' ? '#2563eb' : '#6b7280',
+                              fontWeight: bookingFilter === 'active' ? '600' : '500',
+                              border: 'none',
+                              borderRight: '1px solid #e5e7eb',
+                              cursor: 'pointer'
+                            }}
+                          >
+                            Active
+                          </button>
+                          <button
+                            type="button"
+                            aria-pressed={bookingFilter === 'archived'}
+                            onClick={() => setBookingFilter('archived')}
+                            style={{
+                              padding: '0.5rem 0.75rem',
+                              fontSize: '0.875rem',
+                              background: bookingFilter === 'archived' ? 'white' : 'transparent',
+                              color: bookingFilter === 'archived' ? '#2563eb' : '#6b7280',
+                              fontWeight: bookingFilter === 'archived' ? '600' : '500',
+                              border: 'none',
+                              cursor: 'pointer'
+                            }}
+                          >
+                            Archived
+                          </button>
+                        </div>
                       </div>
                     </div>
 
@@ -979,7 +1043,7 @@ export default function PortalRoute() {
                       <p style={{ color: '#6b7280' }}>Loading bookings...</p>
                     )}
 
-                    {!isLoadingMore && bookings.length === 0 && !bookingsError && (
+                    {!isLoadingMore && displayedBookings.length === 0 && !bookingsError && (
                       <div style={{
                         textAlign: 'center',
                         padding: '3rem',
@@ -991,22 +1055,26 @@ export default function PortalRoute() {
                           <path d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
                         </svg>
                         <h3 style={{ fontSize: '1.25rem', fontWeight: '600', color: '#111827', marginBottom: '0.5rem' }}>
-                          No bookings yet
+                          {bookingFilter === 'archived' ? 'No archived lessons' : (bookingFilter === 'active' ? 'No active lessons' : 'No bookings yet')}
                         </h3>
                         <p style={{ color: '#6b7280' }}>
-                          {user?.accountType === 'instructor' ? 'You have no booking requests yet.' : 'You have no bookings yet.'}
+                          {bookingFilter === 'archived'
+                            ? 'You have no archived lessons.'
+                            : bookingFilter === 'active'
+                              ? 'You have no active lessons.'
+                              : (user?.accountType === 'instructor' ? 'You have no booking requests yet.' : 'You have no bookings yet.')}
                         </p>
                       </div>
                     )}
 
-                    {!isLoadingMore && bookings.length > 0 && (
+                    {!isLoadingMore && displayedBookings.length > 0 && (
                       <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-                        {bookings.map((booking, idx) => {
+                        {displayedBookings.map((booking, idx) => {
                           const lessonId = booking._id ? String(booking._id) : (booking.id ? String(booking.id) : null);
                           const bothAgreed = Boolean(booking.agreedByInstructorAt) && Boolean(booking.agreedByStudentAt);
                           const youAgreed = user?.accountType === 'instructor' ? Boolean(booking.agreedByInstructorAt) : Boolean(booking.agreedByStudentAt);
                           const updating = lessonId ? Boolean(updatingById[lessonId]) : false;
-                          const isArchived = Boolean(booking.archived || booking.isArchived || booking.archivedAt);
+                          const isArchived = isLessonArchived(booking);
                           const disableActions = isArchived || bothAgreed || !lessonId || updating;
                           
                           return (
@@ -1339,8 +1407,8 @@ export default function PortalRoute() {
                         fontSize: '0.875rem',
                         color: '#6b7280'
                       }}>
-                        Showing {bookings.length} booking{bookings.length !== 1 ? 's' : ''}
-                        {!pagination.hasMore && bookings.length > 0 && ' (all loaded)'}
+                        Showing {displayedBookings.length} booking{displayedBookings.length !== 1 ? 's' : ''}
+                        {!pagination.hasMore && displayedBookings.length > 0 && ' (all loaded)'}
                       </div>
                     )}
                   </div>
