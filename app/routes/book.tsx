@@ -69,6 +69,7 @@ export default function BookingPage() {
   const [time, setTime] = useState('');
   const [notes, setNotes] = useState('');
   const [duration, setDuration] = useState<number>(60);
+  const [automaticStudentAgree, setAutomaticStudentAgree] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState<string | null>(null);
   const [confirmed, setConfirmed] = useState<{ bookingId?: string } | null>(null);
@@ -96,7 +97,14 @@ export default function BookingPage() {
     const iso = `${date}T${time}:00`;
     const start = new Date(iso).getTime();
     const end = start + duration * 60 * 1000;
-    const payload = { instructorId, studentId: user?.id || '', start, end, notes };
+    const payload = { 
+      instructorId, 
+      studentId: user?.id || '', 
+      start, 
+      end, 
+      notes,
+      automaticStudentAgree
+    };
     
     setSubmitError(null);
     setIsSubmitting(true);
@@ -467,6 +475,59 @@ export default function BookingPage() {
                     onChange={(e) => setNotes(e.target.value)}
                     style={{ resize: 'vertical' }}
                   />
+                </div>
+
+                {/* Auto-agree checkbox */}
+                <div style={{ marginBottom: '2rem' }}>
+                  <label style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '0.75rem',
+                    cursor: 'pointer',
+                    padding: '1rem',
+                    background: '#f9fafb',
+                    border: '1px solid #e5e7eb',
+                    borderRadius: '0.75rem',
+                    transition: 'all 0.2s ease'
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.background = '#f3f4f6';
+                    e.currentTarget.style.borderColor = '#d1d5db';
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.background = '#f9fafb';
+                    e.currentTarget.style.borderColor = '#e5e7eb';
+                  }}>
+                    <input
+                      type="checkbox"
+                      checked={automaticStudentAgree}
+                      onChange={(e) => setAutomaticStudentAgree(e.target.checked)}
+                      style={{
+                        width: '18px',
+                        height: '18px',
+                        cursor: 'pointer',
+                        accentColor: '#2563eb'
+                      }}
+                    />
+                    <div style={{ flex: 1 }}>
+                      <span style={{
+                        fontSize: '0.875rem',
+                        fontWeight: '600',
+                        color: '#111827',
+                        display: 'block',
+                        marginBottom: '0.25rem'
+                      }}>
+                        I agree to this booking
+                      </span>
+                      <span style={{
+                        fontSize: '0.8125rem',
+                        color: '#6b7280',
+                        lineHeight: '1.4'
+                      }}>
+                        Check this to automatically confirm your agreement. If unchecked, you can review and agree to the booking later in your portal.
+                      </span>
+                    </div>
+                  </label>
                 </div>
 
                 {/* Payment Method Section */}
