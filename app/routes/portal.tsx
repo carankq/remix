@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { useNavigate, useLoaderData } from '@remix-run/react';
+import { useNavigate, useLoaderData, useSearchParams } from '@remix-run/react';
 import type { LoaderFunctionArgs } from '@remix-run/node';
 import { json, redirect } from '@remix-run/node';
 import { Header } from '../components/Header';
@@ -54,10 +54,11 @@ interface InstructorInfo {
 export async function loader({ request }: LoaderFunctionArgs) {
   const userSession = await getUserFromSession(request);
   
-  // Parse pagination params from URL
+  // Parse pagination and filter params from URL
   const url = new URL(request.url);
   const page = parseInt(url.searchParams.get('page') || '1', 10);
   const limit = Math.min(parseInt(url.searchParams.get('limit') || '5', 10), 5);
+  const filter = url.searchParams.get('filter') || 'active';
   
   // If no session, use client-side auth (fallback)
   if (!userSession) {
@@ -74,11 +75,13 @@ export async function loader({ request }: LoaderFunctionArgs) {
   const apiHost = (process.env.API_HOST || request.url.split('/')[0] + '//' + request.url.split('/')[2]).replace(/\/$/, '');
   
   try {
-    // Fetch bookings based on account type with pagination
+    // Fetch bookings based on account type with pagination and filter
     const bookingsUrl = userSession.accountType === 'instructor'
-      ? `${apiHost}/instructor/${encodeURIComponent(userSession.id)}/bookings?page=${page}&limit=${limit}`
-      : `${apiHost}/students/${encodeURIComponent(userSession.id)}/bookings?page=${page}&limit=${limit}`;
+      ? `${apiHost}/instructor/${encodeURIComponent(userSession.id)}/bookings?page=${page}&limit=${limit}&filter=${encodeURIComponent(filter)}`
+      : `${apiHost}/students/${encodeURIComponent(userSession.id)}/bookings?page=${page}&limit=${limit}&filter=${encodeURIComponent(filter)}`;
     
+    console.log('making request to:', bookingsUrl);
+
     const bookingsRes = await fetch(bookingsUrl, {
       headers: {
         'Accept-Encoding': 'gzip, deflate, br'
@@ -151,16 +154,13 @@ export default function PortalRoute() {
   const loaderData = useLoaderData<typeof loader>();
   const navigate = useNavigate();
   
-  // If there's a page param in URL, default to bookings tab
-  const [searchParams] = useState(() => {
-    if (typeof window !== 'undefined') {
-      return new URLSearchParams(window.location.search);
-    }
-    return new URLSearchParams();
-  });
+  // URL params for server-driven pagination & filtering
+  const [searchParams, setSearchParams] = useSearchParams();
   const hasPageParam = searchParams.has('page');
+  const hasFilterParam = searchParams.has('filter');
+  const tabParam = (searchParams.get('tab') || '').toLowerCase();
   
-  const [activeTab, setActiveTab] = useState<Tab>(hasPageParam ? 'bookings' : 'overview');
+  const [activeTab, setActiveTab] = useState<Tab>('bookings');
   const [bookings, setBookings] = useState<BookingItem[]>(loaderData.serverBookings || []);
   const [isLoadingMore, setIsLoadingMore] = useState(false);
   const [bookingsError, setBookingsError] = useState<string | null>(loaderData.bookingsError);
@@ -168,7 +168,56 @@ export default function PortalRoute() {
   const [updatingById, setUpdatingById] = useState<Record<string, boolean>>({});
   const [payoutLoadingById, setPayoutLoadingById] = useState<Record<string, boolean>>({});
   const [instructorsById, setInstructorsById] = useState<Record<string, InstructorInfo>>(loaderData.serverInstructors || {});
-  const [bookingFilter, setBookingFilter] = useState<BookingFilter>('all');
+  const [bookingFilter, setBookingFilter] = useState<BookingFilter>('active');
+
+  // Sync filter with URL param
+  useEffect(() => {
+    const f = (searchParams.get('filter') || '').toLowerCase();
+    if (f === 'all' || f === 'active' || f === 'archived') {
+      setBookingFilter(f as BookingFilter);
+    } else {
+      // default to active if no/unknown param
+      setBookingFilter('active');
+    }
+  }, [searchParams]);
+
+  // Sync active tab with URL param; default to bookings
+  useEffect(() => {
+    const t = (searchParams.get('tab') || '').toLowerCase();
+    const allowed: Tab[] = ['overview', 'bookings', 'payments', 'account', 'instructor'];
+    if (allowed.includes(t as Tab)) {
+      setActiveTab(t as Tab);
+    } else {
+      setActiveTab('bookings');
+    }
+  }, [searchParams]);
+
+  // Initialize URL params if missing (on first load) - fill in individual missing params
+  useEffect(() => {
+    const params = new URLSearchParams(searchParams);
+    let needsUpdate = false;
+    
+    if (!params.has('tab')) {
+      params.set('tab', 'bookings');
+      needsUpdate = true;
+    }
+    if (!params.has('page')) {
+      params.set('page', '1');
+      needsUpdate = true;
+    }
+    if (!params.has('limit')) {
+      params.set('limit', '5');
+      needsUpdate = true;
+    }
+    if (!params.has('filter')) {
+      params.set('filter', 'active');
+      needsUpdate = true;
+    }
+    
+    if (needsUpdate) {
+      setSearchParams(params, { replace: true });
+    }
+  }, []);
   
   // Message container state
   const [message, setMessage] = useState<{ text: string; type: MessageType } | null>(null);
@@ -277,6 +326,11 @@ export default function PortalRoute() {
   
   // Sync loader data with state when page changes
   useEffect(() => {
+    console.log('Loader data updated:', {
+      useClientAuth: loaderData.useClientAuth,
+      bookingsCount: loaderData.serverBookings?.length,
+      pagination: loaderData.pagination
+    });
     if (!loaderData.useClientAuth) {
       setBookings(loaderData.serverBookings || []);
       setInstructorsById(loaderData.serverInstructors || {});
@@ -313,12 +367,9 @@ export default function PortalRoute() {
 
   // Load bookings from client ONLY if server didn't provide data (useClientAuth fallback)
   useEffect(() => {
-    // Skip if server already loaded data OR if we've already initiated a fetch
-    if (!loaderData.useClientAuth || fetchInitiatedRef.current) return;
-    if (!isAuthenticated || !user?.id || bookingsLoaded) return;
-    
-    // Mark as initiated to prevent duplicate fetches
-    fetchInitiatedRef.current = true;
+    // Skip if server already loaded data
+    if (!loaderData.useClientAuth) return;
+    if (!isAuthenticated || !user?.id) return;
     
     const host = getApiHost();
     if (!host) return;
@@ -328,9 +379,16 @@ export default function PortalRoute() {
       setBookingsError(null);
       
       try {
+        // Read params from URL instead of state
+        const page = searchParams.get('page') || '1';
+        const limit = searchParams.get('limit') || '5';
+        const filter = searchParams.get('filter') || 'active';
+        
         const url = user?.accountType === 'instructor'
-          ? `${host}/instructor/${encodeURIComponent(user.id)}/bookings?page=${pagination.page}&limit=${pagination.limit}`
-          : `${host}/students/${encodeURIComponent(user.id)}/bookings?page=${pagination.page}&limit=${pagination.limit}`;
+          ? `${host}/instructor/${encodeURIComponent(user.id)}/bookings?page=${page}&limit=${limit}&filter=${encodeURIComponent(filter)}`
+          : `${host}/students/${encodeURIComponent(user.id)}/bookings?page=${page}&limit=${limit}&filter=${encodeURIComponent(filter)}`;
+        
+        console.log('Client-side fetch to:', url);
         
         const res = await fetch(url);
         let data: any = null;
@@ -349,10 +407,10 @@ export default function PortalRoute() {
           
           setBookings(bookingsData);
           setPagination({ 
-            page: pagination.page, 
-            limit: pagination.limit, 
+            page: parseInt(page, 10), 
+            limit: parseInt(limit, 10), 
             hasResults: bookingsData.length > 0,
-            hasMore: bookingsData.length === pagination.limit
+            hasMore: bookingsData.length === parseInt(limit, 10)
           });
         } else {
           setBookingsError(data?.error || 'Could not load your bookings.');
@@ -361,13 +419,12 @@ export default function PortalRoute() {
         setBookingsError('Network error while loading your bookings.');
       } finally {
         setIsLoadingMore(false);
-        setBookingsLoaded(true);
       }
     };
     
     fetchBookings();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [loaderData.useClientAuth, isAuthenticated, user?.id, user?.accountType]);
+  }, [loaderData.useClientAuth, isAuthenticated, user?.id, user?.accountType, searchParams]);
 
   // Load instructor details ONLY if using client auth (server already loaded them)
   useEffect(() => {
@@ -492,13 +549,47 @@ export default function PortalRoute() {
     return `${Math.floor(seconds / 604800)}w ago`;
   };
 
+  // Helper to check if a lesson is archived (for UI display)
   const isLessonArchived = (b: BookingItem) => Boolean(b.archived || b.isArchived || b.archivedAt);
-  const displayedBookings = bookings.filter(b => {
-    const archived = isLessonArchived(b);
-    if (bookingFilter === 'archived') return archived;
-    if (bookingFilter === 'active') return !archived;
-    return true;
+  
+  // No client-side filtering needed - the API returns filtered results based on the filter param
+  const displayedBookings = bookings;
+  
+  console.log('Displaying bookings:', {
+    count: displayedBookings.length,
+    currentPage: pagination.page,
+    filter: bookingFilter,
+    ids: displayedBookings.map(b => b._id || b.id).slice(0, 3)
   });
+
+  const goToPage = (nextPage: number) => {
+    const params = new URLSearchParams(searchParams);
+    params.set('page', String(Math.max(1, nextPage)));
+    params.set('limit', String(pagination.limit));
+    params.set('filter', bookingFilter);
+    params.set('tab', 'bookings');
+    setSearchParams(params);
+  };
+
+  const applyFilter = (filter: BookingFilter) => {
+    const params = new URLSearchParams(searchParams);
+    params.set('filter', filter);
+    params.set('page', '1');
+    params.set('limit', String(pagination.limit));
+    params.set('tab', 'bookings');
+    setSearchParams(params);
+  };
+
+  const selectTab = (tab: Tab) => {
+    const params = new URLSearchParams(searchParams);
+    params.set('tab', tab);
+    if (tab === 'bookings') {
+      if (!params.has('page')) params.set('page', String(pagination.page));
+      if (!params.has('limit')) params.set('limit', String(pagination.limit));
+      if (!params.has('filter')) params.set('filter', bookingFilter);
+    }
+    setSearchParams(params);
+  };
 
   const updateAgreement = async (lessonId: string, agree: boolean) => {
     const host = getApiHost();
@@ -800,7 +891,7 @@ export default function PortalRoute() {
                   <button
                     key={tab.id}
                     data-tab={tab.id}
-                    onClick={() => setActiveTab(tab.id)}
+                    onClick={() => selectTab(tab.id)}
                     style={{
                       flex: '1',
                       minWidth: 'max-content',
@@ -905,7 +996,7 @@ export default function PortalRoute() {
                       </h3>
                       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '1rem' }}>
                         <button
-                          onClick={() => setActiveTab('bookings')}
+                          onClick={() => selectTab('bookings')}
                           className="btn btn-primary"
                           style={{
                             display: 'flex',
@@ -920,7 +1011,7 @@ export default function PortalRoute() {
                           View Bookings
                         </button>
                         <button
-                          onClick={() => setActiveTab('payments')}
+                          onClick={() => selectTab('payments')}
                           className="btn btn-secondary"
                           style={{
                             display: 'flex',
@@ -935,7 +1026,7 @@ export default function PortalRoute() {
                           {user.accountType === 'instructor' ? 'Stripe Account' : 'Payment Methods'}
                         </button>
                         <button
-                          onClick={() => setActiveTab('account')}
+                          onClick={() => selectTab('account')}
                           className="btn btn-secondary"
                           style={{
                             display: 'flex',
@@ -975,7 +1066,7 @@ export default function PortalRoute() {
                           <button
                             type="button"
                             aria-pressed={bookingFilter === 'all'}
-                            onClick={() => setBookingFilter('all')}
+                            onClick={() => applyFilter('all')}
                             style={{
                               padding: '0.5rem 0.75rem',
                               fontSize: '0.875rem',
@@ -992,7 +1083,7 @@ export default function PortalRoute() {
                           <button
                             type="button"
                             aria-pressed={bookingFilter === 'active'}
-                            onClick={() => setBookingFilter('active')}
+                            onClick={() => applyFilter('active')}
                             style={{
                               padding: '0.5rem 0.75rem',
                               fontSize: '0.875rem',
@@ -1009,7 +1100,7 @@ export default function PortalRoute() {
                           <button
                             type="button"
                             aria-pressed={bookingFilter === 'archived'}
-                            onClick={() => setBookingFilter('archived')}
+                            onClick={() => applyFilter('archived')}
                             style={{
                               padding: '0.5rem 0.75rem',
                               fontSize: '0.875rem',
@@ -1225,7 +1316,7 @@ export default function PortalRoute() {
                                     {user?.accountType !== 'instructor' && (
                                       <>
                                         <button
-                                          onClick={() => lessonId && getLessonCode(lessonId)}
+                                        onClick={() => lessonId && getLessonCode(lessonId)}
                                           disabled={!lessonId || Boolean(codeLoadingById[lessonId || '']) || !bothAgreed || isArchived}
                                           className="btn btn-secondary"
                                           style={{ fontSize: '0.875rem', padding: '0.5rem 1rem' }}
@@ -1358,43 +1449,33 @@ export default function PortalRoute() {
                       </div>
                     )}
                     
-                    {/* Load More Button */}
-                    {pagination.hasResults && pagination.hasMore && (
+                    {/* Pagination Controls */}
+                    {pagination.hasResults && (
                       <div style={{
                         display: 'flex',
-                        justifyContent: 'center',
+                        justifyContent: 'space-between',
                         alignItems: 'center',
-                        marginTop: '2rem'
+                        marginTop: '2rem',
+                        gap: '1rem'
                       }}>
                         <button
-                          onClick={loadMoreBookings}
-                          disabled={isLoadingMore}
-                          className="btn"
-                          style={{
-                            display: 'flex',
-                            alignItems: 'center',
-                            gap: '0.5rem',
-                            padding: '0.75rem 2rem',
-                            fontSize: '1rem',
-                            opacity: isLoadingMore ? 0.7 : 1,
-                            cursor: isLoadingMore ? 'not-allowed' : 'pointer'
-                          }}
+                          onClick={() => goToPage(Math.max(1, pagination.page - 1))}
+                          disabled={pagination.page <= 1}
+                          className="btn btn-secondary"
+                          style={{ minWidth: '120px' }}
                         >
-                          {isLoadingMore ? (
-                            <>
-                              <svg className="animate-spin" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                                <path d="M21 12a9 9 0 11-6.219-8.56"/>
-                              </svg>
-                              Loading...
-                            </>
-                          ) : (
-                            <>
-                              Load More
-                              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                                <polyline points="6 9 12 15 18 9"/>
-                              </svg>
-                            </>
-                          )}
+                          Prev
+                        </button>
+                        <div style={{ fontSize: '0.875rem', color: '#6b7280' }}>
+                          Page {pagination.page}
+                        </div>
+                        <button
+                          onClick={() => goToPage(pagination.page + 1)}
+                          disabled={!pagination.hasMore}
+                          className="btn"
+                          style={{ minWidth: '120px' }}
+                        >
+                          Next
                         </button>
                       </div>
                     )}
