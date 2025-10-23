@@ -54,11 +54,13 @@ interface InstructorInfo {
 export async function loader({ request }: LoaderFunctionArgs) {
   const userSession = await getUserFromSession(request);
   
-  // Parse pagination and filter params from URL
+  // Parse pagination, filter, and sorting params from URL
   const url = new URL(request.url);
   const page = parseInt(url.searchParams.get('page') || '1', 10);
   const limit = Math.min(parseInt(url.searchParams.get('limit') || '5', 10), 5);
   const filter = url.searchParams.get('filter') || 'active';
+  const order = url.searchParams.get('order') || 'desc';
+  const orderBy = url.searchParams.get('orderBy') || 'date';
   
   // If no session, use client-side auth (fallback)
   if (!userSession) {
@@ -75,10 +77,10 @@ export async function loader({ request }: LoaderFunctionArgs) {
   const apiHost = (process.env.API_HOST || request.url.split('/')[0] + '//' + request.url.split('/')[2]).replace(/\/$/, '');
   
   try {
-    // Fetch bookings based on account type with pagination and filter
+    // Fetch bookings based on account type with pagination, filter, and sorting
     const bookingsUrl = userSession.accountType === 'instructor'
-      ? `${apiHost}/instructor/${encodeURIComponent(userSession.id)}/bookings?page=${page}&limit=${limit}&filter=${encodeURIComponent(filter)}`
-      : `${apiHost}/students/${encodeURIComponent(userSession.id)}/bookings?page=${page}&limit=${limit}&filter=${encodeURIComponent(filter)}`;
+      ? `${apiHost}/instructor/${encodeURIComponent(userSession.id)}/bookings?page=${page}&limit=${limit}&filter=${encodeURIComponent(filter)}&order=${encodeURIComponent(order)}&orderBy=${encodeURIComponent(orderBy)}`
+      : `${apiHost}/students/${encodeURIComponent(userSession.id)}/bookings?page=${page}&limit=${limit}&filter=${encodeURIComponent(filter)}&order=${encodeURIComponent(order)}&orderBy=${encodeURIComponent(orderBy)}`;
     
     console.log('making request to:', bookingsUrl);
 
@@ -169,6 +171,8 @@ export default function PortalRoute() {
   const [payoutLoadingById, setPayoutLoadingById] = useState<Record<string, boolean>>({});
   const [instructorsById, setInstructorsById] = useState<Record<string, InstructorInfo>>(loaderData.serverInstructors || {});
   const [bookingFilter, setBookingFilter] = useState<BookingFilter>('active');
+  const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('desc');
+  const [sortBy, setSortBy] = useState<'made' | 'date'>('date');
 
   // Sync filter with URL param
   useEffect(() => {
@@ -178,6 +182,19 @@ export default function PortalRoute() {
     } else {
       // default to active if no/unknown param
       setBookingFilter('active');
+    }
+  }, [searchParams]);
+
+  // Sync sorting params from URL
+  useEffect(() => {
+    const order = searchParams.get('order') || 'desc';
+    const orderBy = searchParams.get('orderBy') || 'date';
+    
+    if (order === 'asc' || order === 'desc') {
+      setSortOrder(order);
+    }
+    if (orderBy === 'made' || orderBy === 'date') {
+      setSortBy(orderBy);
     }
   }, [searchParams]);
 
@@ -211,6 +228,14 @@ export default function PortalRoute() {
     }
     if (!params.has('filter')) {
       params.set('filter', 'active');
+      needsUpdate = true;
+    }
+    if (!params.has('order')) {
+      params.set('order', 'desc');
+      needsUpdate = true;
+    }
+    if (!params.has('orderBy')) {
+      params.set('orderBy', 'date');
       needsUpdate = true;
     }
     
@@ -385,10 +410,12 @@ export default function PortalRoute() {
         const page = searchParams.get('page') || '1';
         const limit = searchParams.get('limit') || '5';
         const filter = searchParams.get('filter') || 'active';
+        const order = searchParams.get('order') || 'desc';
+        const orderBy = searchParams.get('orderBy') || 'date';
         
         const url = user?.accountType === 'instructor'
-          ? `${host}/instructor/${encodeURIComponent(user.id)}/bookings?page=${page}&limit=${limit}&filter=${encodeURIComponent(filter)}`
-          : `${host}/students/${encodeURIComponent(user.id)}/bookings?page=${page}&limit=${limit}&filter=${encodeURIComponent(filter)}`;
+          ? `${host}/instructor/${encodeURIComponent(user.id)}/bookings?page=${page}&limit=${limit}&filter=${encodeURIComponent(filter)}&order=${encodeURIComponent(order)}&orderBy=${encodeURIComponent(orderBy)}`
+          : `${host}/students/${encodeURIComponent(user.id)}/bookings?page=${page}&limit=${limit}&filter=${encodeURIComponent(filter)}&order=${encodeURIComponent(order)}&orderBy=${encodeURIComponent(orderBy)}`;
         
         console.log('Client-side fetch to:', url);
         
@@ -581,6 +608,8 @@ export default function PortalRoute() {
     params.set('page', String(Math.max(1, nextPage)));
     params.set('limit', String(pagination.limit));
     params.set('filter', bookingFilter);
+    params.set('order', sortOrder);
+    params.set('orderBy', sortBy);
     params.set('tab', 'bookings');
     setSearchParams(params);
   };
@@ -590,6 +619,19 @@ export default function PortalRoute() {
     params.set('filter', filter);
     params.set('page', '1');
     params.set('limit', String(pagination.limit));
+    params.set('order', sortOrder);
+    params.set('orderBy', sortBy);
+    params.set('tab', 'bookings');
+    setSearchParams(params);
+  };
+
+  const applySorting = (order: 'asc' | 'desc', orderBy: 'made' | 'date') => {
+    const params = new URLSearchParams(searchParams);
+    params.set('order', order);
+    params.set('orderBy', orderBy);
+    params.set('page', '1'); // Reset to first page when sorting changes
+    params.set('limit', String(pagination.limit));
+    params.set('filter', bookingFilter);
     params.set('tab', 'bookings');
     setSearchParams(params);
   };
@@ -1128,6 +1170,83 @@ export default function PortalRoute() {
                             Archived
                           </button>
                         </div>
+                      </div>
+                    </div>
+
+                    {/* Sorting Controls */}
+                    <div style={{ display: 'flex', gap: '1rem', marginBottom: '1.5rem', alignItems: 'center', flexWrap: 'wrap' }}>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                        <span style={{ fontSize: '0.875rem', color: '#6b7280', fontWeight: '500' }}>Sort by:</span>
+                        <div style={{ display: 'inline-flex', background: '#f9fafb', border: '1px solid #e5e7eb', borderRadius: '0.5rem', overflow: 'hidden' }}>
+                          <button
+                            type="button"
+                            onClick={() => applySorting(sortOrder, 'date')}
+                            style={{
+                              padding: '0.5rem 0.75rem',
+                              fontSize: '0.875rem',
+                              background: sortBy === 'date' ? 'white' : 'transparent',
+                              color: sortBy === 'date' ? '#2563eb' : '#6b7280',
+                              fontWeight: sortBy === 'date' ? '600' : '500',
+                              border: 'none',
+                              borderRight: '1px solid #e5e7eb',
+                              cursor: 'pointer'
+                            }}
+                          >
+                            Lesson Date
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => applySorting(sortOrder, 'made')}
+                            style={{
+                              padding: '0.5rem 0.75rem',
+                              fontSize: '0.875rem',
+                              background: sortBy === 'made' ? 'white' : 'transparent',
+                              color: sortBy === 'made' ? '#2563eb' : '#6b7280',
+                              fontWeight: sortBy === 'made' ? '600' : '500',
+                              border: 'none',
+                              cursor: 'pointer'
+                            }}
+                          >
+                            Booking Made
+                          </button>
+                        </div>
+                      </div>
+
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                        <span style={{ fontSize: '0.875rem', color: '#6b7280', fontWeight: '500' }}>Order:</span>
+                        <button
+                          type="button"
+                          onClick={() => applySorting(sortOrder === 'asc' ? 'desc' : 'asc', sortBy)}
+                          style={{
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: '0.5rem',
+                            padding: '0.5rem 0.75rem',
+                            fontSize: '0.875rem',
+                            background: '#f9fafb',
+                            color: '#2563eb',
+                            fontWeight: '600',
+                            border: '1px solid #e5e7eb',
+                            borderRadius: '0.5rem',
+                            cursor: 'pointer'
+                          }}
+                        >
+                          {sortOrder === 'desc' ? (
+                            <>
+                              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                <path d="M12 5v14M19 12l-7 7-7-7"/>
+                              </svg>
+                              Newest First
+                            </>
+                          ) : (
+                            <>
+                              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                <path d="M12 19V5M5 12l7-7 7 7"/>
+                              </svg>
+                              Oldest First
+                            </>
+                          )}
+                        </button>
                       </div>
                     </div>
 
