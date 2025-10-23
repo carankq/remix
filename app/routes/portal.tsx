@@ -1214,39 +1214,51 @@ export default function PortalRoute() {
 
                       <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
                         <span style={{ fontSize: '0.875rem', color: '#6b7280', fontWeight: '500' }}>Order:</span>
-                        <button
-                          type="button"
-                          onClick={() => applySorting(sortOrder === 'asc' ? 'desc' : 'asc', sortBy)}
-                          style={{
-                            display: 'flex',
-                            alignItems: 'center',
-                            gap: '0.5rem',
-                            padding: '0.5rem 0.75rem',
-                            fontSize: '0.875rem',
-                            background: '#f9fafb',
-                            color: '#2563eb',
-                            fontWeight: '600',
-                            border: '1px solid #e5e7eb',
-                            borderRadius: '0.5rem',
-                            cursor: 'pointer'
-                          }}
-                        >
-                          {sortOrder === 'desc' ? (
-                            <>
-                              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                                <path d="M12 5v14M19 12l-7 7-7-7"/>
-                              </svg>
-                              Newest First
-                            </>
-                          ) : (
-                            <>
-                              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                                <path d="M12 19V5M5 12l7-7 7 7"/>
-                              </svg>
-                              Oldest First
-                            </>
-                          )}
-                        </button>
+                        <div style={{ display: 'inline-flex', background: '#f9fafb', border: '1px solid #e5e7eb', borderRadius: '0.5rem', overflow: 'hidden' }}>
+                          <button
+                            type="button"
+                            onClick={() => applySorting('desc', sortBy)}
+                            style={{
+                              display: 'flex',
+                              alignItems: 'center',
+                              gap: '0.375rem',
+                              padding: '0.5rem 0.75rem',
+                              fontSize: '0.875rem',
+                              background: sortOrder === 'desc' ? 'white' : 'transparent',
+                              color: sortOrder === 'desc' ? '#2563eb' : '#6b7280',
+                              fontWeight: sortOrder === 'desc' ? '600' : '500',
+                              border: 'none',
+                              borderRight: '1px solid #e5e7eb',
+                              cursor: 'pointer'
+                            }}
+                          >
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                              <path d="M12 5v14M19 12l-7 7-7-7"/>
+                            </svg>
+                            Newest First
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => applySorting('asc', sortBy)}
+                            style={{
+                              display: 'flex',
+                              alignItems: 'center',
+                              gap: '0.375rem',
+                              padding: '0.5rem 0.75rem',
+                              fontSize: '0.875rem',
+                              background: sortOrder === 'asc' ? 'white' : 'transparent',
+                              color: sortOrder === 'asc' ? '#2563eb' : '#6b7280',
+                              fontWeight: sortOrder === 'asc' ? '600' : '500',
+                              border: 'none',
+                              cursor: 'pointer'
+                            }}
+                          >
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                              <path d="M12 19V5M5 12l7-7 7 7"/>
+                            </svg>
+                            Oldest First
+                          </button>
+                        </div>
                       </div>
                     </div>
 
