@@ -1887,7 +1887,7 @@ export default function PortalRoute() {
                         border: '1px solid #e5e7eb',
                         borderRadius: '0.75rem'
                       }}>
-                        <InstructorStripeAccountSection instructorId={user.id} />
+                        <InstructorStripeAccountSection instructorId={user.id} trueInstructor={ownerInst} />
                       </div>
                     )}
                   </div>

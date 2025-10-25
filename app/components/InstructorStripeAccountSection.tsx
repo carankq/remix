@@ -1,7 +1,9 @@
 import { useEffect, useState } from 'react';
+import { useAuth } from '../context/AuthContext';
 
 interface InstructorStripeAccountSectionProps {
   instructorId: string;
+  trueInstructor: any;
 }
 
 function getApiHost(): string {
@@ -12,7 +14,8 @@ function getApiHost(): string {
   return typeof window !== 'undefined' ? window.location.origin : '';
 }
 
-export function InstructorStripeAccountSection({ instructorId }: InstructorStripeAccountSectionProps) {
+export function InstructorStripeAccountSection({ instructorId, trueInstructor }: InstructorStripeAccountSectionProps) {
+  const { token } = useAuth();
   const [isLoading, setIsLoading] = useState(false);
   const [exists, setExists] = useState<boolean | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -117,17 +120,30 @@ export function InstructorStripeAccountSection({ instructorId }: InstructorStrip
   };
 
   const handleDashboardLink = async () => {
-    if (!instructorId) return;
     const host = getApiHost();
     if (!host) return;
+    
+    if (!token) {
+      setError('You must be signed in to access your Stripe dashboard.');
+      return;
+    }
+    
+    const listingId = trueInstructor?._id || trueInstructor?.id;
+    if (!listingId) {
+      setError('Instructor listing not found. Please create your instructor profile first.');
+      return;
+    }
     
     setIsDashboardLinking(true);
     setError(null);
     
     try {
-      const res = await fetch(`${host}/instructors/${encodeURIComponent(instructorId)}/account/dashboard-link`, {
+      const res = await fetch(`${host}/instructors/${encodeURIComponent(listingId)}/account/dashboard-link`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
       });
       const data = await res.json().catch(() => ({}));
       
