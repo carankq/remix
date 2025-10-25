@@ -18,6 +18,7 @@ export function InstructorStripeAccountSection({ instructorId }: InstructorStrip
   const [error, setError] = useState<string | null>(null);
   const [isCreating, setIsCreating] = useState(false);
   const [isLinking, setIsLinking] = useState(false);
+  const [isDashboardLinking, setIsDashboardLinking] = useState(false);
   const [isCheckingOnboard, setIsCheckingOnboard] = useState(false);
   const [onboarded, setOnboarded] = useState<boolean | null>(null);
   const [onboardError, setOnboardError] = useState<string | null>(null);
@@ -112,6 +113,37 @@ export function InstructorStripeAccountSection({ instructorId }: InstructorStrip
       setError('Network error while generating your Stripe account link.');
     } finally {
       setIsLinking(false);
+    }
+  };
+
+  const handleDashboardLink = async () => {
+    if (!instructorId) return;
+    const host = getApiHost();
+    if (!host) return;
+    
+    setIsDashboardLinking(true);
+    setError(null);
+    
+    try {
+      const res = await fetch(`${host}/instructors/${encodeURIComponent(instructorId)}/account/dashboard-link`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+      });
+      const data = await res.json().catch(() => ({}));
+      
+      if (res.status === 200 && data && typeof data.url === 'string' && data.url.length > 0) {
+        window.location.href = data.url as string;
+        return;
+      } else if (res.status === 404) {
+        setError('Stripe account not initialized yet. Please create one first.');
+      } else {
+        const message = (data && (data.error || data.message)) || `Unexpected status ${res.status}`;
+        setError(message);
+      }
+    } catch {
+      setError('Network error while accessing your Stripe dashboard.');
+    } finally {
+      setIsDashboardLinking(false);
     }
   };
 
@@ -238,41 +270,82 @@ export function InstructorStripeAccountSection({ instructorId }: InstructorStrip
             )}
           </div>
           
-          <button
-            onClick={handleManageLink}
-            disabled={isLinking}
-            className="btn btn-primary"
-            style={{
-              display: 'inline-flex',
-              alignItems: 'center',
-              gap: '0.5rem',
-              opacity: isLinking ? 0.7 : 1,
-              cursor: isLinking ? 'not-allowed' : 'pointer',
-              position: 'relative'
-            }}
-          >
-            {isLinking ? (
-              <>
-                <span className="spinner" style={{
-                  width: '16px',
-                  height: '16px',
-                  border: '2px solid rgba(255,255,255,0.3)',
-                  borderTopColor: 'white',
-                  borderRadius: '50%',
-                  animation: 'spin 0.6s linear infinite'
-                }} />
-                Redirecting to Stripe...
-              </>
-            ) : (
-              <>
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                  <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
-                  <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
-                </svg>
-                Manage Stripe Account
-              </>
-            )}
-          </button>
+          <div style={{ display: 'flex', gap: '0.75rem', flexWrap: 'wrap' }}>
+            <button
+              onClick={handleManageLink}
+              disabled={isLinking || isDashboardLinking}
+              className="btn btn-primary"
+              style={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '0.5rem',
+                opacity: (isLinking || isDashboardLinking) ? 0.7 : 1,
+                cursor: (isLinking || isDashboardLinking) ? 'not-allowed' : 'pointer',
+                position: 'relative'
+              }}
+            >
+              {isLinking ? (
+                <>
+                  <span className="spinner" style={{
+                    width: '16px',
+                    height: '16px',
+                    border: '2px solid rgba(255,255,255,0.3)',
+                    borderTopColor: 'white',
+                    borderRadius: '50%',
+                    animation: 'spin 0.6s linear infinite'
+                  }} />
+                  Redirecting...
+                </>
+              ) : (
+                <>
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
+                    <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
+                  </svg>
+                  Complete Onboarding
+                </>
+              )}
+            </button>
+            
+            <button
+              onClick={handleDashboardLink}
+              disabled={isLinking || isDashboardLinking}
+              className="btn"
+              style={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '0.5rem',
+                opacity: (isLinking || isDashboardLinking) ? 0.7 : 1,
+                cursor: (isLinking || isDashboardLinking) ? 'not-allowed' : 'pointer',
+                background: '#6366f1',
+                color: 'white',
+                border: 'none'
+              }}
+            >
+              {isDashboardLinking ? (
+                <>
+                  <span className="spinner" style={{
+                    width: '16px',
+                    height: '16px',
+                    border: '2px solid rgba(255,255,255,0.3)',
+                    borderTopColor: 'white',
+                    borderRadius: '50%',
+                    animation: 'spin 0.6s linear infinite'
+                  }} />
+                  Redirecting...
+                </>
+              ) : (
+                <>
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <rect x="3" y="3" width="18" height="18" rx="2" ry="2"/>
+                    <line x1="3" y1="9" x2="21" y2="9"/>
+                    <line x1="9" y1="21" x2="9" y2="9"/>
+                  </svg>
+                  Manage Stripe Dashboard
+                </>
+              )}
+            </button>
+          </div>
         </div>
       )}
 
