@@ -168,6 +168,7 @@ export default function PortalRoute() {
   const [bookings, setBookings] = useState<BookingItem[]>(loaderData.serverBookings || []);
   const [isLoadingMore, setIsLoadingMore] = useState(false);
   const [bookingsError, setBookingsError] = useState<string | null>(loaderData.bookingsError);
+  const [instructorListingNotInitialized, setInstructorListingNotInitialized] = useState(false);
   const [bookingsLoaded, setBookingsLoaded] = useState(!loaderData.useClientAuth); // Mark as loaded if server provided data
   const [updatingById, setUpdatingById] = useState<Record<string, boolean>>({});
   const [payoutLoadingById, setPayoutLoadingById] = useState<Record<string, boolean>>({});
@@ -449,7 +450,14 @@ export default function PortalRoute() {
             hasMore: bookingsData.length === parseInt(limit, 10)
           });
         } else {
-          setBookingsError(data?.error || 'Could not load your bookings.');
+          // Check if instructor listing is not initialized (instructors only)
+          if (user?.accountType === 'instructor' && data?.instructorListingInitialised === false) {
+            setInstructorListingNotInitialized(true);
+            setBookingsError(null);
+          } else {
+            setBookingsError(data?.error || 'Could not load your bookings.');
+            setInstructorListingNotInitialized(false);
+          }
         }
       } catch {
         if (!cancelled) {
@@ -1330,7 +1338,40 @@ export default function PortalRoute() {
                       </div>
                     </div>
 
-                    {bookingsError && (
+                    {instructorListingNotInitialized && user?.accountType === 'instructor' && (
+                      <div style={{
+                        padding: '1.5rem',
+                        background: '#eff6ff',
+                        border: '1px solid #bfdbfe',
+                        borderRadius: '0.75rem',
+                        marginBottom: '1.5rem'
+                      }}>
+                        <div style={{ display: 'flex', alignItems: 'start', gap: '1rem' }}>
+                          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#2563eb" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0 }}>
+                            <circle cx="12" cy="12" r="10"/>
+                            <line x1="12" y1="16" x2="12" y2="12"/>
+                            <line x1="12" y1="8" x2="12.01" y2="8"/>
+                          </svg>
+                          <div style={{ flex: 1 }}>
+                            <h3 style={{ fontSize: '1rem', fontWeight: '600', color: '#1e40af', marginBottom: '0.5rem' }}>
+                              Create Your Instructor Listing First
+                            </h3>
+                            <p style={{ fontSize: '0.875rem', color: '#1e40af', marginBottom: '1rem', lineHeight: '1.5' }}>
+                              Before you can receive and manage bookings, you need to create your instructor listing. This will make you discoverable to students (after admin approval).
+                            </p>
+                            <button
+                              onClick={() => selectTab('instructor')}
+                              className="btn btn-primary"
+                              style={{ fontSize: '0.875rem' }}
+                            >
+                              Go to Instructor Profile
+                            </button>
+                          </div>
+                        </div>
+                      </div>
+                    )}
+
+                    {bookingsError && !instructorListingNotInitialized && (
                       <div style={{
                         padding: '1rem',
                         background: '#fef2f2',
@@ -1347,7 +1388,7 @@ export default function PortalRoute() {
                       <p style={{ color: '#6b7280' }}>Loading bookings...</p>
                     )}
 
-                    {!isLoadingMore && displayedBookings.length === 0 && !bookingsError && (
+                    {!isLoadingMore && displayedBookings.length === 0 && !bookingsError && !instructorListingNotInitialized && (
                       <>
                         <div style={{
                           textAlign: 'center',
