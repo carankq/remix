@@ -34,6 +34,8 @@ interface BookingItem {
   archivedReason?: string;
   reason?: string;
   instructorConsensus?: boolean;
+  refundFailed?: boolean;
+  refundReasonAccountedFor?: boolean;
 }
 
 function getApiHost(): string {
@@ -169,6 +171,7 @@ export default function PortalRoute() {
   const [bookingsLoaded, setBookingsLoaded] = useState(!loaderData.useClientAuth); // Mark as loaded if server provided data
   const [updatingById, setUpdatingById] = useState<Record<string, boolean>>({});
   const [payoutLoadingById, setPayoutLoadingById] = useState<Record<string, boolean>>({});
+  const [refundLoadingById, setRefundLoadingById] = useState<Record<string, boolean>>({});
   const [instructorsById, setInstructorsById] = useState<Record<string, InstructorInfo>>(loaderData.serverInstructors || {});
   const [bookingFilter, setBookingFilter] = useState<BookingFilter>('active');
   const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('desc');
@@ -741,6 +744,71 @@ export default function PortalRoute() {
       showMessage('Network error while processing payout. Please try again.', 'error');
     } finally {
       setPayoutLoadingById(prev => ({ ...prev, [lessonId]: false }));
+    }
+  };
+
+  const retryRefund = async (lessonId: string) => {
+    const host = getApiHost();
+    if (!host) return;
+    if (!token) {
+      showMessage('You must be signed in to retry refund.', 'error');
+      return;
+    }
+    
+    if (!confirm('Are you sure you want to retry the refund for this lesson? This should only be done if the initial refund failed.')) {
+      return;
+    }
+    
+    try {
+      setRefundLoadingById(prev => ({ ...prev, [lessonId]: true }));
+      const res = await fetch(`${host}/lessons/${encodeURIComponent(lessonId)}/retry-refund`, {
+        method: 'POST',
+        headers: { 
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        }
+      });
+      
+      if (res.ok) {
+        showMessage('Refund processed successfully!', 'success');
+        // Update booking to clear refundFailed flag
+        setBookings(prev => prev.map(b => {
+          const id = String(b._id || b.id || b.bookingId || '');
+          if (id !== lessonId) return b;
+          return { ...b, refundFailed: false } as BookingItem;
+        }));
+      } else {
+        let msg = 'Failed to process refund. Please try again.';
+        let refundReasonAccountedFor = false;
+        
+        try {
+          const data = await res.json();
+          if (data?.refundReasonAccountedFor === true) {
+            refundReasonAccountedFor = true;
+          }
+          if (data?.error) {
+            msg = data.error;
+          }
+        } catch {}
+        
+        // If refundReasonAccountedFor is true, provide reassurance about future refund
+        if (refundReasonAccountedFor) {
+          showMessage(
+            `${msg}\n\n` +
+            `✓ Your payment has been accounted for and is safe.\n\n` +
+            `Don't worry - even though the refund didn't process this time, you will receive your refund at a later stage. ` +
+            `This will happen either through another manual retry or via admin intervention. ` +
+            `Your refund is secure and will be transferred to you.`,
+            'warning'
+          );
+        } else {
+          showMessage(msg, 'error');
+        }
+      }
+    } catch {
+      showMessage('Network error while processing refund. Please try again.', 'error');
+    } finally {
+      setRefundLoadingById(prev => ({ ...prev, [lessonId]: false }));
     }
   };
 
@@ -1401,6 +1469,34 @@ export default function PortalRoute() {
                                         <strong>Cancelled:</strong> {booking.archivedReason || booking.reason || 'No reason provided'}
                                       </div>
                                     )}
+                                    {user?.accountType !== 'instructor' && booking.refundFailed && booking.refundReasonAccountedFor && !isArchived && (
+                                      <div style={{
+                                        marginTop: '0.5rem',
+                                        padding: '0.75rem',
+                                        background: '#fef3c7',
+                                        borderRadius: '0.5rem',
+                                        color: '#78350f',
+                                        fontSize: '0.875rem',
+                                        lineHeight: '1.5'
+                                      }}>
+                                        <div style={{ display: 'flex', alignItems: 'start', gap: '0.5rem' }}>
+                                          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0, marginTop: '0.125rem' }}>
+                                            <path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0Z"/>
+                                            <line x1="12" y1="9" x2="12" y2="13"/>
+                                            <line x1="12" y1="17" x2="12.01" y2="17"/>
+                                          </svg>
+                                          <div>
+                                            <strong>Refund Processing Issue</strong>
+                                            <div style={{ marginTop: '0.25rem' }}>
+                                              ✓ Your payment has been accounted for and is safe.
+                                            </div>
+                                            <div style={{ marginTop: '0.25rem' }}>
+                                              The refund didn't process automatically, but you will receive your refund. Use the "Retry Refund" button below or contact support if the issue persists.
+                                            </div>
+                                          </div>
+                                        </div>
+                                      </div>
+                                    )}
                                   </div>
 
                                   {/* Agreement Status */}
@@ -1469,8 +1565,8 @@ export default function PortalRoute() {
                                         </button>
                                       </>
                                     )}
-                                    {/* Only show cancel button if instructorConsensus is not true */}
-                                    {!booking.instructorConsensus && (
+                                    {/* Only show cancel button if instructorConsensus is not true AND (for students) refundFailed is not true */}
+                                    {!booking.instructorConsensus && !(user?.accountType !== 'instructor' && booking.refundFailed) && (
                                       <button
                                         onClick={() => {
                                           if (lessonId) {
@@ -1491,6 +1587,41 @@ export default function PortalRoute() {
                                         }}
                                       >
                                         {updating ? 'Cancelling...' : 'Cancel lesson'}
+                                      </button>
+                                    )}
+
+                                    {/* Student: Retry Refund (when refund failed) */}
+                                    {user?.accountType !== 'instructor' && booking.refundFailed && booking.refundReasonAccountedFor && !isArchived && (
+                                      <button
+                                        onClick={() => lessonId && retryRefund(lessonId)}
+                                        disabled={!lessonId || Boolean(refundLoadingById[lessonId || ''])}
+                                        className="btn"
+                                        style={{ 
+                                          fontSize: '0.875rem', 
+                                          padding: '0.5rem 1rem',
+                                          background: '#fef3c7',
+                                          color: '#92400e',
+                                          border: '1px solid #fde68a',
+                                          display: 'flex',
+                                          alignItems: 'center',
+                                          gap: '0.5rem'
+                                        }}
+                                      >
+                                        {lessonId && refundLoadingById[lessonId] ? (
+                                          <>
+                                            <svg className="animate-spin" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                              <path d="M21 12a9 9 0 11-6.219-8.56"/>
+                                            </svg>
+                                            Processing...
+                                          </>
+                                        ) : (
+                                          <>
+                                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                              <path d="M12 1v22m5-18H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/>
+                                            </svg>
+                                            Retry Refund
+                                          </>
+                                        )}
                                       </button>
                                     )}
                                     
