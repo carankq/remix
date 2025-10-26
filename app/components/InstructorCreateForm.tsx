@@ -383,12 +383,7 @@ const InstructorCreateForm: React.FC<InstructorCreateFormProps> = ({ onCreated }
   // If not fully onboarded, disable listing UI and prompt to complete onboarding
   if (user?.accountType === 'instructor' && onboarded === false) {
     return (
-      <div style={{
-        background: '#ffffff',
-        borderRadius: '1rem',
-        padding: '2rem',
-        boxShadow: '0 1px 3px rgba(0,0,0,0.1)'
-      }}>
+      <div>
         <h2 style={{ 
           fontSize: '1.5rem', 
           fontWeight: '600', 
@@ -396,51 +391,77 @@ const InstructorCreateForm: React.FC<InstructorCreateFormProps> = ({ onCreated }
           marginBottom: '1.5rem',
           fontFamily: "'Space Grotesk', 'Poppins', sans-serif"
         }}>
-          Complete Stripe Onboarding
+          Instructor Profile
         </h2>
+        
         <div style={{
-          backgroundColor: '#FFF7ED',
-          color: '#9A3412',
-          border: '1px solid #FDBA74',
-          borderLeft: '6px solid #F97316',
+          width: '100%',
+          background: '#ffffff',
+          border: '1px solid #fdba74',
           borderRadius: '0.75rem',
-          padding: '1.25rem',
-          marginBottom: '1.5rem'
+          padding: '1.5rem',
+          boxShadow: '0 1px 3px rgba(0,0,0,0.05)'
         }}>
-          <div style={{ display: 'flex', alignItems: 'start', gap: '0.75rem' }}>
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden style={{ flexShrink: 0, marginTop: '0.125rem' }}>
-              <path d="M12 9v4" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-              <path d="M12 17h.01" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-              <path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0Z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-            </svg>
-            <div>
-              <p style={{ fontWeight: '600', marginBottom: '0.25rem' }}>Stripe account setup required</p>
-              <p style={{ fontSize: '0.875rem' }}>Complete your Stripe onboarding to enable your instructor listing and start receiving payments from students.</p>
+          <div style={{ display: 'flex', alignItems: 'start', gap: '1rem' }}>
+            <div style={{
+              flexShrink: 0,
+              width: '40px',
+              height: '40px',
+              borderRadius: '50%',
+              background: '#fff7ed',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center'
+            }}>
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#f97316" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0Z"/>
+                <line x1="12" y1="9" x2="12" y2="13"/>
+                <line x1="12" y1="17" x2="12.01" y2="17"/>
+              </svg>
+            </div>
+            <div style={{ flex: 1 }}>
+              <h4 style={{
+                fontSize: '1rem',
+                fontWeight: '600',
+                color: '#0f172a',
+                marginBottom: '0.5rem',
+                fontFamily: "'Space Grotesk', sans-serif"
+              }}>
+                Stripe Account Setup Required
+              </h4>
+              <p style={{ fontSize: '0.875rem', color: '#64748b', marginBottom: '1rem', lineHeight: '1.5' }}>
+                Complete your Stripe onboarding to enable your instructor listing and start receiving payments from students.
+              </p>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', flexWrap: 'wrap' }}>
+                <button 
+                  className="btn btn-primary" 
+                  onClick={() => {
+                    const tabButtons = document.querySelectorAll('[data-tab]');
+                    tabButtons.forEach(btn => {
+                      if (btn.getAttribute('data-tab') === 'payments') {
+                        (btn as HTMLButtonElement).click();
+                      }
+                    });
+                  }}
+                  style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', fontSize: '0.875rem' }}
+                >
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <rect x="1" y="4" width="22" height="16" rx="2" ry="2"/>
+                    <line x1="1" y1="10" x2="23" y2="10"/>
+                  </svg>
+                  Go to Payments
+                </button>
+                <button 
+                  className="btn" 
+                  disabled 
+                  title="Complete onboarding to edit your listing"
+                  style={{ fontSize: '0.875rem', opacity: 0.5, cursor: 'not-allowed' }}
+                >
+                  Edit Listing
+                </button>
+              </div>
             </div>
           </div>
-        </div>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', flexWrap: 'wrap' }}>
-          <button 
-            className="btn btn-primary" 
-            onClick={() => {
-              const tabButtons = document.querySelectorAll('[data-tab]');
-              tabButtons.forEach(btn => {
-                if (btn.getAttribute('data-tab') === 'payments') {
-                  (btn as HTMLButtonElement).click();
-                }
-              });
-            }}
-            style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}
-          >
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-              <rect x="1" y="4" width="22" height="16" rx="2" ry="2"/>
-              <line x1="1" y1="10" x2="23" y2="10"/>
-            </svg>
-            Go to Payments
-          </button>
-          <button className="btn" disabled title="Complete onboarding to edit your listing">
-            Edit listing
-          </button>
         </div>
       </div>
     );
