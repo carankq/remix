@@ -1,4 +1,4 @@
-import { Link } from "@remix-run/react";
+import { Link, useNavigate } from "@remix-run/react";
 
 type Instructor = {
   id: string;
@@ -27,29 +27,45 @@ type InstructorCardProps = {
 };
 
 export function InstructorCard({ instructor, showActions = true }: InstructorCardProps) {
+  const navigate = useNavigate();
   const hasRating = instructor.rating && instructor.rating > 0;
   const hasImage = instructor.image && instructor.image.trim() !== '';
   const placeholder = 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><rect width="100" height="100" rx="50" fill="%23e5e7eb"/><circle cx="50" cy="38" r="18" fill="%239ca3af"/><path d="M20 86c4-18 18-28 30-28s26 10 30 28" fill="%239ca3af"/></svg>';
   const imgSrc = hasImage ? instructor.image : placeholder;
   
-  const cardContent = (
-    <article style={{
-      background: '#ffffff',
-      borderRadius: '1rem',
-      border: '1px solid #e2e8f0',
-      overflow: 'hidden',
-      boxShadow: '0 1px 3px rgba(0,0,0,0.05)',
-      transition: 'all 0.2s ease',
-      cursor: instructor.brandName ? 'pointer' : 'default'
-    }}
-    onMouseEnter={(e) => {
-      e.currentTarget.style.boxShadow = '0 8px 24px rgba(0,0,0,0.1)';
-      e.currentTarget.style.transform = 'translateY(-2px)';
-    }}
-    onMouseLeave={(e) => {
-      e.currentTarget.style.boxShadow = '0 1px 3px rgba(0,0,0,0.05)';
-      e.currentTarget.style.transform = 'translateY(0)';
-    }}>
+  const handleCardClick = (e: React.MouseEvent) => {
+    // Don't navigate if clicking on a button or link
+    const target = e.target as HTMLElement;
+    if (target.closest('a, button')) {
+      return;
+    }
+    
+    // Navigate to instructor profile if brandName exists
+    if (instructor.brandName) {
+      navigate(`/instructors/${encodeURIComponent(instructor.brandName)}`);
+    }
+  };
+  
+  return (
+    <article 
+      style={{
+        background: '#ffffff',
+        borderRadius: '1rem',
+        border: '1px solid #e2e8f0',
+        overflow: 'hidden',
+        boxShadow: '0 1px 3px rgba(0,0,0,0.05)',
+        transition: 'all 0.2s ease',
+        cursor: instructor.brandName ? 'pointer' : 'default'
+      }}
+      onClick={handleCardClick}
+      onMouseEnter={(e) => {
+        e.currentTarget.style.boxShadow = '0 8px 24px rgba(0,0,0,0.1)';
+        e.currentTarget.style.transform = 'translateY(-2px)';
+      }}
+      onMouseLeave={(e) => {
+        e.currentTarget.style.boxShadow = '0 1px 3px rgba(0,0,0,0.05)';
+        e.currentTarget.style.transform = 'translateY(0)';
+      }}>
       
       {/* Hero Section with Gradient Background */}
       <div style={{ padding: '2rem', background: 'linear-gradient(to bottom, #f8fafc 0%, #ffffff 100%)' }}>
@@ -321,7 +337,6 @@ export function InstructorCard({ instructor, showActions = true }: InstructorCar
                 justifyContent: 'center',
                 gap: '0.5rem'
               }}
-              onClick={(e) => e.stopPropagation()}
             >
               <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                 <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/>
@@ -346,7 +361,6 @@ export function InstructorCard({ instructor, showActions = true }: InstructorCar
                   gap: '0.5rem',
                   textDecoration: 'none'
                 }}
-                onClick={(e) => e.stopPropagation()}
               >
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                   <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/>
@@ -359,26 +373,5 @@ export function InstructorCard({ instructor, showActions = true }: InstructorCar
       </div>
     </article>
   );
-
-  // If instructor has a brandName, wrap the entire card in a Link
-  if (instructor.brandName) {
-    return (
-      <Link 
-        to={`/instructors/${encodeURIComponent(instructor.brandName)}`}
-        style={{ textDecoration: 'none', display: 'block' }}
-        onClick={(e) => {
-          // Prevent navigation if clicking on buttons or links inside the card
-          const target = e.target as HTMLElement;
-          if (target.closest('a, button')) {
-            e.preventDefault();
-          }
-        }}
-      >
-        {cardContent}
-      </Link>
-    );
-  }
-  
-  return cardContent;
 }
 
