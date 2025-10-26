@@ -51,6 +51,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
       name: String(r.name ?? r.fullName ?? "Unknown"),
       description: typeof r.description === 'string' ? r.description?.substring(0, 200) : '', // Limit description length
       pricePerHour: Number(r.pricePerHour ?? r.hourlyRate ?? r.price ?? 0) || undefined,
+      brandName: String(r.brandName) || undefined,
       vehicleType: r.vehicleType ?? r.transmission,
       yearsOfExperience: Number(r.yearsOfExperience ?? r.experienceYears ?? 0) || undefined,
       rating: Number(r.rating ?? r.averageRating ?? 0) || undefined,
