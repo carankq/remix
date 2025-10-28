@@ -62,7 +62,7 @@ export default function BookingPage() {
   const [searchParams] = useSearchParams();
   const instructorId = searchParams.get('instructor') || '';
   const navigate = useNavigate();
-  const { isAuthenticated, user } = useAuth();
+  const { isAuthenticated, user, token } = useAuth();
   const loaderData = useLoaderData<typeof loader>();
   
   const [date, setDate] = useState('');
@@ -113,7 +113,10 @@ export default function BookingPage() {
       const apiHost = (window as any).__ENV__?.API_HOST || 'http://localhost:3001';
       const res = await fetch(`${apiHost}/book`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
         body: JSON.stringify(payload)
       });
       

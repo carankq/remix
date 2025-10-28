@@ -17,7 +17,7 @@ function getApiHost(): string {
 }
 
 export function PaymentMethodSection({ title = 'Payment Method', allowDelete = false, onStatusChange }: PaymentMethodSectionProps) {
-  const { isAuthenticated, user } = useAuth();
+  const { isAuthenticated, user, token } = useAuth();
   const [savedPm, setSavedPm] = useState<{ paymentMethodId?: string | null; last4?: string | null } | null>(null);
   const [pmLoading, setPmLoading] = useState(false);
   const [pmError, setPmError] = useState<string | null>(null);
@@ -40,7 +40,9 @@ export function PaymentMethodSection({ title = 'Payment Method', allowDelete = f
     setPmError(null);
     
     try {
-      const res = await fetch(`${host}/users/${encodeURIComponent(user.id)}/payment-method`);
+      const res = await fetch(`${host}/users/${encodeURIComponent(user.id)}/payment-method`, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
       let data: any = null;
       try { data = await res.json(); } catch {}
       
@@ -76,7 +78,10 @@ export function PaymentMethodSection({ title = 'Payment Method', allowDelete = f
     setPmDeleting(true);
     
     try {
-      const res = await fetch(`${host}/users/${encodeURIComponent(user.id)}/payment-method`, { method: 'DELETE' });
+      const res = await fetch(`${host}/users/${encodeURIComponent(user.id)}/payment-method`, { 
+        method: 'DELETE',
+        headers: { Authorization: `Bearer ${token}` }
+      });
       let data: any = null;
       try { data = await res.json(); } catch {}
       

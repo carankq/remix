@@ -40,7 +40,7 @@ export function StripeCardForm({ onPaymentMethod, onSaved, onCancel }: StripeCar
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [serverMessage, setServerMessage] = useState<string | null>(null);
-  const { user } = useAuth();
+  const { user, token } = useAuth();
   const [cardholderName, setCardholderName] = useState('');
   const [addressLine1, setAddressLine1] = useState('');
   const [addressLine2, setAddressLine2] = useState('');
@@ -89,7 +89,9 @@ export function StripeCardForm({ onPaymentMethod, onSaved, onCancel }: StripeCar
     let cancelled = false;
     const load = async () => {
       try {
-        const res = await fetch(`${host}/users/${encodeURIComponent(user.id)}/payment-method`);
+        const res = await fetch(`${host}/users/${encodeURIComponent(user.id)}/payment-method`, {
+          headers: { Authorization: `Bearer ${token}` }
+        });
         const data = await res.json().catch(() => ({}));
         
         if (!cancelled && res.ok && data?.billing) {
@@ -108,7 +110,7 @@ export function StripeCardForm({ onPaymentMethod, onSaved, onCancel }: StripeCar
     load();
     
     return () => { cancelled = true; };
-  }, [user?.id, user?.fullName]);
+  }, [user?.id, user?.fullName, token]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -154,7 +156,7 @@ export function StripeCardForm({ onPaymentMethod, onSaved, onCancel }: StripeCar
             const last4 = paymentMethod?.card?.last4 || '';
             const res = await fetch(`${host}/users/${encodeURIComponent(user.id)}/payment-method`, {
               method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
+              headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
               body: JSON.stringify({
                 paymentMethodId: paymentMethod.id,
                 last4,

@@ -85,10 +85,11 @@ export async function loader({ request }: LoaderFunctionArgs) {
       : `${apiHost}/students/${encodeURIComponent(userSession.id)}/bookings?page=${page}&limit=${limit}&filter=${encodeURIComponent(filter)}&order=${encodeURIComponent(order)}&orderBy=${encodeURIComponent(orderBy)}`;
     
     console.log('making request to:', bookingsUrl);
-
+    
     const bookingsRes = await fetch(bookingsUrl, {
       headers: {
-        'Accept-Encoding': 'gzip, deflate, br'
+        'Accept-Encoding': 'gzip, deflate, br',
+        'Authorization': `Bearer ${userSession.token}`
       }
     });
     
@@ -423,7 +424,11 @@ export default function PortalRoute() {
         
         console.log('Client-side fetch to:', url);
         
-        const res = await fetch(url);
+        const res = await fetch(url, {
+          headers: {
+            'Authorization': `Bearer ${token}`
+          }
+        });
         if (cancelled) return;
         
         let data: any = null;
@@ -454,18 +459,18 @@ export default function PortalRoute() {
           if (user?.accountType === 'instructor' && data?.instructorListingInitialised === false) {
             setInstructorListingNotInitialized(true);
             setBookingsError(null);
-          } else {
-            setBookingsError(data?.error || 'Could not load your bookings.');
+        } else {
+          setBookingsError(data?.error || 'Could not load your bookings.');
             setInstructorListingNotInitialized(false);
           }
         }
       } catch {
         if (!cancelled) {
-          setBookingsError('Network error while loading your bookings.');
+        setBookingsError('Network error while loading your bookings.');
         }
       } finally {
         if (!cancelled) {
-          setIsLoadingMore(false);
+        setIsLoadingMore(false);
         }
       }
     };
@@ -670,7 +675,10 @@ export default function PortalRoute() {
       setUpdatingById(prev => ({ ...prev, [lessonId]: true }));
       const res = await fetch(`${host}${path}`, {
         method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
         body: JSON.stringify({ agreed: agree })
       });
       
@@ -828,7 +836,10 @@ export default function PortalRoute() {
       setUpdatingById(prev => ({ ...prev, [lessonId]: true }));
       const res = await fetch(`${host}/lessons/${encodeURIComponent(lessonId)}/archive`, {
         method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
         body: JSON.stringify({ reason })
       });
       
@@ -1191,7 +1202,7 @@ export default function PortalRoute() {
                         {user?.accountType === 'instructor' ? 'Booking Requests' : 'My Bookings'}
                       </h2>
                       <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
-                        <div style={{ fontSize: '0.875rem', color: '#6b7280' }}>
+                      <div style={{ fontSize: '0.875rem', color: '#6b7280' }}>
                           {pagination.hasResults ? `${displayedBookings.length} booking${displayedBookings.length !== 1 ? 's' : ''}` : 'No bookings'}
                         </div>
                         <div style={{ display: 'inline-flex', background: '#f9fafb', border: '1px solid #e5e7eb', borderRadius: '0.5rem', overflow: 'hidden' }}>
@@ -1390,22 +1401,22 @@ export default function PortalRoute() {
 
                     {!isLoadingMore && displayedBookings.length === 0 && !bookingsError && !instructorListingNotInitialized && (
                       <>
-                        <div style={{
-                          textAlign: 'center',
-                          padding: '3rem',
-                          background: '#f9fafb',
-                          borderRadius: '0.75rem',
-                          border: '1px solid #e5e7eb'
-                        }}>
-                          <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="#d1d5db" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ margin: '0 auto 1rem' }}>
-                            <path d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
-                          </svg>
-                          <h3 style={{ fontSize: '1.25rem', fontWeight: '600', color: '#111827', marginBottom: '0.5rem' }}>
+                      <div style={{
+                        textAlign: 'center',
+                        padding: '3rem',
+                        background: '#f9fafb',
+                        borderRadius: '0.75rem',
+                        border: '1px solid #e5e7eb'
+                      }}>
+                        <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="#d1d5db" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ margin: '0 auto 1rem' }}>
+                          <path d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                        </svg>
+                        <h3 style={{ fontSize: '1.25rem', fontWeight: '600', color: '#111827', marginBottom: '0.5rem' }}>
                             {pagination.page > 1 
                               ? 'No more bookings' 
                               : (bookingFilter === 'archived' ? 'No archived lessons' : (bookingFilter === 'active' ? 'No active lessons' : 'No bookings yet'))}
-                          </h3>
-                          <p style={{ color: '#6b7280' }}>
+                        </h3>
+                        <p style={{ color: '#6b7280' }}>
                             {pagination.page > 1
                               ? 'You\'ve reached the end of your bookings list.'
                               : (bookingFilter === 'archived'
@@ -1444,7 +1455,7 @@ export default function PortalRoute() {
                             >
                               Next
                             </button>
-                          </div>
+                      </div>
                         )}
                       </>
                     )}
@@ -1670,7 +1681,7 @@ export default function PortalRoute() {
                                     {user?.accountType !== 'instructor' && (
                                       <>
                                         <button
-                                        onClick={() => lessonId && getLessonCode(lessonId)}
+                                          onClick={() => lessonId && getLessonCode(lessonId)}
                                           disabled={!lessonId || Boolean(codeLoadingById[lessonId || '']) || !bothAgreed || isArchived}
                                           className="btn btn-secondary"
                                           style={{ fontSize: '0.875rem', padding: '0.5rem 1rem' }}

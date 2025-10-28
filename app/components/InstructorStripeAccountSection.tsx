@@ -37,13 +37,18 @@ export function InstructorStripeAccountSection({ instructorId, trueInstructor }:
       setExists(null);
       
       try {
-        const res = await fetch(`${host}/instructors/${encodeURIComponent(instructorId)}/account`);
+        const res = await fetch(`${host}/instructors/${encodeURIComponent(instructorId)}/account`, {
+          headers: token ? { Authorization: `Bearer ${token}` } : undefined
+        });
         const maybeJson = await res.json().catch(() => undefined as any);
         
         if (res.status === 200) {
           setExists(true);
         } else if (res.status === 404) {
           setExists(false);
+        } else if (res.status === 401) {
+          setError('You are not authorized to view Stripe account details. Please sign in again.');
+          setExists(null);
         } else {
           const message = (maybeJson && (maybeJson.error || maybeJson.message)) || `Unexpected status ${res.status}`;
           setError(message);
@@ -57,12 +62,13 @@ export function InstructorStripeAccountSection({ instructorId, trueInstructor }:
       }
     };
     run();
-  }, [instructorId]);
+  }, [instructorId, token]);
 
   const handleCreateAccount = async () => {
     if (!instructorId) return;
     const host = getApiHost();
     if (!host) return;
+    if (!token) { setError('You must be signed in to create a Stripe account.'); return; }
     
     setIsCreating(true);
     setError(null);
@@ -70,12 +76,14 @@ export function InstructorStripeAccountSection({ instructorId, trueInstructor }:
     try {
       const res = await fetch(`${host}/instructors/${encodeURIComponent(instructorId)}/account`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
       });
       const maybeJson = await res.json().catch(() => undefined as any);
       
       if (res.status === 201 || res.status === 200) {
         setExists(true);
+      } else if (res.status === 401) {
+        setError('You are not authorized to create a Stripe account. Please sign in again.');
       } else {
         const message = (maybeJson && (maybeJson.error || maybeJson.message)) || `Unexpected status ${res.status}`;
         setError(message);
@@ -91,6 +99,7 @@ export function InstructorStripeAccountSection({ instructorId, trueInstructor }:
     if (!instructorId) return;
     const host = getApiHost();
     if (!host) return;
+    if (!token) { setError('You must be signed in to access your Stripe onboarding.'); return; }
     
     setIsLinking(true);
     setError(null);
@@ -98,7 +107,7 @@ export function InstructorStripeAccountSection({ instructorId, trueInstructor }:
     try {
       const res = await fetch(`${host}/instructors/${encodeURIComponent(instructorId)}/account/link`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
       });
       const data = await res.json().catch(() => ({}));
       
@@ -108,6 +117,8 @@ export function InstructorStripeAccountSection({ instructorId, trueInstructor }:
       } else if (res.status === 404) {
         setExists(false);
         setError('Stripe account not initialized yet. Please create one first.');
+      } else if (res.status === 401) {
+        setError('You are not authorized to create a Stripe onboarding link. Please sign in again.');
       } else {
         const message = (data && (data.error || data.message)) || `Unexpected status ${res.status}`;
         setError(message);
@@ -175,7 +186,9 @@ export function InstructorStripeAccountSection({ instructorId, trueInstructor }:
       setOnboarded(null);
       
       try {
-        const res = await fetch(`${host}/instructors/${encodeURIComponent(instructorId)}/account/onboarded`);
+        const res = await fetch(`${host}/instructors/${encodeURIComponent(instructorId)}/account/onboarded`, {
+          headers: token ? { Authorization: `Bearer ${token}` } : undefined
+        });
         const data = await res.json().catch(() => ({}));
         
         if (res.status === 200 && typeof data?.onboarded === 'boolean') {
@@ -183,6 +196,8 @@ export function InstructorStripeAccountSection({ instructorId, trueInstructor }:
         } else if (res.status === 404) {
           setExists(false);
           setOnboarded(null);
+        } else if (res.status === 401) {
+          setOnboardError('You are not authorized to read onboarding status. Please sign in again.');
         } else {
           const message = (data && (data.error || data.message)) || `Unexpected status ${res.status}`;
           setOnboardError(message);
@@ -194,7 +209,7 @@ export function InstructorStripeAccountSection({ instructorId, trueInstructor }:
       }
     };
     checkOnboard();
-  }, [exists, instructorId]);
+  }, [exists, instructorId, token]);
 
   return (
     <div>
