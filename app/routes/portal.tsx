@@ -437,8 +437,28 @@ export default function PortalRoute() {
     return true;
   };
 
+  const canCancelProposal = (b: BookingItem): boolean => {
+    const idx = getLastPendingProposalIndex(b);
+    if (idx < 0) return false;
+    const arr = b.proposals || [];
+    const proposedBy = (arr[idx] as any)?.proposedBy as string | undefined;
+    if (!proposedBy) return false;
+    if (proposedBy === 'instructor' || proposedBy === 'student') {
+      return proposedBy === (user?.accountType || '');
+    }
+    if (!user?.id) return false;
+    if (proposedBy === user.id) return true;
+    if (proposedBy === (b.studentId || '')) return user.id === (b.studentId || '');
+    if (proposedBy === (b.instructorId || '')) return user.id === (b.instructorId || '');
+    return false;
+  };
+
   const openProposal = (lessonId: string, startMs?: number, endMs?: number) => {
     const b = bookings.find(x => String(x._id || x.id || x.bookingId || '') === lessonId);
+    if (b && b.instructorConsensus) {
+      showMessage('Lesson changes are locked. Proposals are disabled.', 'warning');
+      return;
+    }
     if (b && hasPendingProposal(b)) {
       showMessage('A time change proposal is already pending for this lesson. You can propose again after it is accepted or rejected.', 'warning');
       return;
@@ -1931,38 +1951,49 @@ export default function PortalRoute() {
                                         {(() => {
                                           const pendingIdx = getLastPendingProposalIndex(booking);
                                           const pending = pendingIdx >= 0;
+                                          const locked = Boolean(booking.instructorConsensus);
                                           const canRespond = pending && canRespondToProposal(booking);
+                                          const canCancel = pending && canCancelProposal(booking) && !locked;
                                           const last = pending && Array.isArray(booking.proposals) ? booking.proposals![pendingIdx] : undefined;
                                           const startLabel = last?.start ? new Date(last.start).toLocaleString() : undefined;
                                           const durLabel = last?.durationMinutes ? `${last.durationMinutes} min` : undefined;
 
                                           return (
                                             <>
-                                              {!canRespond && (
-                                                <>
-                                                  <button
-                                                    onClick={() => openProposal(lessonId, booking.start, booking.end)}
-                                                    className="btn"
-                                                    disabled={pending}
-                                                    title={pending ? 'A proposal is already pending' : 'Suggest a new start time'}
-                                                    style={{ 
-                                                      fontSize: '0.875rem', 
-                                                      padding: '0.5rem 1rem', 
-                                                      background: pending ? '#f3f4f6' : '#eef2ff', 
-                                                      color: pending ? '#9ca3af' : '#3730a3', 
-                                                      border: '1px solid',
-                                                      borderColor: pending ? '#e5e7eb' : '#c7d2fe', 
-                                                      cursor: pending ? 'not-allowed' : 'pointer'
-                                                    }}
-                                                  >
-                                                    Propose new time
-                                                  </button>
-                                                  {pending && (
-                                                    <div style={{ fontSize: '0.8125rem', color: '#6b7280', marginTop: '0.375rem' }}>
-                                                      A proposal is pending. Waiting for the other party to respond.
-                                                    </div>
-                                                  )}
-                                                </>
+                                              {!canRespond && !canCancel && !pending && !locked && (
+                                                <button
+                                                  onClick={() => openProposal(lessonId, booking.start, booking.end)}
+                                                  className="btn"
+                                                  title={'Suggest a new start time'}
+                                                  style={{ 
+                                                    fontSize: '0.875rem', 
+                                                    padding: '0.5rem 1rem', 
+                                                    background: '#eef2ff', 
+                                                    color: '#3730a3', 
+                                                    border: '1px solid',
+                                                    borderColor: '#c7d2fe'
+                                                  }}
+                                                >
+                                                  Propose new time
+                                                </button>
+                                              )}
+
+                                              {canCancel && (
+                                                <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+                                                  <div style={{ fontSize: '0.875rem', color: '#374151' }}>
+                                                    You proposed: {startLabel || '—'}{durLabel ? ` • ${durLabel}` : ''}
+                                                  </div>
+                                                  <div>
+                                                    <button
+                                                      onClick={() => respondToProposal(lessonId, pendingIdx, 'rejected')}
+                                                      disabled={Boolean(proposalActionById[lessonId])}
+                                                      className="btn"
+                                                      style={{ fontSize: '0.875rem', padding: '0.5rem 1rem', background: '#fef2f2', color: '#dc2626', border: '1px solid #fecaca' }}
+                                                    >
+                                                      {proposalActionById[lessonId] ? 'Cancelling…' : 'Cancel proposal'}
+                                                    </button>
+                                                  </div>
+                                                </div>
                                               )}
 
                                               {canRespond && (
