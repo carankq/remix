@@ -2342,6 +2342,17 @@ export default function PortalRoute() {
             <p style={{ fontSize: '0.9375rem', color: '#6b7280', marginBottom: '1rem' }}>
               Suggest a new start time and duration. The other party will be notified to review your proposal.
             </p>
+            <div style={{
+              fontSize: '0.875rem',
+              color: '#92400e',
+              background: '#fef3c7',
+              border: '1px solid #fde68a',
+              borderRadius: '0.5rem',
+              padding: '0.75rem 1rem',
+              marginBottom: '1rem'
+            }}>
+              Nothing changes until your proposal is accepted. The current lesson time remains in place until both parties agree to the change.
+            </div>
 
             <div style={{ display: 'grid', gap: '0.75rem', marginBottom: '0.75rem' }}>
               <label style={{ fontSize: '0.875rem', color: '#374151' }}>
