@@ -37,7 +37,7 @@ interface BookingItem {
   refundFailed?: boolean;
   refundReasonAccountedFor?: boolean;
   // Proposal-related
-  proposals?: Array<{ status?: 'accepted' | 'rejected' | null; type?: string; start?: number; durationMinutes?: number; createdAt?: any; createdBy?: string }>;
+  proposals?: Array<{ status?: 'accepted' | 'rejected' | null; type?: string; start?: number; durationMinutes?: number; createdAt?: any; proposedBy?: string }>;
 }
 
 function getApiHost(): string {
@@ -397,6 +397,7 @@ export default function PortalRoute() {
   const [proposalDurationMin, setProposalDurationMin] = useState<string>('60');
   const [proposalSubmitting, setProposalSubmitting] = useState(false);
   const [proposalError, setProposalError] = useState<string | null>(null);
+  const [proposalActionById, setProposalActionById] = useState<Record<string, boolean>>({});
 
   // Helper to check if a lesson is archived (for UI display)
   const isLessonArchived = (b: BookingItem) => Boolean(b.archived || b.isArchived || b.archivedAt);
@@ -405,6 +406,35 @@ export default function PortalRoute() {
   const hasPendingProposal = (b: BookingItem): boolean => {
     const arr = Array.isArray(b.proposals) ? b.proposals : [];
     return arr.some(p => p && (p.status === null || typeof p.status === 'undefined'));
+  };
+
+  const getLastPendingProposalIndex = (b: BookingItem): number => {
+    const arr = Array.isArray(b.proposals) ? b.proposals : [];
+    for (let i = arr.length - 1; i >= 0; i--) {
+      const p = arr[i];
+      if (p && (p.status === null || typeof p.status === 'undefined')) return i;
+    }
+    return -1;
+  };
+
+  const canRespondToProposal = (b: BookingItem): boolean => {
+    const idx = getLastPendingProposalIndex(b);
+    if (idx < 0) return false;
+    const arr = b.proposals || [];
+    const proposedBy = (arr[idx] as any)?.proposedBy as string | undefined;
+    if (!proposedBy) return false;
+    // Prefer role-based check if proposedBy is a role string
+    if (proposedBy === 'instructor' || proposedBy === 'student') {
+      return proposedBy !== (user?.accountType || '');
+    }
+    // Fallback to id-based comparison
+    if (!user?.id) return false;
+    if (proposedBy === user.id) return false;
+    // If backend stores instructorId/studentId, try matching those too
+    if (proposedBy === (b.studentId || '')) return user.id !== (b.studentId || '');
+    if (proposedBy === (b.instructorId || '')) return user.id !== (b.instructorId || '');
+    // Default: allow respond if not obviously self
+    return true;
   };
 
   const openProposal = (lessonId: string, startMs?: number, endMs?: number) => {
@@ -467,6 +497,7 @@ export default function PortalRoute() {
       if (res.ok) {
         showMessage('Proposal sent successfully.', 'success');
         setShowProposalModal(false);
+        try { navigate(0 as any); } catch {}
       } else {
         setProposalError(data?.error || `Failed to send proposal (status ${res.status}).`);
       }
@@ -474,6 +505,47 @@ export default function PortalRoute() {
       setProposalError('Network error while sending proposal.');
     } finally {
       setProposalSubmitting(false);
+    }
+  };
+
+  const respondToProposal = async (lessonId: string, proposalIndex: number, decision: 'accepted' | 'rejected') => {
+    const host = getApiHost();
+    if (!host) return;
+    if (!token) { showMessage('You must be signed in.', 'error'); return; }
+
+    setProposalActionById(prev => ({ ...prev, [lessonId]: true }));
+    try {
+      const res = await fetch(`${host}/lessons/${encodeURIComponent(lessonId)}/proposals/${proposalIndex}`, {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({ status: decision })
+      });
+
+      let data: any = null;
+      try { data = await res.json(); } catch {}
+
+      if (res.ok) {
+        showMessage(`Proposal ${decision}.`, 'success');
+        setBookings(prev => prev.map(b => {
+          const id = String(b._id || b.id || b.bookingId || '');
+          if (id !== lessonId) return b;
+          const arr = Array.isArray(b.proposals) ? [...b.proposals] : [];
+          if (arr[proposalIndex]) {
+            (arr[proposalIndex] as any).status = decision;
+          }
+          return { ...b, proposals: arr } as BookingItem;
+        }));
+        try { navigate(0 as any); } catch {}
+      } else {
+        showMessage(data?.error || 'Failed to update proposal.', 'error');
+      }
+    } catch {
+      showMessage('Network error while updating proposal.', 'error');
+    } finally {
+      setProposalActionById(prev => ({ ...prev, [lessonId]: false }));
     }
   };
 
@@ -1853,33 +1925,69 @@ export default function PortalRoute() {
                                       </button>
                                     )}
 
-                                    {/* Propose new time (both roles) */}
+                                    {/* Propose / Respond to proposal */}
                                     {!isArchived && lessonId && (
                                       <div>
                                         {(() => {
-                                          const pending = hasPendingProposal(booking);
+                                          const pendingIdx = getLastPendingProposalIndex(booking);
+                                          const pending = pendingIdx >= 0;
+                                          const canRespond = pending && canRespondToProposal(booking);
+                                          const last = pending && Array.isArray(booking.proposals) ? booking.proposals![pendingIdx] : undefined;
+                                          const startLabel = last?.start ? new Date(last.start).toLocaleString() : undefined;
+                                          const durLabel = last?.durationMinutes ? `${last.durationMinutes} min` : undefined;
+
                                           return (
                                             <>
-                                              <button
-                                                onClick={() => openProposal(lessonId, booking.start, booking.end)}
-                                                className="btn"
-                                                disabled={pending}
-                                                title={pending ? 'A proposal is already pending' : 'Suggest a new start time'}
-                                                style={{ 
-                                                  fontSize: '0.875rem', 
-                                                  padding: '0.5rem 1rem', 
-                                                  background: pending ? '#f3f4f6' : '#eef2ff', 
-                                                  color: pending ? '#9ca3af' : '#3730a3', 
-                                                  border: '1px solid',
-                                                  borderColor: pending ? '#e5e7eb' : '#c7d2fe', 
-                                                  cursor: pending ? 'not-allowed' : 'pointer'
-                                                }}
-                                              >
-                                                Propose new time
-                                              </button>
-                                              {pending && (
-                                                <div style={{ fontSize: '0.8125rem', color: '#6b7280', marginTop: '0.375rem' }}>
-                                                  There's already a pending time change proposal awaiting response.
+                                              {!canRespond && (
+                                                <>
+                                                  <button
+                                                    onClick={() => openProposal(lessonId, booking.start, booking.end)}
+                                                    className="btn"
+                                                    disabled={pending}
+                                                    title={pending ? 'A proposal is already pending' : 'Suggest a new start time'}
+                                                    style={{ 
+                                                      fontSize: '0.875rem', 
+                                                      padding: '0.5rem 1rem', 
+                                                      background: pending ? '#f3f4f6' : '#eef2ff', 
+                                                      color: pending ? '#9ca3af' : '#3730a3', 
+                                                      border: '1px solid',
+                                                      borderColor: pending ? '#e5e7eb' : '#c7d2fe', 
+                                                      cursor: pending ? 'not-allowed' : 'pointer'
+                                                    }}
+                                                  >
+                                                    Propose new time
+                                                  </button>
+                                                  {pending && (
+                                                    <div style={{ fontSize: '0.8125rem', color: '#6b7280', marginTop: '0.375rem' }}>
+                                                      A proposal is pending. Waiting for the other party to respond.
+                                                    </div>
+                                                  )}
+                                                </>
+                                              )}
+
+                                              {canRespond && (
+                                                <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+                                                  <div style={{ fontSize: '0.875rem', color: '#374151' }}>
+                                                    Proposed time: {startLabel || '—'}{durLabel ? ` • ${durLabel}` : ''}
+                                                  </div>
+                                                  <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
+                                                    <button
+                                                      onClick={() => respondToProposal(lessonId, pendingIdx, 'accepted')}
+                                                      disabled={Boolean(proposalActionById[lessonId])}
+                                                      className="btn btn-primary"
+                                                      style={{ fontSize: '0.875rem', padding: '0.5rem 1rem' }}
+                                                    >
+                                                      {proposalActionById[lessonId] ? 'Accepting…' : 'Accept'}
+                                                    </button>
+                                                    <button
+                                                      onClick={() => respondToProposal(lessonId, pendingIdx, 'rejected')}
+                                                      disabled={Boolean(proposalActionById[lessonId])}
+                                                      className="btn btn-secondary"
+                                                      style={{ fontSize: '0.875rem', padding: '0.5rem 1rem' }}
+                                                    >
+                                                      {proposalActionById[lessonId] ? 'Rejecting…' : 'Reject'}
+                                                    </button>
+                                                  </div>
                                                 </div>
                                               )}
                                             </>
