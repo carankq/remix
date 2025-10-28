@@ -388,6 +388,79 @@ export default function PortalRoute() {
   const [codeLoadingById, setCodeLoadingById] = useState<Record<string, boolean>>({});
   const [codeErrorById, setCodeErrorById] = useState<Record<string, string>>({});
 
+  // Proposal modal (time change)
+  const [showProposalModal, setShowProposalModal] = useState(false);
+  const [proposalLessonId, setProposalLessonId] = useState<string | null>(null);
+  const [proposalDateTime, setProposalDateTime] = useState<string>(''); // YYYY-MM-DDTHH:mm
+  const [proposalDurationMin, setProposalDurationMin] = useState<string>('60');
+  const [proposalSubmitting, setProposalSubmitting] = useState(false);
+  const [proposalError, setProposalError] = useState<string | null>(null);
+
+  const openProposal = (lessonId: string, startMs?: number, endMs?: number) => {
+    setProposalLessonId(lessonId);
+    try {
+      if (typeof startMs === 'number') {
+        const iso = new Date(startMs).toISOString();
+        setProposalDateTime(iso.slice(0, 16));
+      } else {
+        setProposalDateTime('');
+      }
+      if (typeof startMs === 'number' && typeof endMs === 'number' && endMs > startMs) {
+        setProposalDurationMin(String(Math.max(1, Math.round((endMs - startMs) / 60000))));
+      } else {
+        setProposalDurationMin('60');
+      }
+    } catch {
+      setProposalDateTime('');
+      setProposalDurationMin('60');
+    }
+    setProposalError(null);
+    setShowProposalModal(true);
+  };
+
+  const submitProposal = async () => {
+    if (!proposalLessonId) return;
+    const host = getApiHost();
+    if (!host) return;
+    if (!token) { setProposalError('You must be signed in.'); return; }
+
+    const dt = (proposalDateTime || '').trim();
+    const durStr = (proposalDurationMin || '').trim();
+    const dur = parseInt(durStr, 10);
+    if (!dt) { setProposalError('Please choose a date and time.'); return; }
+    if (!Number.isFinite(dur) || dur < 1) { setProposalError('Duration must be at least 1 minute.'); return; }
+
+    const start = new Date(dt).getTime();
+    if (!Number.isFinite(start) || start <= 0) { setProposalError('Invalid date/time.'); return; }
+
+    setProposalSubmitting(true);
+    setProposalError(null);
+    try {
+      const res = await fetch(`${host}/lessons/${encodeURIComponent(proposalLessonId)}/proposal`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({ type: 'time', start, durationMinutes: dur })
+      });
+
+      let data: any = null;
+      try { data = await res.json(); } catch {}
+
+      if (res.ok) {
+        showMessage('Proposal sent successfully.', 'success');
+        setShowProposalModal(false);
+      } else {
+        setProposalError(data?.error || `Failed to send proposal (status ${res.status}).`);
+      }
+    } catch {
+      setProposalError('Network error while sending proposal.');
+    } finally {
+      setProposalSubmitting(false);
+    }
+  };
+
   // Redirect to auth if not authenticated
   useEffect(() => {
     if (!isAuthenticated) {
@@ -1766,6 +1839,17 @@ export default function PortalRoute() {
                                         )}
                                       </button>
                                     )}
+
+                                    {/* Propose new time (both roles) */}
+                                    {!isArchived && lessonId && (
+                                      <button
+                                        onClick={() => openProposal(lessonId, booking.start, booking.end)}
+                                        className="btn"
+                                        style={{ fontSize: '0.875rem', padding: '0.5rem 1rem', background: '#eef2ff', color: '#3730a3', border: '1px solid #c7d2fe' }}
+                                      >
+                                        Propose new time
+                                      </button>
+                                    )}
                                   </div>
                                 </div>
 
@@ -2228,6 +2312,94 @@ export default function PortalRoute() {
           autoClose={message.type === 'success'}
           autoCloseDelay={5000}
         />
+      )}
+
+      {/* Proposal Modal */}
+      {showProposalModal && (
+        <div style={{
+          position: 'fixed',
+          inset: 0,
+          background: 'rgba(0,0,0,0.5)',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          zIndex: 9999,
+          padding: '1rem'
+        }}
+        onClick={() => !proposalSubmitting && setShowProposalModal(false)}
+        >
+          <div style={{
+            background: 'white',
+            borderRadius: '1rem',
+            width: '100%',
+            maxWidth: '520px',
+            padding: '1.25rem',
+            boxShadow: '0 10px 40px rgba(0,0,0,0.2)'
+          }}
+          onClick={(e) => e.stopPropagation()}
+          >
+            <h3 style={{ fontSize: '1.25rem', fontWeight: 700, color: '#111827', marginBottom: '0.75rem' }}>Propose new time</h3>
+            <p style={{ fontSize: '0.9375rem', color: '#6b7280', marginBottom: '1rem' }}>
+              Suggest a new start time and duration. The other party will be notified to review your proposal.
+            </p>
+
+            <div style={{ display: 'grid', gap: '0.75rem', marginBottom: '0.75rem' }}>
+              <label style={{ fontSize: '0.875rem', color: '#374151' }}>
+                Start time
+                <input
+                  type="datetime-local"
+                  value={proposalDateTime}
+                  onChange={(e) => setProposalDateTime(e.target.value)}
+                  style={{ display: 'block', width: '100%', marginTop: '0.375rem', padding: '0.5rem 0.75rem', border: '1px solid #e5e7eb', borderRadius: '0.5rem' }}
+                />
+              </label>
+              <label style={{ fontSize: '0.875rem', color: '#374151' }}>
+                Duration (minutes)
+                <input
+                  type="number"
+                  min={1}
+                  value={proposalDurationMin}
+                  onChange={(e) => setProposalDurationMin(e.target.value)}
+                  style={{ display: 'block', width: '100%', marginTop: '0.375rem', padding: '0.5rem 0.75rem', border: '1px solid #e5e7eb', borderRadius: '0.5rem' }}
+                />
+              </label>
+            </div>
+
+            {proposalError && (
+              <div style={{
+                fontSize: '0.95rem',
+                color: '#dc2626',
+                background: '#fef2f2',
+                border: '1px solid #fecaca',
+                borderRadius: '0.5rem',
+                padding: '0.75rem 1rem',
+                marginBottom: '0.75rem'
+              }}>
+                {proposalError}
+              </div>
+            )}
+
+            <div style={{ display: 'flex', gap: '0.75rem', justifyContent: 'flex-end' }}>
+              <button
+                type="button"
+                className="btn"
+                onClick={() => !proposalSubmitting && setShowProposalModal(false)}
+                disabled={proposalSubmitting}
+                style={{ background: '#f3f4f6', border: '1px solid #e5e7eb' }}
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                className="btn btn-primary"
+                onClick={submitProposal}
+                disabled={proposalSubmitting}
+              >
+                {proposalSubmitting ? 'Sending…' : 'Send proposal'}
+              </button>
+            </div>
+          </div>
+        </div>
       )}
     </div>
   );
