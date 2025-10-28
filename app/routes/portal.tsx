@@ -36,6 +36,8 @@ interface BookingItem {
   instructorConsensus?: boolean;
   refundFailed?: boolean;
   refundReasonAccountedFor?: boolean;
+  // Proposal-related
+  proposals?: Array<{ status?: 'accepted' | 'rejected' | null; type?: string; start?: number; durationMinutes?: number; createdAt?: any; createdBy?: string }>;
 }
 
 function getApiHost(): string {
@@ -396,7 +398,21 @@ export default function PortalRoute() {
   const [proposalSubmitting, setProposalSubmitting] = useState(false);
   const [proposalError, setProposalError] = useState<string | null>(null);
 
+  // Helper to check if a lesson is archived (for UI display)
+  const isLessonArchived = (b: BookingItem) => Boolean(b.archived || b.isArchived || b.archivedAt);
+
+  // Helper to check if there is a pending proposal (status null or undefined)
+  const hasPendingProposal = (b: BookingItem): boolean => {
+    const arr = Array.isArray(b.proposals) ? b.proposals : [];
+    return arr.some(p => p && (p.status === null || typeof p.status === 'undefined'));
+  };
+
   const openProposal = (lessonId: string, startMs?: number, endMs?: number) => {
+    const b = bookings.find(x => String(x._id || x.id || x.bookingId || '') === lessonId);
+    if (b && hasPendingProposal(b)) {
+      showMessage('A time change proposal is already pending for this lesson. You can propose again after it is accepted or rejected.', 'warning');
+      return;
+    }
     setProposalLessonId(lessonId);
     try {
       if (typeof startMs === 'number') {
@@ -679,9 +695,6 @@ export default function PortalRoute() {
     return `${Math.floor(seconds / 604800)}w ago`;
   };
 
-  // Helper to check if a lesson is archived (for UI display)
-  const isLessonArchived = (b: BookingItem) => Boolean(b.archived || b.isArchived || b.archivedAt);
-  
   // No client-side filtering needed - the API returns filtered results based on the filter param
   const displayedBookings = bookings;
   
@@ -1842,13 +1855,37 @@ export default function PortalRoute() {
 
                                     {/* Propose new time (both roles) */}
                                     {!isArchived && lessonId && (
-                                      <button
-                                        onClick={() => openProposal(lessonId, booking.start, booking.end)}
-                                        className="btn"
-                                        style={{ fontSize: '0.875rem', padding: '0.5rem 1rem', background: '#eef2ff', color: '#3730a3', border: '1px solid #c7d2fe' }}
-                                      >
-                                        Propose new time
-                                      </button>
+                                      <div>
+                                        {(() => {
+                                          const pending = hasPendingProposal(booking);
+                                          return (
+                                            <>
+                                              <button
+                                                onClick={() => openProposal(lessonId, booking.start, booking.end)}
+                                                className="btn"
+                                                disabled={pending}
+                                                title={pending ? 'A proposal is already pending' : 'Suggest a new start time'}
+                                                style={{ 
+                                                  fontSize: '0.875rem', 
+                                                  padding: '0.5rem 1rem', 
+                                                  background: pending ? '#f3f4f6' : '#eef2ff', 
+                                                  color: pending ? '#9ca3af' : '#3730a3', 
+                                                  border: '1px solid',
+                                                  borderColor: pending ? '#e5e7eb' : '#c7d2fe', 
+                                                  cursor: pending ? 'not-allowed' : 'pointer'
+                                                }}
+                                              >
+                                                Propose new time
+                                              </button>
+                                              {pending && (
+                                                <div style={{ fontSize: '0.8125rem', color: '#6b7280', marginTop: '0.375rem' }}>
+                                                  There's already a pending time change proposal awaiting response.
+                                                </div>
+                                              )}
+                                            </>
+                                          );
+                                        })()}
+                                      </div>
                                     )}
                                   </div>
                                 </div>
