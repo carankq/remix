@@ -18,7 +18,16 @@ export function Header() {
       <div className="container px-4 py-4">
         <div className="flex items-center justify-between">
           <Link to="/" className="no-underline">
-            <h1 className="text-2xl text-gray-900 brand-name">Carank</h1>
+            <h1 style={{
+              fontSize: '1.75rem',
+              fontWeight: '800',
+              color: '#111827',
+              fontFamily: "'Space Grotesk', sans-serif",
+              letterSpacing: '-0.02em',
+              margin: 0
+            }}>
+              Carank
+            </h1>
           </Link>
           <div className="flex items-center gap-3">
             {isAuthenticated && user ? (
