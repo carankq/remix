@@ -21,7 +21,9 @@ type Instructor = {
   phone?: string;
   email?: string;
   specializations?: string[];
-  availability?: string[];
+  availability?:
+    | Array<{ day: string; start?: string; end?: string; startTime?: string; endTime?: string }>
+    | { working?: Array<{ day: string; startTime: string; endTime: string }>; exceptions?: Array<any> };
   languages?: string[];
   enabled?: boolean;
   image?: string;
@@ -62,7 +64,16 @@ export async function loader({ request }: LoaderFunctionArgs) {
       phone: r.phone,
       email: r.email,
       specializations: Array.isArray(r.specializations) ? r.specializations.slice(0, 5) : undefined, // Limit array size
-      availability: Array.isArray(r.availability) ? r.availability.slice(0, 7) : undefined, // Limit to one week
+      availability: (() => {
+        // Handle both old array format and new object format
+        if (Array.isArray(r.availability)) {
+          return r.availability.slice(0, 7); // Legacy format
+        } else if (r.availability && typeof r.availability === 'object' && Array.isArray(r.availability.working)) {
+          // New format: return the working schedule
+          return { working: r.availability.working.slice(0, 7), exceptions: [] };
+        }
+        return undefined;
+      })(),
       languages: Array.isArray(r.languages) ? r.languages.slice(0, 3) : undefined, // Limit languages shown
       enabled: r.enabled,
       image: r.image || r.profileImage || r.avatar,
