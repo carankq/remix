@@ -111,7 +111,7 @@ export function TrustTechnologySection() {
               </ul>
             </div>
 
-            {/* Stripe Identity Verification */}
+            {/* Dual Verification System */}
             <div style={{
               background: 'rgba(255, 255, 255, 0.1)',
               backdropFilter: 'blur(10px)',
@@ -139,9 +139,9 @@ export function TrustTechnologySection() {
                 marginBottom: '1.5rem'
               }}>
                 <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                  <path d="M12 2a10 10 0 0 1 10 10v1a4 4 0 0 1-4 4h-1.5"/>
-                  <path d="M12 2v10"/>
-                  <circle cx="12" cy="12" r="3"/>
+                  <path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
+                  <circle cx="8.5" cy="7" r="4"/>
+                  <polyline points="17 11 19 13 23 9"/>
                 </svg>
               </div>
               <h3 style={{ 
@@ -150,19 +150,41 @@ export function TrustTechnologySection() {
                 marginBottom: '0.75rem',
                 fontFamily: "'Space Grotesk', sans-serif"
               }}>
-                Stripe Identity Verification
+                Dual Verification System
               </h3>
               <p style={{ 
                 fontSize: '0.9375rem', 
                 lineHeight: '1.6',
-                opacity: 0.9
+                opacity: 0.9,
+                marginBottom: '0.75rem'
               }}>
-                Every instructor undergoes rigorous identity verification through Stripe, including government-issued ID checks and facial recognition technology.
+                Every instructor passes through <strong>two layers of verification</strong>: automated Stripe identity checks and manual admin review.
               </p>
+              <div style={{ 
+                background: 'rgba(255, 255, 255, 0.1)',
+                borderRadius: '0.5rem',
+                padding: '0.75rem 1rem',
+                marginBottom: '1rem',
+                fontSize: '0.8125rem',
+                opacity: 0.95
+              }}>
+                <strong style={{ display: 'block', marginBottom: '0.25rem' }}>Automated (Stripe):</strong>
+                Government ID, facial recognition, driving license verification
+              </div>
+              <div style={{ 
+                background: 'rgba(255, 255, 255, 0.1)',
+                borderRadius: '0.5rem',
+                padding: '0.75rem 1rem',
+                marginBottom: '1rem',
+                fontSize: '0.8125rem',
+                opacity: 0.95
+              }}>
+                <strong style={{ display: 'block', marginBottom: '0.25rem' }}>Human Review:</strong>
+                Admin team manually approves every instructor before they can accept bookings
+              </div>
               <ul style={{ 
                 listStyle: 'none', 
-                padding: 0, 
-                marginTop: '1.25rem',
+                padding: 0,
                 fontSize: '0.875rem',
                 opacity: 0.85
               }}>
@@ -170,19 +192,13 @@ export function TrustTechnologySection() {
                   <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
                     <polyline points="20 6 9 17 4 12"/>
                   </svg>
-                  Driving license verification
-                </li>
-                <li style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.5rem' }}>
-                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                    <polyline points="20 6 9 17 4 12"/>
-                  </svg>
-                  Facial recognition matching
+                  Double-checked credentials
                 </li>
                 <li style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
                   <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
                     <polyline points="20 6 9 17 4 12"/>
                   </svg>
-                  Instant verification status
+                  Strive for authenticity
                 </li>
               </ul>
             </div>
