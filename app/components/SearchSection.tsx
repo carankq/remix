@@ -75,31 +75,10 @@ export function SearchSection({
   };
 
   return (
-    <section style={{
-      background: 'linear-gradient(135deg, #1e3a8a 0%, #3b82f6 50%, #60a5fa 100%)',
+    <section className="bg-deep-navy" style={{
       padding: '3.5rem 0 4.5rem',
-      position: 'relative',
-      overflow: 'hidden'
+      position: 'relative'
     }}>
-      {/* Decorative background elements */}
-      <div style={{
-        position: 'absolute',
-        top: '-50%',
-        right: '-10%',
-        width: '500px',
-        height: '500px',
-        background: 'radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%)',
-        borderRadius: '50%'
-      }} />
-      <div style={{
-        position: 'absolute',
-        bottom: '-30%',
-        left: '-5%',
-        width: '400px',
-        height: '400px',
-        background: 'radial-gradient(circle, rgba(255,255,255,0.08) 0%, transparent 70%)',
-        borderRadius: '50%'
-      }} />
 
       <div className="container mx-auto px-4" style={{ position: 'relative', zIndex: 1 }}>
         <div style={{ maxWidth: '1200px', margin: '0 auto' }}>
