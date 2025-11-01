@@ -75,16 +75,51 @@ export default function BookingPage() {
   const [confirmed, setConfirmed] = useState<{ bookingId?: string } | null>(null);
   const [hasSavedPm, setHasSavedPm] = useState(false);
   const [savedLast4, setSavedLast4] = useState<string | null>(null);
+  const [availability, setAvailability] = useState<Array<{ day: string; startTime: number; endTime: number }>>([]);
+  const [loadingAvailability, setLoadingAvailability] = useState(false);
 
   const instructor = loaderData.instructor;
   const loadError = loaderData.error;
 
   useEffect(() => {
-    if (!isAuthenticated) {
+    if (!isAuthenticated && instructorId) {
       // Redirect to auth page with return URL
-      navigate(`/auth?redirect=/book?instructor=${instructorId}`);
+      navigate(`/auth?redirect=${encodeURIComponent(`/book?instructor=${instructorId}`)}`);
     }
   }, [isAuthenticated, navigate, instructorId]);
+
+  // Fetch availability when date changes
+  useEffect(() => {
+    if (!date || !instructorId) return;
+    
+    const fetchAvailability = async () => {
+      setLoadingAvailability(true);
+      try {
+        const apiHost = (window as any).__ENV__?.API_HOST || 'http://localhost:3001';
+        const selectedDate = new Date(date);
+        const start = selectedDate.setHours(0, 0, 0, 0);
+        const end = selectedDate.setHours(23, 59, 59, 999);
+        
+        const res = await fetch(
+          `${apiHost}/instructors/${encodeURIComponent(instructorId)}/availability-summary?start=${start}&end=${end}&roundMins=30`,
+          { headers: { 'Accept': 'application/json' } }
+        );
+        
+        if (res.ok) {
+          const data = await res.json();
+          setAvailability(Array.isArray(data) ? data : []);
+        } else {
+          setAvailability([]);
+        }
+      } catch {
+        setAvailability([]);
+      } finally {
+        setLoadingAvailability(false);
+      }
+    };
+    
+    fetchAvailability();
+  }, [date, instructorId]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -146,6 +181,18 @@ export default function BookingPage() {
 
   const placeholder = 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><rect width="100" height="100" rx="50" fill="%23e5e7eb"/><circle cx="50" cy="38" r="18" fill="%239ca3af"/><path d="M20 86c4-18 18-28 30-28s26 10 30 28" fill="%239ca3af"/></svg>';
   const imgSrc = instructor?.image && instructor.image.trim().length > 0 ? instructor.image : placeholder;
+
+  const formatTime = (timestamp: number) => {
+    const d = new Date(timestamp);
+    return d.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' });
+  };
+
+  const handleTimeSlotClick = (startTime: number) => {
+    const d = new Date(startTime);
+    const hours = String(d.getHours()).padStart(2, '0');
+    const minutes = String(d.getMinutes()).padStart(2, '0');
+    setTime(`${hours}:${minutes}`);
+  };
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', minHeight: '100vh' }}>
@@ -457,6 +504,137 @@ export default function BookingPage() {
                     </div>
                   </div>
                 </div>
+
+                {/* Available Time Slots */}
+                {date && (
+                  <div style={{ marginBottom: '2rem' }}>
+                    <h3 style={{
+                      fontSize: '1.125rem',
+                      fontWeight: '600',
+                      color: '#0f172a',
+                      marginBottom: '1rem',
+                      fontFamily: "'Space Grotesk', sans-serif"
+                    }}>
+                      Available Time Slots for {new Date(date).toLocaleDateString('en-GB', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })}
+                    </h3>
+                    
+                    {loadingAvailability ? (
+                      <div style={{
+                        padding: '3rem',
+                        textAlign: 'center',
+                        background: '#f9fafb',
+                        borderRadius: '0',
+                        border: '1px solid #e5e7eb'
+                      }}>
+                        <svg className="animate-spin" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#3b82f6" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ margin: '0 auto 1rem' }}>
+                          <path d="M21 12a9 9 0 11-6.219-8.56"/>
+                        </svg>
+                        <p style={{ color: '#6b7280', fontSize: '0.9375rem' }}>Loading availability...</p>
+                      </div>
+                    ) : availability.length === 0 ? (
+                      <div style={{
+                        padding: '2rem',
+                        textAlign: 'center',
+                        background: '#fef2f2',
+                        border: '1px solid #fecaca',
+                        borderRadius: '0'
+                      }}>
+                        <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#ef4444" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ margin: '0 auto 1rem' }}>
+                          <circle cx="12" cy="12" r="10"/>
+                          <line x1="12" y1="8" x2="12" y2="12"/>
+                          <line x1="12" y1="16" x2="12.01" y2="16"/>
+                        </svg>
+                        <p style={{ color: '#dc2626', fontSize: '1rem', fontWeight: '600', marginBottom: '0.5rem' }}>
+                          No availability on this date
+                        </p>
+                        <p style={{ color: '#991b1b', fontSize: '0.875rem', margin: 0 }}>
+                          Please choose a different date or contact the instructor directly.
+                        </p>
+                      </div>
+                    ) : (
+                      <div style={{
+                        display: 'grid',
+                        gridTemplateColumns: 'repeat(auto-fill, minmax(140px, 1fr))',
+                        gap: '0.75rem',
+                        padding: '1.5rem',
+                        background: '#f9fafb',
+                        border: '1px solid #e5e7eb',
+                        borderRadius: '0'
+                      }}>
+                        {availability.map((slot, idx) => {
+                          const slotStartTime = formatTime(slot.startTime);
+                          const slotEndTime = formatTime(slot.endTime);
+                          const d = new Date(slot.startTime);
+                          const hours = String(d.getHours()).padStart(2, '0');
+                          const minutes = String(d.getMinutes()).padStart(2, '0');
+                          const slotTimeValue = `${hours}:${minutes}`;
+                          const isSelected = time === slotTimeValue;
+                          
+                          return (
+                            <button
+                              key={idx}
+                              type="button"
+                              onClick={() => handleTimeSlotClick(slot.startTime)}
+                              style={{
+                                padding: '0.875rem 1rem',
+                                background: isSelected ? '#2563eb' : '#ffffff',
+                                color: isSelected ? '#ffffff' : '#374151',
+                                border: isSelected ? '2px solid #2563eb' : '1px solid #d1d5db',
+                                borderRadius: '0',
+                                cursor: 'pointer',
+                                transition: 'all 0.2s ease',
+                                fontSize: '0.875rem',
+                                fontWeight: isSelected ? '600' : '500',
+                                textAlign: 'center'
+                              }}
+                              onMouseEnter={(e) => {
+                                if (!isSelected) {
+                                  e.currentTarget.style.background = '#f3f4f6';
+                                  e.currentTarget.style.borderColor = '#9ca3af';
+                                }
+                              }}
+                              onMouseLeave={(e) => {
+                                if (!isSelected) {
+                                  e.currentTarget.style.background = '#ffffff';
+                                  e.currentTarget.style.borderColor = '#d1d5db';
+                                }
+                              }}
+                            >
+                              <div style={{ fontWeight: '600', marginBottom: '0.25rem' }}>
+                                {slotStartTime}
+                              </div>
+                              <div style={{ 
+                                fontSize: '0.75rem', 
+                                opacity: isSelected ? 0.9 : 0.7,
+                                color: isSelected ? '#dbeafe' : '#6b7280'
+                              }}>
+                                to {slotEndTime}
+                              </div>
+                            </button>
+                          );
+                        })}
+                      </div>
+                    )}
+                    
+                    {availability.length > 0 && (
+                      <p style={{
+                        marginTop: '0.75rem',
+                        fontSize: '0.8125rem',
+                        color: '#6b7280',
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '0.5rem'
+                      }}>
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                          <circle cx="12" cy="12" r="10"/>
+                          <line x1="12" y1="16" x2="12" y2="12"/>
+                          <line x1="12" y1="8" x2="12.01" y2="8"/>
+                        </svg>
+                        Click on a time slot to automatically fill in the time field, or enter your preferred time manually.
+                      </p>
+                    )}
+                  </div>
+                )}
 
                 {/* Additional Notes */}
                 <div style={{ marginBottom: '2rem' }}>
