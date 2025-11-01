@@ -25,7 +25,7 @@ export function TrustTechnologySection() {
               margin: '0 auto',
               lineHeight: '1.7'
             }}>
-              We've partnered with industry leaders to create the safest, most transparent platform for driving lessons
+              We've partnered with industry leaders to create a safe and transparent platform for driving lessons
             </p>
           </div>
 
