@@ -1,4 +1,4 @@
-import { Link, useNavigate } from "@remix-run/react";
+import { Link, useNavigate, useLocation } from "@remix-run/react";
 import { useState } from "react";
 import { useAuth } from "../context/AuthContext";
 
@@ -6,6 +6,9 @@ export function Header() {
   const { isAuthenticated, user, logout } = useAuth();
   const [showUserMenu, setShowUserMenu] = useState(false);
   const navigate = useNavigate();
+  const location = useLocation();
+  
+  const isHomePage = location.pathname === '/';
 
   const handleLogout = () => {
     logout();
@@ -14,14 +17,17 @@ export function Header() {
   };
 
   return (
-    <header className="bg-white border border-gray-100">
+    <header style={{
+      background: isHomePage ? '#1e40af' : '#ffffff',
+      borderBottom: isHomePage ? '1px solid rgba(255, 255, 255, 0.1)' : '1px solid #f3f4f6'
+    }}>
       <div className="container px-4 py-4">
         <div className="flex items-center justify-between">
           <Link to="/" className="no-underline">
             <h1 style={{
               fontSize: '1.75rem',
               fontWeight: '800',
-              color: '#111827',
+              color: isHomePage ? '#ffffff' : '#111827',
               fontFamily: "'Space Grotesk', sans-serif",
               letterSpacing: '-0.02em',
               margin: 0
@@ -39,22 +45,32 @@ export function Header() {
                     alignItems: 'center',
                     gap: '0.75rem',
                     padding: '0.75rem 1rem',
-                    background: '#f9fafb',
-                    border: '1px solid #e5e7eb',
-                    borderRadius: '0.75rem',
+                    background: isHomePage ? 'rgba(255, 255, 255, 0.15)' : '#f9fafb',
+                    border: isHomePage ? '1px solid rgba(255, 255, 255, 0.2)' : '1px solid #e5e7eb',
+                    borderRadius: '0',
                     cursor: 'pointer',
                     transition: 'all 0.2s ease',
                     fontSize: '0.95rem',
                     fontWeight: '500',
-                    color: '#111827'
+                    color: isHomePage ? '#ffffff' : '#111827'
                   }}
                   onMouseEnter={(e) => {
-                    e.currentTarget.style.background = '#f3f4f6';
-                    e.currentTarget.style.borderColor = '#d1d5db';
+                    if (isHomePage) {
+                      e.currentTarget.style.background = 'rgba(255, 255, 255, 0.25)';
+                      e.currentTarget.style.borderColor = 'rgba(255, 255, 255, 0.3)';
+                    } else {
+                      e.currentTarget.style.background = '#f3f4f6';
+                      e.currentTarget.style.borderColor = '#d1d5db';
+                    }
                   }}
                   onMouseLeave={(e) => {
-                    e.currentTarget.style.background = '#f9fafb';
-                    e.currentTarget.style.borderColor = '#e5e7eb';
+                    if (isHomePage) {
+                      e.currentTarget.style.background = 'rgba(255, 255, 255, 0.15)';
+                      e.currentTarget.style.borderColor = 'rgba(255, 255, 255, 0.2)';
+                    } else {
+                      e.currentTarget.style.background = '#f9fafb';
+                      e.currentTarget.style.borderColor = '#e5e7eb';
+                    }
                   }}
                 >
                   <div style={{
@@ -231,7 +247,38 @@ export function Header() {
                 )}
               </div>
             ) : (
-              <Link to="/auth" className="btn btn-primary">Login</Link>
+              <Link 
+                to="/auth" 
+                className="btn"
+                style={{
+                  background: isHomePage ? 'rgba(255, 255, 255, 0.15)' : '#2563eb',
+                  color: '#ffffff',
+                  border: isHomePage ? '1px solid rgba(255, 255, 255, 0.2)' : 'none',
+                  boxShadow: isHomePage ? 'none' : '0 8px 24px rgba(37,99,235,0.25)'
+                }}
+                onMouseEnter={(e) => {
+                  if (isHomePage) {
+                    e.currentTarget.style.background = 'rgba(255, 255, 255, 0.25)';
+                    e.currentTarget.style.borderColor = 'rgba(255, 255, 255, 0.3)';
+                  } else {
+                    e.currentTarget.style.background = '#1d4ed8';
+                    e.currentTarget.style.transform = 'translateY(-2px)';
+                    e.currentTarget.style.boxShadow = '0 12px 30px rgba(29,78,216,0.35)';
+                  }
+                }}
+                onMouseLeave={(e) => {
+                  if (isHomePage) {
+                    e.currentTarget.style.background = 'rgba(255, 255, 255, 0.15)';
+                    e.currentTarget.style.borderColor = 'rgba(255, 255, 255, 0.2)';
+                  } else {
+                    e.currentTarget.style.background = '#2563eb';
+                    e.currentTarget.style.transform = 'translateY(0)';
+                    e.currentTarget.style.boxShadow = '0 8px 24px rgba(37,99,235,0.25)';
+                  }
+                }}
+              >
+                Login
+              </Link>
             )}
           </div>
         </div>

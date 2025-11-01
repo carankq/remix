@@ -75,9 +75,10 @@ export function SearchSection({
   };
 
   return (
-    <section className="bg-deep-navy" style={{
+    <section style={{
       padding: '3.5rem 0 4.5rem',
-      position: 'relative'
+      position: 'relative',
+      background: '#1e40af'
     }}>
 
       <div className="container mx-auto px-4" style={{ position: 'relative', zIndex: 1 }}>
