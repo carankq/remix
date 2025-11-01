@@ -15,7 +15,9 @@ type Instructor = {
   phone?: string;
   email?: string;
   specializations?: string[];
-  availability?: Array<{ day: string; start?: string; end?: string; startTime?: string; endTime?: string }>;
+  availability?:
+    | Array<{ day: string; start?: string; end?: string; startTime?: string; endTime?: string }>
+    | { working?: Array<{ day: string; startTime: string; endTime: string }>; exceptions?: Array<any> };
   languages?: string[];
   enabled?: boolean;
   image?: string;
@@ -32,6 +34,27 @@ export function InstructorCard({ instructor, showActions = true }: InstructorCar
   const hasImage = instructor.image && instructor.image.trim() !== '';
   const placeholder = 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><rect width="100" height="100" rx="50" fill="%23e5e7eb"/><circle cx="50" cy="38" r="18" fill="%239ca3af"/><path d="M20 86c4-18 18-28 30-28s26 10 30 28" fill="%239ca3af"/></svg>';
   const imgSrc = hasImage ? instructor.image : placeholder;
+  
+  // Normalize availability to a simple array of slots we can render
+  const workingSlots: Array<{ day: string; startTime: string; endTime: string }> = (() => {
+    const a: any = instructor.availability as any;
+    if (!a) return [];
+    if (Array.isArray(a)) {
+      // legacy shape: array of { day, start|startTime, end|endTime }
+      return (a as any[])
+        .map((s: any) => ({
+          day: String(s.day || ''),
+          startTime: String(s.startTime || s.start || ''),
+          endTime: String(s.endTime || s.end || ''),
+        }))
+        .filter(s => s.day && s.startTime && s.endTime);
+    }
+    // new shape: { working: [ { day, startTime, endTime } ], exceptions: [...] }
+    const w: any[] = Array.isArray(a.working) ? a.working : [];
+    return w
+      .map((s: any) => ({ day: String(s.day || ''), startTime: String(s.startTime || ''), endTime: String(s.endTime || '') }))
+      .filter(s => s.day && s.startTime && s.endTime);
+  })();
   
   const handleCardClick = (e: React.MouseEvent) => {
     // Don't navigate if clicking on a button or link
@@ -252,7 +275,7 @@ export function InstructorCard({ instructor, showActions = true }: InstructorCar
 
         {/* Languages */}
         {instructor.languages && instructor.languages.length > 0 && (
-          <div style={{ marginBottom: instructor.availability && instructor.availability.length > 0 ? '1.5rem' : (showActions ? '1.5rem' : 0) }}>
+          <div style={{ marginBottom: workingSlots.length > 0 ? '1.5rem' : (showActions ? '1.5rem' : 0) }}>
             <h5 style={{ 
               fontSize: '0.75rem', 
               fontWeight: '600', 
@@ -280,8 +303,8 @@ export function InstructorCard({ instructor, showActions = true }: InstructorCar
           </div>
         )}
 
-        {/* Availability */}
-        {instructor.availability && instructor.availability.length > 0 && (
+        {/* Availability (working only) */}
+        {workingSlots.length > 0 && (
           <div style={{ marginBottom: showActions ? '1.5rem' : 0 }}>
             <h5 style={{ 
               fontSize: '0.75rem', 
@@ -294,7 +317,7 @@ export function InstructorCard({ instructor, showActions = true }: InstructorCar
               Availability
             </h5>
             <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.5rem' }}>
-              {instructor.availability.slice(0, 6).map((a, i) => (
+              {workingSlots.slice(0, 6).map((a, i) => (
                 <span key={i} style={{
                   padding: '0.5rem 0.875rem',
                   background: '#fef3c7',
@@ -303,10 +326,10 @@ export function InstructorCard({ instructor, showActions = true }: InstructorCar
                   fontSize: '0.8125rem',
                   fontWeight: '500'
                 }}>
-                  {a.day.slice(0, 3)} {a.start || (a.startTime ? new Date(a.startTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : '')}–{a.end || (a.endTime ? new Date(a.endTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : '')}
+                  {a.day.slice(0, 3)} {a.startTime}–{a.endTime}
                 </span>
               ))}
-              {instructor.availability.length > 6 && (
+              {workingSlots.length > 6 && (
                 <span style={{
                   padding: '0.5rem 0.875rem',
                   background: '#f1f5f9',
@@ -315,7 +338,7 @@ export function InstructorCard({ instructor, showActions = true }: InstructorCar
                   fontSize: '0.8125rem',
                   fontWeight: '500'
                 }}>
-                  +{instructor.availability.length - 6} more
+                  +{workingSlots.length - 6} more
                 </span>
               )}
             </div>

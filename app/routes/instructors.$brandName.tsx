@@ -20,13 +20,9 @@ interface InstructorData {
   phone?: string;
   email?: string;
   specializations?: string[];
-  availability?: Array<{ 
-    day: string; 
-    start?: string; 
-    end?: string; 
-    startTime?: string; 
-    endTime?: string 
-  }>;
+  availability?:
+    | Array<{ day: string; start?: string; end?: string; startTime?: string; endTime?: string }>
+    | { working?: Array<{ day: string; startTime: string; endTime: string }>; exceptions?: Array<any> };
   languages?: string[];
   enabled?: boolean;
   image?: string;
@@ -94,6 +90,24 @@ export default function InstructorProfilePage() {
   const placeholder = 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="200" height="200" viewBox="0 0 200 200"><rect width="200" height="200" rx="100" fill="%23e5e7eb"/><circle cx="100" cy="76" r="36" fill="%239ca3af"/><path d="M40 172c8-36 36-56 60-56s52 20 60 56" fill="%239ca3af"/></svg>';
   const imgSrc = hasImage ? instructor.image : placeholder;
   const instructorId = instructor._id || instructor.id;
+
+  const workingSlots: Array<{ day: string; startTime: string; endTime: string }> = (() => {
+    const a: any = instructor.availability as any;
+    if (!a) return [];
+    if (Array.isArray(a)) {
+      return (a as any[])
+        .map((s: any) => ({
+          day: String(s.day || ''),
+          startTime: String(s.startTime || s.start || ''),
+          endTime: String(s.endTime || s.end || ''),
+        }))
+        .filter(s => s.day && s.startTime && s.endTime);
+    }
+    const w: any[] = Array.isArray(a.working) ? a.working : [];
+    return w
+      .map((s: any) => ({ day: String(s.day || ''), startTime: String(s.startTime || ''), endTime: String(s.endTime || '') }))
+      .filter(s => s.day && s.startTime && s.endTime);
+  })();
   
   return (
     <div style={{ display: 'flex', flexDirection: 'column', minHeight: '100vh', background: '#f8fafc' }}>
@@ -443,8 +457,8 @@ export default function InstructorProfilePage() {
               </div>
             )}
             
-            {/* Availability Card */}
-            {instructor.availability && instructor.availability.length > 0 && (
+            {/* Availability Card (working only) */}
+            {workingSlots.length > 0 && (
               <div style={{
                 background: '#ffffff',
                 borderRadius: '1rem',
@@ -462,7 +476,7 @@ export default function InstructorProfilePage() {
                   Availability
                 </h3>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
-                  {instructor.availability.map((a: any, i: number) => (
+                  {workingSlots.map((a: any, i: number) => (
                     <div key={i} style={{
                       padding: '1rem 1.25rem',
                       background: 'linear-gradient(135deg, #fefce8 0%, #fef9c3 100%)',
@@ -476,7 +490,7 @@ export default function InstructorProfilePage() {
                         {a.day}
                       </span>
                       <span style={{ fontSize: '0.9375rem', color: '#854d0e', fontWeight: '500' }}>
-                        {a.start || (a.startTime ? new Date(a.startTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : '')} – {a.end || (a.endTime ? new Date(a.endTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : '')}
+                        {a.startTime} – {a.endTime}
                       </span>
                     </div>
                   ))}

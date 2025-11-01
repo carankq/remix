@@ -1982,7 +1982,7 @@ export default function PortalRoute() {
                                                 <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
                                                   <div style={{ fontSize: '0.875rem', color: '#374151' }}>
                                                     You proposed: {startLabel || '—'}{durLabel ? ` • ${durLabel}` : ''}
-                                                  </div>
+                                  </div>
                                                   <div>
                                                     <button
                                                       onClick={() => respondToProposal(lessonId, pendingIdx, 'rejected')}

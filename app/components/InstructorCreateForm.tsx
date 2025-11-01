@@ -49,7 +49,13 @@ const InstructorCreateForm: React.FC<InstructorCreateFormProps> = ({ onCreated }
   });
   const [specializations, setSpecializations] = useState<string[]>([]);
   const [languages, setLanguages] = useState<string[]>([]);
+  // Working availability (day + HH:MM inputs rendered as strings)
   const [availability, setAvailability] = useState<{ day: string; start: string; end: string }[]>([]);
+  // Exceptions (date + specific times for that date)
+  const [excDate, setExcDate] = useState(''); // YYYY-MM-DD
+  const [excStart, setExcStart] = useState(''); // HH:MM
+  const [excEnd, setExcEnd] = useState(''); // HH:MM
+  const [exceptions, setExceptions] = useState<{ date: string; start: string; end: string }[]>([]);
   const [langSelect, setLangSelect] = useState('');
   const [specSelect, setSpecSelect] = useState('');
   const [postcodes, setPostcodes] = useState<string[]>([]);
@@ -171,6 +177,17 @@ const InstructorCreateForm: React.FC<InstructorCreateFormProps> = ({ onCreated }
       const mm = String(d.getMinutes()).padStart(2, '0');
       return `${hh}:${mm}`;
     };
+    const ampmToHHMM = (s: string): string => {
+      if (!s) return '';
+      const m = s.trim().match(/^([0-9]{1,2}):([0-9]{2})\s*([ap]m)$/i);
+      if (!m) return s; // fallback
+      let h = parseInt(m[1], 10);
+      const mm = m[2];
+      const ampm = m[3].toLowerCase();
+      if (ampm === 'pm' && h !== 12) h += 12;
+      if (ampm === 'am' && h === 12) h = 0;
+      return `${String(h).padStart(2, '0')}:${mm}`;
+    };
     setInstForm(prev => ({
       ...prev,
       name: ownerInst.name || prev.name,
@@ -188,7 +205,20 @@ const InstructorCreateForm: React.FC<InstructorCreateFormProps> = ({ onCreated }
     setPostcodes(Array.isArray(ownerInst.postcode) ? ownerInst.postcode : (ownerInst.postcode ? [ownerInst.postcode] : []));
     setSpecializations(Array.isArray(ownerInst.specializations) ? ownerInst.specializations : []);
     setLanguages(Array.isArray(ownerInst.languages) ? ownerInst.languages : []);
-    setAvailability(Array.isArray(ownerInst.availability) ? ownerInst.availability.map((a: any) => ({ day: a.day, start: toHHMM(a.startTime), end: toHHMM(a.endTime) })) : []);
+    // Prefill availability (support both legacy array and new object with .working/.exceptions)
+    if (Array.isArray(ownerInst.availability)) {
+      setAvailability(ownerInst.availability.map((a: any) => ({ day: a.day, start: toHHMM(a.startTime), end: toHHMM(a.endTime) })));
+      setExceptions([]);
+    } else if (ownerInst.availability && typeof ownerInst.availability === 'object') {
+      const w = Array.isArray(ownerInst.availability.working) ? ownerInst.availability.working : [];
+      // working.startTime/endTime are strings like 10:30am per new schema
+      setAvailability(w.map((a: any) => ({ day: a.day, start: ampmToHHMM(String(a.startTime || '')), end: ampmToHHMM(String(a.endTime || '')) })));
+      const ex = Array.isArray(ownerInst.availability.exceptions) ? ownerInst.availability.exceptions : [];
+      setExceptions(ex.map((e: any) => ({ date: new Date(e.date).toISOString().slice(0,10), start: toHHMM(e.startTime), end: toHHMM(e.endTime) })));
+    } else {
+      setAvailability([]);
+      setExceptions([]);
+    }
   }, [mode, ownerInst]);
 
   const onInstChange = (field: keyof typeof instForm) => (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
@@ -244,6 +274,18 @@ const InstructorCreateForm: React.FC<InstructorCreateFormProps> = ({ onCreated }
     setInstSuccess(null);
     setInstSubmitting(true);
     try {
+      const toAmPm = (hhmm: string): string => {
+        if (!hhmm) return '';
+        const [hStr, m] = hhmm.split(':');
+        let h = Number(hStr);
+        const ampm = h >= 12 ? 'pm' : 'am';
+        h = h % 12; if (h === 0) h = 12;
+        return `${h}:${m}${ampm}`;
+      };
+      const toDateMs = (dateStr: string, timeHHMM: string): number => {
+        const d = new Date(`${dateStr}T${timeHHMM}:00`);
+        return d.getTime();
+      };
       const payload: any = {
         ownerId: user.id,
         name: instForm.name.trim(),
@@ -259,12 +301,20 @@ const InstructorCreateForm: React.FC<InstructorCreateFormProps> = ({ onCreated }
         email: instForm.email.trim() || undefined,
         image: instForm.image.trim() || undefined,
         specializations: specializations,
-        availability: availability.map(a => ({
-          day: a.day,
-          // Unix ms timestamps as required by PUT schema
-          startTime: new Date(`1970-01-01T${a.start}:00Z`).getTime(),
-          endTime: new Date(`1970-01-01T${a.end}:00Z`).getTime()
-        })),
+        availability: {
+          working: availability.map(a => ({
+            day: a.day,
+            // working times are plain strings like 10:30am per new schema
+            startTime: toAmPm(a.start),
+            endTime: toAmPm(a.end)
+          })),
+          exceptions: exceptions.map(ex => ({
+            // exceptions require timestamps per guidance
+            date: new Date(`${ex.date}T00:00:00`).getTime(),
+            startTime: toDateMs(ex.date, ex.start),
+            endTime: toDateMs(ex.date, ex.end)
+          }))
+        },
         languages: languages,
       };
       if (!payload.name || !payload.brandName || postcodes.length === 0 || !payload.vehicleType) {
@@ -299,6 +349,7 @@ const InstructorCreateForm: React.FC<InstructorCreateFormProps> = ({ onCreated }
         setSpecializations([]);
         setLanguages([]);
         setAvailability([]);
+        setExceptions([]);
         setLangSelect('');
         setPostcodes([]);
         setPostcodeInput('');
@@ -1088,6 +1139,84 @@ const InstructorCreateForm: React.FC<InstructorCreateFormProps> = ({ onCreated }
               </div>
             )}
           </div>
+        </div>
+
+        {/* Exceptions Section */}
+        <div style={sectionStyle}>
+          <h3 style={sectionHeaderStyle}>
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ color: '#ef4444' }}>
+              <path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/>
+            </svg>
+            Exceptions (optional)
+          </h3>
+          <p style={{ fontSize: '0.8125rem', color: '#64748b', marginBottom: '1rem', lineHeight: '1.5' }}>
+            Add one-off exceptions to your schedule for specific dates.
+          </p>
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr', gap: '0.75rem', marginBottom: '1rem' }}>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(140px, 1fr))', gap: '0.75rem' }}>
+              <div>
+                <label style={{ display: 'block', fontSize: '0.75rem', fontWeight: '500', color: '#64748b', marginBottom: '0.375rem', textTransform: 'uppercase', letterSpacing: '0.025em' }}>Date</label>
+                <input type="date" className="input w-full" value={excDate} onChange={(e)=>setExcDate(e.target.value)} />
+              </div>
+              <div>
+                <label style={{ display: 'block', fontSize: '0.75rem', fontWeight: '500', color: '#64748b', marginBottom: '0.375rem', textTransform: 'uppercase', letterSpacing: '0.025em' }}>Start</label>
+                <input type="time" className="input w-full" value={excStart} onChange={(e)=>setExcStart(e.target.value)} />
+              </div>
+              <div>
+                <label style={{ display: 'block', fontSize: '0.75rem', fontWeight: '500', color: '#64748b', marginBottom: '0.375rem', textTransform: 'uppercase', letterSpacing: '0.025em' }}>End</label>
+                <input type="time" className="input w-full" value={excEnd} onChange={(e)=>setExcEnd(e.target.value)} />
+              </div>
+            </div>
+            <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
+              <button type="button" className="btn" onClick={()=>{
+                if (!excDate || !excStart || !excEnd) return;
+                if (excStart >= excEnd) return;
+                const key = `${excDate}-${excStart}-${excEnd}`;
+                if (exceptions.some(e => `${e.date}-${e.start}-${e.end}` === key)) return;
+                setExceptions(prev => [...prev, { date: excDate, start: excStart, end: excEnd }]);
+                setExcDate(''); setExcStart(''); setExcEnd('');
+              }} style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', fontSize: '0.875rem' }}>
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <line x1="12" y1="5" x2="12" y2="19"/>
+                  <line x1="5" y1="12" x2="19" y2="12"/>
+                </svg>
+                Add Exception
+              </button>
+            </div>
+          </div>
+          {exceptions.length > 0 && (
+            <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.5rem', paddingTop: '0.75rem', borderTop: '1px solid #e2e8f0' }}>
+              {exceptions.map(e => {
+                const key = `${e.date}-${e.start}-${e.end}`;
+                return (
+                  <span key={key} style={{
+                    display: 'inline-flex', alignItems: 'center', gap: '0.5rem',
+                    padding: '0.5rem 0.875rem', borderRadius: '0.5rem',
+                    background: '#fee2e2', color: '#991b1b', fontSize: '0.8125rem', fontWeight: '500'
+                  }}>
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                      <path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/>
+                    </svg>
+                    {e.date} {e.start}–{e.end}
+                    <button
+                      type="button"
+                      onClick={()=>setExceptions(prev => prev.filter(x => `${x.date}-${x.start}-${x.end}` !== key))}
+                      style={{
+                        display: 'flex', alignItems: 'center', justifyContent: 'center', width: '18px', height: '18px', borderRadius: '50%', background: 'transparent', border: 'none', cursor: 'pointer', transition: 'background 0.2s', marginLeft: '0.25rem', padding: 0
+                      }}
+                      onMouseEnter={(e) => e.currentTarget.style.background = '#fecaca'}
+                      onMouseLeave={(e) => e.currentTarget.style.background = 'transparent'}
+                    >
+                      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" style={{ color: '#991b1b' }}>
+                        <line x1="18" y1="6" x2="6" y2="18"/>
+                        <line x1="6" y1="6" x2="18" y2="18"/>
+                      </svg>
+                    </button>
+                  </span>
+                );
+              })}
+            </div>
+          )}
         </div>
 
         {/* Description Section */}
