@@ -102,6 +102,90 @@ export default function Safeguarding() {
           </div>
         </section>
 
+        {/* Positive Section - Benefits */}
+        <section style={{
+          background: 'linear-gradient(135deg, #10b981 0%, #059669 100%)',
+          borderRadius: '1rem',
+          padding: '2.5rem',
+          marginBottom: '2rem',
+          color: 'white',
+          boxShadow: '0 10px 40px rgba(16, 185, 129, 0.3)'
+        }}>
+          <div style={{ textAlign: 'center', marginBottom: '2rem' }}>
+            <div style={{
+              display: 'inline-flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              width: '64px',
+              height: '64px',
+              borderRadius: '50%',
+              background: 'rgba(255,255,255,0.2)',
+              marginBottom: '1rem'
+            }}>
+              <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+                <polyline points="9 12 11 14 15 10"/>
+              </svg>
+            </div>
+            <h2 style={{ fontSize: '2rem', fontWeight: '700', margin: '0 0 1rem 0' }}>
+              ✨ Why Carank is Safer
+            </h2>
+            <p style={{ fontSize: '1.125rem', opacity: 0.95, maxWidth: '700px', margin: '0 auto' }}>
+              Following these guidelines isn't just about avoiding problems - it's about creating a positive, trustworthy community where everyone feels confident and protected.
+            </p>
+          </div>
+
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '1.5rem' }}>
+            <div style={{ background: 'rgba(255,255,255,0.15)', padding: '1.5rem', borderRadius: '0.75rem', backdropFilter: 'blur(10px)' }}>
+              <div style={{ fontSize: '2.5rem', marginBottom: '0.75rem' }}>🔍</div>
+              <h3 style={{ fontSize: '1.25rem', fontWeight: '600', margin: '0 0 0.75rem 0' }}>Verified Community</h3>
+              <p style={{ margin: 0, lineHeight: '1.7', opacity: 0.95 }}>
+                All instructors and students are verified with proper documentation. You're learning with real, authenticated people, not anonymous strangers.
+              </p>
+            </div>
+
+            <div style={{ background: 'rgba(255,255,255,0.15)', padding: '1.5rem', borderRadius: '0.75rem', backdropFilter: 'blur(10px)' }}>
+              <div style={{ fontSize: '2.5rem', marginBottom: '0.75rem' }}>🛡️</div>
+              <h3 style={{ fontSize: '1.25rem', fontWeight: '600', margin: '0 0 0.75rem 0' }}>Built-In Protections</h3>
+              <p style={{ margin: 0, lineHeight: '1.7', opacity: 0.95 }}>
+                Vehicle registration tracking, identity verification, and reporting systems mean bad actors are quickly identified and removed from the platform.
+              </p>
+            </div>
+
+            <div style={{ background: 'rgba(255,255,255,0.15)', padding: '1.5rem', borderRadius: '0.75rem', backdropFilter: 'blur(10px)' }}>
+              <div style={{ fontSize: '2.5rem', marginBottom: '0.75rem' }}>🤝</div>
+              <h3 style={{ fontSize: '1.25rem', fontWeight: '600', margin: '0 0 0.75rem 0' }}>Mutual Respect</h3>
+              <p style={{ margin: 0, lineHeight: '1.7', opacity: 0.95 }}>
+                When both parties follow the guidelines, lessons are professional, comfortable, and focused on learning - creating better outcomes for everyone.
+              </p>
+            </div>
+
+            <div style={{ background: 'rgba(255,255,255,0.15)', padding: '1.5rem', borderRadius: '0.75rem', backdropFilter: 'blur(10px)' }}>
+              <div style={{ fontSize: '2.5rem', marginBottom: '0.75rem' }}>💪</div>
+              <h3 style={{ fontSize: '1.25rem', fontWeight: '600', margin: '0 0 0.75rem 0' }}>Peace of Mind</h3>
+              <p style={{ margin: 0, lineHeight: '1.7', opacity: 0.95 }}>
+                Knowing that safety measures are in place lets you focus on what matters - learning to drive and building confidence on the road.
+              </p>
+            </div>
+
+            <div style={{ background: 'rgba(255,255,255,0.15)', padding: '1.5rem', borderRadius: '0.75rem', backdropFilter: 'blur(10px)' }}>
+              <div style={{ fontSize: '2.5rem', marginBottom: '0.75rem' }}>📱</div>
+              <h3 style={{ fontSize: '1.25rem', fontWeight: '600', margin: '0 0 0.75rem 0' }}>Always Supported</h3>
+              <p style={{ margin: 0, lineHeight: '1.7', opacity: 0.95 }}>
+                Our admin portal and support team are here to help. You're never alone - report concerns anytime and we'll take action swiftly.
+              </p>
+            </div>
+
+            <div style={{ background: 'rgba(255,255,255,0.15)', padding: '1.5rem', borderRadius: '0.75rem', backdropFilter: 'blur(10px)' }}>
+              <div style={{ fontSize: '2.5rem', marginBottom: '0.75rem' }}>⭐</div>
+              <h3 style={{ fontSize: '1.25rem', fontWeight: '600', margin: '0 0 0.75rem 0' }}>Better Experience</h3>
+              <p style={{ margin: 0, lineHeight: '1.7', opacity: 0.95 }}>
+                Safe lessons are more effective lessons. When everyone feels secure, students learn faster and instructors can teach better.
+              </p>
+            </div>
+          </div>
+        </section>
+
         {/* Quick Summary Section */}
         <section style={{
           background: '#eff6ff',
@@ -679,6 +763,81 @@ export default function Safeguarding() {
           </div>
         </section>
 
+        {/* Positive Following Guidelines Section */}
+        <section style={{
+          background: 'linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%)',
+          borderRadius: '1rem',
+          padding: '2rem',
+          marginBottom: '2rem',
+          color: 'white',
+          boxShadow: '0 10px 40px rgba(59, 130, 246, 0.3)'
+        }}>
+          <div style={{ textAlign: 'center' }}>
+            <div style={{
+              display: 'inline-flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              width: '56px',
+              height: '56px',
+              borderRadius: '50%',
+              background: 'rgba(255,255,255,0.2)',
+              marginBottom: '1rem'
+            }}>
+              <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/>
+                <polyline points="22 4 12 14.01 9 11.01"/>
+              </svg>
+            </div>
+            <h2 style={{ fontSize: '1.875rem', fontWeight: '700', margin: '0 0 1rem 0' }}>
+              🎯 The Positive Side: When Everyone Follows the Guidelines
+            </h2>
+            <p style={{ fontSize: '1.125rem', lineHeight: '1.8', margin: '0 0 2rem 0', opacity: 0.95, maxWidth: '700px', marginLeft: 'auto', marginRight: 'auto' }}>
+              The vast majority of lessons on Carank go smoothly because people follow these simple guidelines. Here's what happens when everyone does their part:
+            </p>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: '1.5rem', textAlign: 'left' }}>
+              <div style={{ background: 'rgba(255,255,255,0.15)', padding: '1.25rem', borderRadius: '0.75rem' }}>
+                <div style={{ fontSize: '2rem', marginBottom: '0.75rem' }}>🎓</div>
+                <h3 style={{ fontSize: '1.125rem', fontWeight: '600', marginBottom: '0.5rem' }}>Better Learning</h3>
+                <p style={{ margin: 0, fontSize: '0.9375rem', lineHeight: '1.6', opacity: 0.95 }}>
+                  Students progress faster when they feel comfortable and safe, leading to quicker test passes.
+                </p>
+              </div>
+              <div style={{ background: 'rgba(255,255,255,0.15)', padding: '1.25rem', borderRadius: '0.75rem' }}>
+                <div style={{ fontSize: '2rem', marginBottom: '0.75rem' }}>😊</div>
+                <h3 style={{ fontSize: '1.125rem', fontWeight: '600', marginBottom: '0.5rem' }}>Enjoyable Lessons</h3>
+                <p style={{ margin: 0, fontSize: '0.9375rem', lineHeight: '1.6', opacity: 0.95 }}>
+                  Professional, respectful interactions make learning to drive an enjoyable experience, not a stressful one.
+                </p>
+              </div>
+              <div style={{ background: 'rgba(255,255,255,0.15)', padding: '1.25rem', borderRadius: '0.75rem' }}>
+                <div style={{ fontSize: '2rem', marginBottom: '0.75rem' }}>🌟</div>
+                <h3 style={{ fontSize: '1.125rem', fontWeight: '600', marginBottom: '0.5rem' }}>Trust & Reputation</h3>
+                <p style={{ margin: 0, fontSize: '0.9375rem', lineHeight: '1.6', opacity: 0.95 }}>
+                  Instructors build strong reputations, students get quality teaching, and everyone benefits from a trustworthy platform.
+                </p>
+              </div>
+              <div style={{ background: 'rgba(255,255,255,0.15)', padding: '1.25rem', borderRadius: '0.75rem' }}>
+                <div style={{ fontSize: '2rem', marginBottom: '0.75rem' }}>🏆</div>
+                <h3 style={{ fontSize: '1.125rem', fontWeight: '600', marginBottom: '0.5rem' }}>Success Stories</h3>
+                <p style={{ margin: 0, fontSize: '0.9375rem', lineHeight: '1.6', opacity: 0.95 }}>
+                  Following guidelines leads to thousands of successful driving test passes and satisfied learners across the UK.
+                </p>
+              </div>
+            </div>
+            <div style={{ 
+              marginTop: '2rem', 
+              padding: '1.25rem', 
+              background: 'rgba(255,255,255,0.2)', 
+              borderRadius: '0.75rem',
+              border: '2px solid rgba(255,255,255,0.3)'
+            }}>
+              <p style={{ margin: 0, fontSize: '1.125rem', lineHeight: '1.7', fontWeight: '500' }}>
+                💡 <strong>Remember:</strong> These guidelines aren't here to make things difficult - they're here to make your driving journey smoother, safer, and more successful. Most people on Carank have wonderful experiences because they follow these simple steps!
+              </p>
+            </div>
+          </div>
+        </section>
+
         {/* Reporting Section */}
         <section style={{
           background: '#fffbeb',
@@ -842,7 +1001,7 @@ export default function Safeguarding() {
             By using Carank's services, you acknowledge that you have read and understood these safeguarding guidelines.
           </p>
           <p style={{ margin: '0.5rem 0 0 0' }}>
-            Last updated: November 2024
+            Last updated: November 2025
           </p>
         </div>
       </main>
