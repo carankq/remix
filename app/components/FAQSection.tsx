@@ -23,7 +23,7 @@ function AccordionItem({ item, index, active, onToggle }: { item: FAQItem; index
     <div style={{ 
       background: 'white', 
       border: '1px solid #e5e7eb', 
-      borderRadius: '0.75rem',
+      borderRadius: '0',
       marginBottom: '1rem',
       overflow: 'hidden',
       transition: 'all 0.2s ease',
@@ -163,7 +163,7 @@ export function FAQSection({ blogs }: { blogs: any[] }) {
                     style={{
                       background: 'white',
                       border: '1px solid #e5e7eb',
-                      borderRadius: '1rem',
+                      borderRadius: '0',
                       padding: '2rem',
                       transition: 'all 0.2s ease',
                       boxShadow: '0 1px 3px rgba(0,0,0,0.05)'
@@ -209,7 +209,7 @@ export function FAQSection({ blogs }: { blogs: any[] }) {
                           padding: '0.75rem 1.5rem',
                           background: '#2563eb',
                           color: 'white',
-                          borderRadius: '0.5rem',
+                          borderRadius: '0',
                           fontSize: '0.95rem',
                           fontWeight: '500',
                           transition: 'all 0.2s ease',

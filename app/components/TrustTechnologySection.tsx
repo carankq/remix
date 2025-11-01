@@ -40,7 +40,7 @@ export function TrustTechnologySection() {
             <div style={{
               background: 'rgba(255, 255, 255, 0.1)',
               backdropFilter: 'blur(10px)',
-              borderRadius: '1rem',
+              borderRadius: '0',
               padding: '2rem',
               border: '1px solid rgba(255, 255, 255, 0.2)',
               transition: 'transform 0.3s ease, box-shadow 0.3s ease'
@@ -115,7 +115,7 @@ export function TrustTechnologySection() {
             <div style={{
               background: 'rgba(255, 255, 255, 0.1)',
               backdropFilter: 'blur(10px)',
-              borderRadius: '1rem',
+              borderRadius: '0',
               padding: '2rem',
               border: '1px solid rgba(255, 255, 255, 0.2)',
               transition: 'transform 0.3s ease, box-shadow 0.3s ease'
@@ -162,7 +162,7 @@ export function TrustTechnologySection() {
               </p>
               <div style={{ 
                 background: 'rgba(255, 255, 255, 0.1)',
-                borderRadius: '0.5rem',
+                borderRadius: '0',
                 padding: '0.75rem 1rem',
                 marginBottom: '1rem',
                 fontSize: '0.8125rem',
@@ -173,7 +173,7 @@ export function TrustTechnologySection() {
               </div>
               <div style={{ 
                 background: 'rgba(255, 255, 255, 0.1)',
-                borderRadius: '0.5rem',
+                borderRadius: '0',
                 padding: '0.75rem 1rem',
                 marginBottom: '1rem',
                 fontSize: '0.8125rem',
@@ -207,7 +207,7 @@ export function TrustTechnologySection() {
             <div style={{
               background: 'rgba(255, 255, 255, 0.1)',
               backdropFilter: 'blur(10px)',
-              borderRadius: '1rem',
+              borderRadius: '0',
               padding: '2rem',
               border: '1px solid rgba(255, 255, 255, 0.2)',
               transition: 'transform 0.3s ease, box-shadow 0.3s ease'
@@ -316,7 +316,7 @@ export function TrustTechnologySection() {
                 padding: '0.875rem 2rem',
                 background: 'rgba(255, 255, 255, 0.95)',
                 color: '#667eea',
-                borderRadius: '0.5rem',
+                borderRadius: '0',
                 fontWeight: '600',
                 textDecoration: 'none',
                 transition: 'all 0.2s ease',

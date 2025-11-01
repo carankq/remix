@@ -110,7 +110,7 @@ export function SearchSection({
           {/* Main Search Card */}
           <div style={{
             background: 'rgba(255, 255, 255, 0.98)',
-            borderRadius: '1.5rem',
+            borderRadius: '0',
             padding: '2.5rem',
             boxShadow: '0 20px 60px rgba(0,0,0,0.3)',
             backdropFilter: 'blur(10px)',
@@ -150,7 +150,7 @@ export function SearchSection({
                       fontSize: '1rem',
                       color: '#111827',
                       border: '2px solid #e5e7eb',
-                      borderRadius: '0.75rem',
+                      borderRadius: '0',
                       outline: 'none',
                       transition: 'all 0.2s ease',
                       background: '#ffffff',
@@ -211,7 +211,7 @@ export function SearchSection({
                       fontSize: '1rem',
                       color: filters.gender ? '#111827' : '#94a3b8',
                       border: '2px solid #e5e7eb',
-                      borderRadius: '0.75rem',
+                      borderRadius: '0',
                       outline: 'none',
                       transition: 'all 0.2s ease',
                       background: '#ffffff',
@@ -297,7 +297,7 @@ export function SearchSection({
                       fontSize: '1rem',
                       color: filters.vehicleType ? '#111827' : '#94a3b8',
                       border: '2px solid #e5e7eb',
-                      borderRadius: '0.75rem',
+                      borderRadius: '0',
                       outline: 'none',
                       transition: 'all 0.2s ease',
                       background: '#ffffff',
@@ -386,7 +386,7 @@ export function SearchSection({
                       fontSize: '1rem',
                       color: filters.language ? '#111827' : '#94a3b8',
                       border: '2px solid #e5e7eb',
-                      borderRadius: '0.75rem',
+                      borderRadius: '0',
                       outline: 'none',
                       transition: 'all 0.2s ease',
                       background: '#ffffff',
@@ -460,7 +460,7 @@ export function SearchSection({
               <div style={{
                 padding: '1.25rem',
                 background: 'linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%)',
-                borderRadius: '1rem',
+                borderRadius: '0',
                 marginBottom: '1.5rem',
                 border: '1px solid #bfdbfe'
               }}>
@@ -479,28 +479,28 @@ export function SearchSection({
                   <span style={{ fontSize: '0.875rem', fontWeight: '600', color: '#1e40af' }}>
                     Active Filters
                   </span>
-                </div>
+          </div>
                 <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.5rem' }}>
-                  {postcodes.map((pc, idx) => {
-                    const isLast = idx === postcodes.length - 1;
-                    return (
-                      <span key={`pc-${idx}`} style={{
-                        display: 'inline-flex',
-                        alignItems: 'center',
-                        gap: '0.5rem',
+                {postcodes.map((pc, idx) => {
+                  const isLast = idx === postcodes.length - 1;
+                  return (
+                    <span key={`pc-${idx}`} style={{
+                      display: 'inline-flex',
+                      alignItems: 'center',
+                      gap: '0.5rem',
                         padding: '0.5rem 0.875rem',
-                        background: 'white',
-                        color: '#1e40af',
-                        borderRadius: '0.5rem',
-                        fontSize: '0.875rem',
-                        fontWeight: '500',
+                      background: 'white',
+                      color: '#1e40af',
+                        borderRadius: '0',
+                      fontSize: '0.875rem',
+                      fontWeight: '500',
                         boxShadow: '0 2px 4px rgba(0,0,0,0.05)'
-                      }}>
-                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                          <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/>
-                          <circle cx="12" cy="10" r="3"/>
-                        </svg>
-                        <span>{pc}</span>
+                    }}>
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                        <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/>
+                        <circle cx="12" cy="10" r="3"/>
+                      </svg>
+                      <span>{pc}</span>
                         <button type="button" aria-label="Remove postcode" onClick={() => removePostcode(pc, idx)} style={{
                           display: 'inline-flex',
                           alignItems: 'center',
@@ -517,8 +517,8 @@ export function SearchSection({
                         onMouseEnter={(e) => e.currentTarget.style.background = '#dbeafe'}
                         onMouseLeave={(e) => e.currentTarget.style.background = 'transparent'}>
                           <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M18 6L6 18M6 6l12 12" /></svg>
-                        </button>
-                        {isLast && (
+                      </button>
+                      {isLast && (
                           <button type="button" aria-label="Add new postcode" onClick={startNewPostcode} style={{
                             display: 'inline-flex',
                             alignItems: 'center',
@@ -535,75 +535,75 @@ export function SearchSection({
                           onMouseEnter={(e) => e.currentTarget.style.background = '#dbeafe'}
                           onMouseLeave={(e) => e.currentTarget.style.background = 'transparent'}>
                             <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 5v14M5 12h14" /></svg>
-                          </button>
-                        )}
-                      </span>
-                    );
-                  })}
-                  {filters.gender && (
-                    <span style={{
-                      display: 'inline-flex',
-                      alignItems: 'center',
-                      gap: '0.5rem',
+                        </button>
+                      )}
+                    </span>
+                  );
+                })}
+                {filters.gender && (
+                  <span style={{
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: '0.5rem',
                       padding: '0.5rem 0.875rem',
-                      background: 'white',
-                      color: '#1e40af',
-                      borderRadius: '0.5rem',
-                      fontSize: '0.875rem',
-                      fontWeight: '500',
+                    background: 'white',
+                    color: '#1e40af',
+                        borderRadius: '0',
+                    fontSize: '0.875rem',
+                    fontWeight: '500',
                       boxShadow: '0 2px 4px rgba(0,0,0,0.05)'
-                    }}>
-                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                        <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
-                        <circle cx="12" cy="7" r="4"/>
-                      </svg>
+                  }}>
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                      <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+                      <circle cx="12" cy="7" r="4"/>
+                    </svg>
                       {filters.gender}
-                    </span>
-                  )}
-                  {filters.vehicleType && (
-                    <span style={{
-                      display: 'inline-flex',
-                      alignItems: 'center',
-                      gap: '0.5rem',
+                  </span>
+                )}
+                {filters.vehicleType && (
+                  <span style={{
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: '0.5rem',
                       padding: '0.5rem 0.875rem',
-                      background: 'white',
-                      color: '#1e40af',
-                      borderRadius: '0.5rem',
-                      fontSize: '0.875rem',
-                      fontWeight: '500',
+                    background: 'white',
+                    color: '#1e40af',
+                        borderRadius: '0',
+                    fontSize: '0.875rem',
+                    fontWeight: '500',
                       boxShadow: '0 2px 4px rgba(0,0,0,0.05)'
-                    }}>
-                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                        <path d="M5 17h2l.5-1.5h9L17 17h2"/>
-                        <path d="M12 17v-6"/>
-                        <path d="M9 5h6l3 6H6l3-6z"/>
-                        <circle cx="8" cy="17" r="2"/>
-                        <circle cx="16" cy="17" r="2"/>
-                      </svg>
+                  }}>
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                      <path d="M5 17h2l.5-1.5h9L17 17h2"/>
+                      <path d="M12 17v-6"/>
+                      <path d="M9 5h6l3 6H6l3-6z"/>
+                      <circle cx="8" cy="17" r="2"/>
+                      <circle cx="16" cy="17" r="2"/>
+                    </svg>
                       {filters.vehicleType}
-                    </span>
-                  )}
-                  {filters.language && (
-                    <span style={{
-                      display: 'inline-flex',
-                      alignItems: 'center',
-                      gap: '0.5rem',
+                  </span>
+                )}
+                {filters.language && (
+                  <span style={{
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: '0.5rem',
                       padding: '0.5rem 0.875rem',
-                      background: 'white',
-                      color: '#1e40af',
-                      borderRadius: '0.5rem',
-                      fontSize: '0.875rem',
-                      fontWeight: '500',
+                    background: 'white',
+                    color: '#1e40af',
+                        borderRadius: '0',
+                    fontSize: '0.875rem',
+                    fontWeight: '500',
                       boxShadow: '0 2px 4px rgba(0,0,0,0.05)'
-                    }}>
-                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                        <circle cx="12" cy="12" r="10"/>
-                        <line x1="2" y1="12" x2="22" y2="12"/>
-                        <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/>
-                      </svg>
+                  }}>
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                      <circle cx="12" cy="12" r="10"/>
+                      <line x1="2" y1="12" x2="22" y2="12"/>
+                      <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/>
+                    </svg>
                       {filters.language}
-                    </span>
-                  )}
+                  </span>
+                )}
                 </div>
               </div>
             )}
@@ -625,7 +625,7 @@ export function SearchSection({
                   color: '#64748b',
                   background: 'white',
                   border: '2px solid #e5e7eb',
-                  borderRadius: '0.75rem',
+                  borderRadius: '0',
                   cursor: 'pointer',
                   transition: 'all 0.2s ease',
                   display: 'flex',
@@ -656,7 +656,7 @@ export function SearchSection({
                   color: 'white',
                   background: 'linear-gradient(135deg, #2563eb 0%, #3b82f6 100%)',
                   border: 'none',
-                  borderRadius: '0.75rem',
+                  borderRadius: '0',
                   cursor: 'pointer',
                   transition: 'all 0.2s ease',
                   display: 'flex',
