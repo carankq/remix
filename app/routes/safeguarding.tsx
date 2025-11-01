@@ -416,9 +416,22 @@ export default function Safeguarding() {
                     <p style={{ margin: '0 0 0.5rem 0', lineHeight: '1.7', fontSize: '1rem', fontWeight: '600' }}>
                       ✅ <strong>Verified by DVLA:</strong>
                     </p>
-                    <p style={{ margin: 0, lineHeight: '1.7', fontSize: '0.9375rem', opacity: 0.95 }}>
+                    <p style={{ margin: '0 0 0.75rem 0', lineHeight: '1.7', fontSize: '0.9375rem', opacity: 0.95 }}>
                       Carank retrieves vehicle information directly from the DVLA (Driver and Vehicle Licensing Agency) on your behalf. This data <strong>cannot be faked or altered</strong> by instructors. It is the instructor's legal responsibility to keep this information up to date when they change vehicles.
                     </p>
+                    <div style={{ 
+                      background: 'rgba(251, 191, 36, 0.3)',
+                      padding: '0.875rem',
+                      borderRadius: '0.5rem',
+                      border: '2px solid rgba(251, 191, 36, 0.6)'
+                    }}>
+                      <p style={{ margin: '0 0 0.5rem 0', lineHeight: '1.7', fontSize: '0.9375rem', fontWeight: '700' }}>
+                        ⚠️ <strong>Important Limitation:</strong>
+                      </p>
+                      <p style={{ margin: 0, lineHeight: '1.7', fontSize: '0.875rem', opacity: 0.95 }}>
+                        While we verify the vehicle's credentials are genuine, <strong>it's more difficult to verify the vehicle actually belongs to the instructor</strong>. This is why YOU must be extra vigilant - carefully check the vehicle registration matches the profile, and if anything seems wrong, walk away immediately.
+                      </p>
+                    </div>
                   </div>
                   <p style={{ margin: '0 0 0.75rem 0', lineHeight: '1.7', fontSize: '1rem' }}>
                     Before you approach or enter ANY vehicle, verify these details match EXACTLY with the instructor's portal profile:
