@@ -603,6 +603,82 @@ export default function Safeguarding() {
           </div>
         </section>
 
+        {/* Consequences Section - NEW */}
+        <section style={{
+          background: '#450a0a',
+          border: '3px solid #7f1d1d',
+          borderRadius: '1rem',
+          padding: '2rem',
+          marginBottom: '2rem',
+          color: 'white'
+        }}>
+          <div style={{ display: 'flex', alignItems: 'start', gap: '1rem' }}>
+            <div style={{
+              minWidth: '56px',
+              width: '56px',
+              height: '56px',
+              borderRadius: '0.75rem',
+              background: '#7f1d1d',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              flexShrink: 0
+            }}>
+              <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                <circle cx="12" cy="12" r="10"/>
+                <line x1="15" y1="9" x2="9" y2="15"/>
+                <line x1="9" y1="9" x2="15" y2="15"/>
+              </svg>
+            </div>
+            <div style={{ flex: 1 }}>
+              <h2 style={{ fontSize: '1.875rem', fontWeight: '700', margin: '0 0 1rem 0' }}>
+                ⚠️ Serious Consequences for Safety Violations
+              </h2>
+              <div style={{ background: 'rgba(255,255,255,0.15)', padding: '1.5rem', borderRadius: '0.75rem', marginBottom: '1rem' }}>
+                <p style={{ fontSize: '1.125rem', lineHeight: '1.8', margin: '0 0 1rem 0', fontWeight: '500' }}>
+                  Carank takes safeguarding extremely seriously. Any reports that threaten the safety, wellbeing, or integrity of students or instructors will be thoroughly investigated.
+                </p>
+                <div style={{ background: 'rgba(255,255,255,0.95)', color: '#7f1d1d', padding: '1.25rem', borderRadius: '0.5rem', marginBottom: '1rem' }}>
+                  <h3 style={{ fontSize: '1.25rem', fontWeight: '700', margin: '0 0 1rem 0', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                    <span style={{ fontSize: '1.5rem' }}>🚫</span>
+                    Permanent Exclusion from Carank
+                  </h3>
+                  <p style={{ margin: '0 0 1rem 0', lineHeight: '1.7', fontSize: '1rem' }}>
+                    <strong>Both students and instructors</strong> can be permanently banned from the Carank platform for serious violations including, but not limited to:
+                  </p>
+                  <ul style={{ margin: 0, paddingLeft: '1.5rem', lineHeight: '1.8', fontSize: '1rem' }}>
+                    <li>Providing false identification or documentation</li>
+                    <li>Using an unregistered or different vehicle than stated in the profile</li>
+                    <li>Inappropriate, threatening, or abusive behavior</li>
+                    <li>Sexual harassment or misconduct of any kind</li>
+                    <li>Driving under the influence of drugs or alcohol</li>
+                    <li>Deliberate deception or fraud</li>
+                    <li>Any behavior that compromises safety or wellbeing</li>
+                    <li>Repeated failure to follow safeguarding guidelines</li>
+                  </ul>
+                </div>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem', fontSize: '1.0625rem' }}>
+                  <div style={{ display: 'flex', alignItems: 'start', gap: '0.75rem' }}>
+                    <span style={{ fontSize: '1.5rem', lineHeight: 1 }}>⚖️</span>
+                    <div>
+                      <strong>For Instructors:</strong> Permanent ban means immediate removal from the platform, loss of all bookings, and potential reporting to relevant authorities if criminal activity is suspected.
+                    </div>
+                  </div>
+                  <div style={{ display: 'flex', alignItems: 'start', gap: '0.75rem' }}>
+                    <span style={{ fontSize: '1.5rem', lineHeight: 1 }}>⚖️</span>
+                    <div>
+                      <strong>For Students:</strong> Permanent ban means you will be unable to book lessons with any instructor on Carank, and serious incidents may be reported to authorities.
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <p style={{ fontSize: '1.0625rem', lineHeight: '1.7', margin: 0, fontStyle: 'italic', opacity: 0.95 }}>
+                We have zero tolerance for behavior that compromises safety. These consequences apply equally to students and instructors - everyone is held to the same standards.
+              </p>
+            </div>
+          </div>
+        </section>
+
         {/* Reporting Section */}
         <section style={{
           background: '#fffbeb',
