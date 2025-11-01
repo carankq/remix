@@ -237,6 +237,23 @@ const InstructorCreateForm: React.FC<InstructorCreateFormProps> = ({ onCreated }
     setInstForm(prev => ({ ...prev, [field]: e.target.value }));
   };
 
+  const onPriceChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const raw = e.target.value;
+    const value = raw.trim();
+    // Allow: empty, digits, digits with optional . and up to 2 decimals, or leading . with up to 2 decimals
+    const isAllowed = /^$|^\d+$|^\d+\.\d{0,2}$|^\.\d{0,2}$/.test(value);
+    if (!isAllowed) return;
+    const normalized = value.startsWith('.') ? `0${value}` : value;
+    if (normalized !== '' && normalized !== '.') {
+      const num = parseFloat(normalized);
+      if (!Number.isNaN(num) && num > 60) {
+        setInstForm(prev => ({ ...prev, pricePerHour: '60' }));
+        return;
+      }
+    }
+    setInstForm(prev => ({ ...prev, pricePerHour: value }));
+  };
+
   const addSpec = () => {
     const v = specSelect.trim();
     if (!v) return;
@@ -304,7 +321,7 @@ const InstructorCreateForm: React.FC<InstructorCreateFormProps> = ({ onCreated }
         name: instForm.name.trim(),
         brandName: instForm.brandName.trim(),
         description: instForm.description.trim() || undefined,
-        pricePerHour: instForm.pricePerHour ? Number(instForm.pricePerHour) : undefined,
+        pricePerHour: instForm.pricePerHour.trim() !== '' ? Math.min(60, parseFloat(instForm.pricePerHour)) : undefined,
         postcode: postcodes, // array of strings as required
         gender: instForm.gender || undefined,
         vehicleType: instForm.vehicleType,
@@ -832,12 +849,16 @@ const InstructorCreateForm: React.FC<InstructorCreateFormProps> = ({ onCreated }
                   id="instructor-price-per-hour"
                   name="pricePerHour"
                   className="input w-full" 
-                  type="number" 
-                  placeholder="25" 
-                  value={instForm.pricePerHour} 
-                  onChange={onInstChange('pricePerHour')} 
+                  type="text"
+                  inputMode="decimal"
+                  placeholder="25"
+                  value={instForm.pricePerHour}
+                  onChange={onPriceChange}
                   style={{ paddingLeft: '2rem' }} 
                 />
+                <p style={{ fontSize: '0.75rem', color: '#64748b', marginTop: '0.375rem' }}>
+                  Maximum £60 per hour
+                </p>
               </div>
             </div>
             <div>
