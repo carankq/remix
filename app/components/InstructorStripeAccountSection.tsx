@@ -25,6 +25,10 @@ export function InstructorStripeAccountSection({ instructorId, trueInstructor }:
   const [isCheckingOnboard, setIsCheckingOnboard] = useState(false);
   const [onboarded, setOnboarded] = useState<boolean | null>(null);
   const [onboardError, setOnboardError] = useState<string | null>(null);
+  const [showReasons, setShowReasons] = useState(false);
+  const [isFetchingReasons, setIsFetchingReasons] = useState(false);
+  const [reasonsData, setReasonsData] = useState<any>(null);
+  const [reasonsError, setReasonsError] = useState<string | null>(null);
 
   useEffect(() => {
     const run = async () => {
@@ -211,6 +215,43 @@ export function InstructorStripeAccountSection({ instructorId, trueInstructor }:
     checkOnboard();
   }, [exists, instructorId, token]);
 
+  const handleFetchReasons = async () => {
+    if (!instructorId) return;
+    const host = getApiHost();
+    if (!host) return;
+    if (!token) {
+      setReasonsError('You must be signed in to view onboarding details.');
+      return;
+    }
+
+    setIsFetchingReasons(true);
+    setReasonsError(null);
+    setReasonsData(null);
+
+    try {
+      const res = await fetch(`${host}/instructors/${encodeURIComponent(instructorId)}/account/onboarding-reasons`, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      const data = await res.json().catch(() => ({}));
+
+      if (res.status === 200 && data) {
+        setReasonsData(data);
+        setShowReasons(true);
+      } else if (res.status === 404) {
+        setReasonsError('Stripe account not found. Please create one first.');
+      } else if (res.status === 401) {
+        setReasonsError('You are not authorized to view onboarding details. Please sign in again.');
+      } else {
+        const message = (data && (data.error || data.message)) || `Unexpected status ${res.status}`;
+        setReasonsError(message);
+      }
+    } catch {
+      setReasonsError('Network error while fetching onboarding details.');
+    } finally {
+      setIsFetchingReasons(false);
+    }
+  };
+
   return (
     <div>
       {isLoading && (
@@ -297,6 +338,198 @@ export function InstructorStripeAccountSection({ instructorId, trueInstructor }:
                 <p style={{ fontSize: '0.875rem', color: '#6b7280', marginBottom: '0.75rem' }}>
                   Students can't book lessons with you until onboarding is complete.
                 </p>
+                <div style={{ marginBottom: '0.75rem' }}>
+                  <button
+                    onClick={handleFetchReasons}
+                    disabled={isFetchingReasons}
+                    className="btn"
+                    style={{
+                      display: 'inline-flex',
+                      alignItems: 'center',
+                      gap: '0.5rem',
+                      fontSize: '0.875rem',
+                      padding: '0.5rem 1rem',
+                      background: '#f3f4f6',
+                      color: '#374151',
+                      border: '1px solid #d1d5db',
+                      opacity: isFetchingReasons ? 0.7 : 1
+                    }}
+                  >
+                    {isFetchingReasons ? (
+                      <>
+                        <span className="spinner" style={{
+                          width: '14px',
+                          height: '14px',
+                          border: '2px solid rgba(55,65,81,0.3)',
+                          borderTopColor: '#374151',
+                          borderRadius: '50%',
+                          animation: 'spin 0.6s linear infinite'
+                        }} />
+                        Loading...
+                      </>
+                    ) : (
+                      <>
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                          <circle cx="12" cy="12" r="10"/>
+                          <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/>
+                          <line x1="12" y1="17" x2="12.01" y2="17"/>
+                        </svg>
+                        Why is onboarding incomplete?
+                      </>
+                    )}
+                  </button>
+                </div>
+                {reasonsError && (
+                  <div style={{
+                    fontSize: '0.875rem',
+                    color: '#dc2626',
+                    background: '#fef2f2',
+                    border: '1px solid #fecaca',
+                    borderRadius: '0.5rem',
+                    padding: '0.75rem 1rem',
+                    marginBottom: '0.75rem'
+                  }}>
+                    {reasonsError}
+                  </div>
+                )}
+                {showReasons && reasonsData && (
+                  <div style={{
+                    background: '#ffffff',
+                    border: '1px solid #e5e7eb',
+                    borderRadius: '0.75rem',
+                    padding: '1.25rem',
+                    marginBottom: '0.75rem',
+                    boxShadow: '0 1px 3px rgba(0,0,0,0.1)'
+                  }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'start', marginBottom: '1rem' }}>
+                      <div>
+                        <div style={{
+                          display: 'inline-block',
+                          padding: '0.25rem 0.75rem',
+                          borderRadius: '0.375rem',
+                          fontSize: '0.75rem',
+                          fontWeight: '600',
+                          textTransform: 'uppercase',
+                          letterSpacing: '0.05em',
+                          marginBottom: '0.75rem',
+                          background: reasonsData.state === 'completed' ? '#dcfce7' : reasonsData.state === 'under_review' ? '#dbeafe' : reasonsData.state === 'needs_information' ? '#fef3c7' : '#f3f4f6',
+                          color: reasonsData.state === 'completed' ? '#166534' : reasonsData.state === 'under_review' ? '#1e40af' : reasonsData.state === 'needs_information' ? '#92400e' : '#6b7280'
+                        }}>
+                          {reasonsData.state.replace('_', ' ')}
+                        </div>
+                        <h4 style={{ fontSize: '1.125rem', fontWeight: '600', color: '#111827', marginBottom: '0.5rem' }}>
+                          {reasonsData.title}
+                        </h4>
+                        <p style={{ fontSize: '0.9375rem', color: '#4b5563', lineHeight: '1.6' }}>
+                          {reasonsData.message}
+                        </p>
+                      </div>
+                      <button
+                        onClick={() => setShowReasons(false)}
+                        style={{
+                          background: 'transparent',
+                          border: 'none',
+                          cursor: 'pointer',
+                          padding: '0.25rem',
+                          color: '#9ca3af',
+                          display: 'flex',
+                          alignItems: 'center'
+                        }}
+                        title="Close"
+                      >
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                          <line x1="18" y1="6" x2="6" y2="18"/>
+                          <line x1="6" y1="6" x2="18" y2="18"/>
+                        </svg>
+                      </button>
+                    </div>
+
+                    {reasonsData.details && (
+                      <div style={{ marginTop: '1rem', paddingTop: '1rem', borderTop: '1px solid #e5e7eb' }}>
+                        <h5 style={{ fontSize: '0.875rem', fontWeight: '600', color: '#374151', marginBottom: '0.75rem', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+                          Required Information
+                        </h5>
+                        <div style={{ display: 'grid', gap: '0.75rem' }}>
+                          {reasonsData.details.disabledReason && (
+                            <div style={{ fontSize: '0.875rem', color: '#dc2626', background: '#fef2f2', padding: '0.625rem 0.875rem', borderRadius: '0.375rem', border: '1px solid #fecaca' }}>
+                              <strong>Account Disabled:</strong> {reasonsData.details.disabledReason}
+                            </div>
+                          )}
+                          {reasonsData.details.currentlyDue && reasonsData.details.currentlyDue.length > 0 && (
+                            <div>
+                              <div style={{ fontSize: '0.8125rem', fontWeight: '600', color: '#dc2626', marginBottom: '0.375rem' }}>Currently Due:</div>
+                              <ul style={{ listStyle: 'none', padding: 0, margin: 0, display: 'flex', flexWrap: 'wrap', gap: '0.5rem' }}>
+                                {reasonsData.details.currentlyDue.map((item: string, i: number) => (
+                                  <li key={i} style={{ fontSize: '0.8125rem', background: '#fee2e2', color: '#991b1b', padding: '0.375rem 0.75rem', borderRadius: '0.375rem', fontWeight: '500' }}>
+                                    {item}
+                                  </li>
+                                ))}
+                              </ul>
+                            </div>
+                          )}
+                          {reasonsData.details.pastDue && reasonsData.details.pastDue.length > 0 && (
+                            <div>
+                              <div style={{ fontSize: '0.8125rem', fontWeight: '600', color: '#dc2626', marginBottom: '0.375rem' }}>Past Due:</div>
+                              <ul style={{ listStyle: 'none', padding: 0, margin: 0, display: 'flex', flexWrap: 'wrap', gap: '0.5rem' }}>
+                                {reasonsData.details.pastDue.map((item: string, i: number) => (
+                                  <li key={i} style={{ fontSize: '0.8125rem', background: '#fecaca', color: '#7f1d1d', padding: '0.375rem 0.75rem', borderRadius: '0.375rem', fontWeight: '500' }}>
+                                    {item}
+                                  </li>
+                                ))}
+                              </ul>
+                            </div>
+                          )}
+                          {reasonsData.details.pendingVerification && reasonsData.details.pendingVerification.length > 0 && (
+                            <div>
+                              <div style={{ fontSize: '0.8125rem', fontWeight: '600', color: '#2563eb', marginBottom: '0.375rem' }}>Pending Verification:</div>
+                              <ul style={{ listStyle: 'none', padding: 0, margin: 0, display: 'flex', flexWrap: 'wrap', gap: '0.5rem' }}>
+                                {reasonsData.details.pendingVerification.map((item: string, i: number) => (
+                                  <li key={i} style={{ fontSize: '0.8125rem', background: '#dbeafe', color: '#1e40af', padding: '0.375rem 0.75rem', borderRadius: '0.375rem', fontWeight: '500' }}>
+                                    {item}
+                                  </li>
+                                ))}
+                              </ul>
+                            </div>
+                          )}
+                          {reasonsData.details.eventuallyDue && reasonsData.details.eventuallyDue.length > 0 && (
+                            <div>
+                              <div style={{ fontSize: '0.8125rem', fontWeight: '600', color: '#6b7280', marginBottom: '0.375rem' }}>Eventually Due:</div>
+                              <ul style={{ listStyle: 'none', padding: 0, margin: 0, display: 'flex', flexWrap: 'wrap', gap: '0.5rem' }}>
+                                {reasonsData.details.eventuallyDue.map((item: string, i: number) => (
+                                  <li key={i} style={{ fontSize: '0.8125rem', background: '#f3f4f6', color: '#4b5563', padding: '0.375rem 0.75rem', borderRadius: '0.375rem', fontWeight: '500' }}>
+                                    {item}
+                                  </li>
+                                ))}
+                              </ul>
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    )}
+
+                    {reasonsData.nextSteps && reasonsData.nextSteps.length > 0 && (
+                      <div style={{ marginTop: '1rem', paddingTop: '1rem', borderTop: '1px solid #e5e7eb' }}>
+                        <h5 style={{ fontSize: '0.875rem', fontWeight: '600', color: '#374151', marginBottom: '0.75rem', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+                          Next Steps
+                        </h5>
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+                          {reasonsData.nextSteps.map((step: any, i: number) => (
+                            <div key={i} style={{ fontSize: '0.875rem', color: '#374151', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" style={{ color: '#10b981', flexShrink: 0 }}>
+                                <polyline points="9 11 12 14 22 4"/>
+                                <path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/>
+                              </svg>
+                              <span>{step.label}</span>
+                            </div>
+                          ))}
+                        </div>
+                        <div style={{ marginTop: '1rem', padding: '0.75rem 1rem', background: '#eff6ff', border: '1px solid #bfdbfe', borderRadius: '0.5rem', fontSize: '0.875rem', color: '#1e40af', lineHeight: '1.6' }}>
+                          <strong>💡 Tip:</strong> Use the "Complete Onboarding" button above to update your details and resolve any missing information.
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                )}
               </>
             )}
           </div>
