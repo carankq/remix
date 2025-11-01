@@ -406,6 +406,20 @@ export default function Safeguarding() {
                   <h3 style={{ fontSize: '1.125rem', fontWeight: '700', margin: '0 0 0.75rem 0' }}>
                     ⚠️ VEHICLE REGISTRATION CHECK - FIRST MAJOR WARNING SIGN
                   </h3>
+                  <div style={{ 
+                    background: 'rgba(255,255,255,0.2)', 
+                    padding: '1rem',
+                    borderRadius: '0.5rem',
+                    marginBottom: '1rem',
+                    border: '2px solid rgba(255,255,255,0.3)'
+                  }}>
+                    <p style={{ margin: '0 0 0.5rem 0', lineHeight: '1.7', fontSize: '1rem', fontWeight: '600' }}>
+                      ✅ <strong>Verified by DVLA:</strong>
+                    </p>
+                    <p style={{ margin: 0, lineHeight: '1.7', fontSize: '0.9375rem', opacity: 0.95 }}>
+                      Carank retrieves vehicle information directly from the DVLA (Driver and Vehicle Licensing Agency) on your behalf. This data <strong>cannot be faked or altered</strong> by instructors. It is the instructor's legal responsibility to keep this information up to date when they change vehicles.
+                    </p>
+                  </div>
                   <p style={{ margin: '0 0 0.75rem 0', lineHeight: '1.7', fontSize: '1rem' }}>
                     Before you approach or enter ANY vehicle, verify these details match EXACTLY with the instructor's portal profile:
                   </p>
@@ -613,6 +627,25 @@ export default function Safeguarding() {
               <p style={{ margin: 0, color: '#2d3748', lineHeight: '1.7' }}>
                 <strong>Use the correct vehicle:</strong> Always use the vehicle registered on your Carank instructor profile. If you need to use a different vehicle, update your profile first and notify the student in advance.
               </p>
+            </div>
+            <div style={{ 
+              background: '#dcfce7',
+              border: '2px solid #22c55e',
+              borderRadius: '0.75rem',
+              padding: '1.25rem',
+              marginTop: '1rem'
+            }}>
+              <div style={{ display: 'flex', alignItems: 'start', gap: '0.75rem' }}>
+                <span style={{ fontSize: '1.75rem', lineHeight: 1 }}>🚗</span>
+                <div>
+                  <h4 style={{ fontSize: '1.125rem', fontWeight: '700', color: '#166534', margin: '0 0 0.75rem 0' }}>
+                    Your Responsibility: Keep Vehicle Information Up to Date
+                  </h4>
+                  <p style={{ margin: 0, color: '#166534', lineHeight: '1.7', fontSize: '0.9375rem' }}>
+                    <strong>Important:</strong> Carank retrieves your vehicle information directly from the DVLA on behalf of students. This ensures data integrity and cannot be manually altered. It is <strong>your legal responsibility</strong> to update your registered vehicle details on your profile whenever you change vehicles. Using an unregistered vehicle is a serious safeguarding violation and will result in immediate suspension from the platform.
+                  </p>
+                </div>
+              </div>
             </div>
             <div style={{ display: 'flex', alignItems: 'start', gap: '0.75rem' }}>
               <div style={{ minWidth: '24px', marginTop: '0.125rem' }}>
