@@ -844,7 +844,16 @@ const InstructorCreateForm: React.FC<InstructorCreateFormProps> = ({ onCreated }
                 Price per Hour (£)
               </label>
               <div style={{ position: 'relative' }}>
-                <span style={{ position: 'absolute', left: '1rem', top: '50%', transform: 'translateY(-50%)', color: '#6b7280', fontWeight: '500' }}>£</span>
+                <span style={{ 
+                  position: 'absolute', 
+                  left: '1rem', 
+                  top: '0.75rem',
+                  color: '#6b7280', 
+                  fontWeight: '500',
+                  fontSize: '0.95rem',
+                  lineHeight: '1.5',
+                  pointerEvents: 'none'
+                }}>£</span>
                 <input 
                   id="instructor-price-per-hour"
                   name="pricePerHour"
@@ -854,7 +863,7 @@ const InstructorCreateForm: React.FC<InstructorCreateFormProps> = ({ onCreated }
                   placeholder="25"
                   value={instForm.pricePerHour}
                   onChange={onPriceChange}
-                  style={{ paddingLeft: '2rem' }} 
+                  style={{ paddingLeft: '2.25rem' }} 
                 />
                 <p style={{ fontSize: '0.75rem', color: '#64748b', marginTop: '0.375rem' }}>
                   Maximum £60 per hour
