@@ -217,6 +217,14 @@ export function InstructorStripeAccountSection({ instructorId, trueInstructor }:
     checkOnboard();
   }, [exists, instructorId, token]);
 
+  // Automatically fetch onboarding reasons when onboarding is incomplete
+  useEffect(() => {
+    if (onboarded === false && !reasonsData && !isFetchingReasons && !reasonsError) {
+      handleFetchReasons();
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [onboarded]);
+
   const handleFetchReasons = async () => {
     if (!instructorId) return;
     const host = getApiHost();
@@ -314,8 +322,126 @@ export function InstructorStripeAccountSection({ instructorId, trueInstructor }:
       )}
 
       {!isLoading && error == null && exists === true && (
-        <div style={{ display: 'flex', alignItems: 'flex-start', gap: '1rem', flexWrap: 'wrap' }}>
-          <div style={{ flex: 1, minWidth: '200px' }}>
+        <div>
+          {/* Row 1: Action Buttons */}
+          <div style={{ display: 'flex', gap: '0.75rem', flexWrap: 'wrap', marginBottom: '1rem' }}>
+            <button
+              onClick={handleIdentityVerification}
+              disabled={isCreatingVerification || isLinking || isDashboardLinking}
+              className="btn"
+              style={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '0.5rem',
+                opacity: (isCreatingVerification || isLinking || isDashboardLinking) ? 0.7 : 1,
+                cursor: (isCreatingVerification || isLinking || isDashboardLinking) ? 'not-allowed' : 'pointer',
+                background: '#8b5cf6',
+                color: 'white',
+                border: 'none'
+              }}
+            >
+              {isCreatingVerification ? (
+                <>
+                  <span className="spinner" style={{
+                    width: '16px',
+                    height: '16px',
+                    border: '2px solid rgba(255,255,255,0.3)',
+                    borderTopColor: 'white',
+                    borderRadius: '50%',
+                    animation: 'spin 0.6s linear infinite'
+                  }} />
+                  Redirecting...
+                </>
+              ) : (
+                <>
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
+                    <circle cx="8.5" cy="7" r="4"/>
+                    <polyline points="17 11 19 13 23 9"/>
+                  </svg>
+                  Identity Verification
+                </>
+              )}
+            </button>
+
+            <button
+              onClick={handleManageLink}
+              disabled={isLinking || isDashboardLinking || isCreatingVerification}
+              className="btn btn-primary"
+              style={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '0.5rem',
+                opacity: (isLinking || isDashboardLinking || isCreatingVerification) ? 0.7 : 1,
+                cursor: (isLinking || isDashboardLinking || isCreatingVerification) ? 'not-allowed' : 'pointer',
+                position: 'relative'
+              }}
+            >
+              {isLinking ? (
+                <>
+                  <span className="spinner" style={{
+                    width: '16px',
+                    height: '16px',
+                    border: '2px solid rgba(255,255,255,0.3)',
+                    borderTopColor: 'white',
+                    borderRadius: '50%',
+                    animation: 'spin 0.6s linear infinite'
+                  }} />
+                  Redirecting...
+                </>
+              ) : (
+                <>
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
+                    <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
+                  </svg>
+                  Complete Onboarding
+                </>
+              )}
+            </button>
+            
+            <button
+              onClick={handleDashboardLink}
+              disabled={isLinking || isDashboardLinking || isCreatingVerification}
+              className="btn"
+              style={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '0.5rem',
+                opacity: (isLinking || isDashboardLinking || isCreatingVerification) ? 0.7 : 1,
+                cursor: (isLinking || isDashboardLinking || isCreatingVerification) ? 'not-allowed' : 'pointer',
+                background: '#6366f1',
+                color: 'white',
+                border: 'none'
+              }}
+            >
+              {isDashboardLinking ? (
+                <>
+                  <span className="spinner" style={{
+                    width: '16px',
+                    height: '16px',
+                    border: '2px solid rgba(255,255,255,0.3)',
+                    borderTopColor: 'white',
+                    borderRadius: '50%',
+                    animation: 'spin 0.6s linear infinite'
+                  }} />
+                  Redirecting...
+                </>
+              ) : (
+                <>
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <rect x="3" y="3" width="18" height="18" rx="2" ry="2"/>
+                    <line x1="3" y1="9" x2="21" y2="9"/>
+                    <line x1="9" y1="21" x2="9" y2="9"/>
+                  </svg>
+                  Manage Stripe Dashboard
+                </>
+              )}
+            </button>
+          </div>
+
+          {/* Row 2: Status Messages */}
+          <div>
             {isCheckingOnboard && (
               <p style={{ fontSize: '0.95rem', color: '#6b7280', marginBottom: '0.75rem' }}>
                 Checking onboarding status…
@@ -333,6 +459,20 @@ export function InstructorStripeAccountSection({ instructorId, trueInstructor }:
                 marginBottom: '0.75rem'
               }}>
                 {onboardError}
+              </div>
+            )}
+
+            {verificationError && (
+              <div style={{
+                fontSize: '0.875rem',
+                color: '#dc2626',
+                background: '#fef2f2',
+                border: '1px solid #fecaca',
+                borderRadius: '0.5rem',
+                padding: '0.75rem 1rem',
+                marginBottom: '0.75rem'
+              }}>
+                {verificationError}
               </div>
             )}
             
@@ -380,86 +520,13 @@ export function InstructorStripeAccountSection({ instructorId, trueInstructor }:
                 <p style={{ fontSize: '0.875rem', color: '#6b7280', marginBottom: '0.75rem' }}>
                   Students can't book lessons with you until onboarding is complete.
                 </p>
-                <div style={{ marginBottom: '0.75rem', display: 'flex', gap: '0.75rem', flexWrap: 'wrap' }}>
-                  <button
-                    onClick={handleFetchReasons}
-                    disabled={isFetchingReasons}
-                    className="btn"
-                    style={{
-                      display: 'inline-flex',
-                      alignItems: 'center',
-                      gap: '0.5rem',
-                      fontSize: '0.875rem',
-                      padding: '0.5rem 1rem',
-                      background: '#f3f4f6',
-                      color: '#374151',
-                      border: '1px solid #d1d5db',
-                      opacity: isFetchingReasons ? 0.7 : 1
-                    }}
-                  >
-                    {isFetchingReasons ? (
-                      <>
-                        <span className="spinner" style={{
-                          width: '14px',
-                          height: '14px',
-                          border: '2px solid rgba(55,65,81,0.3)',
-                          borderTopColor: '#374151',
-                          borderRadius: '50%',
-                          animation: 'spin 0.6s linear infinite'
-                        }} />
-                        Loading...
-                      </>
-                    ) : (
-                      <>
-                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                          <circle cx="12" cy="12" r="10"/>
-                          <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/>
-                          <line x1="12" y1="17" x2="12.01" y2="17"/>
-                        </svg>
-                        Why is onboarding incomplete?
-                      </>
-                    )}
-                  </button>
-                  <button
-                    onClick={handleIdentityVerification}
-                    disabled={isCreatingVerification}
-                    className="btn"
-                    style={{
-                      display: 'inline-flex',
-                      alignItems: 'center',
-                      gap: '0.5rem',
-                      fontSize: '0.875rem',
-                      padding: '0.5rem 1rem',
-                      background: '#8b5cf6',
-                      color: 'white',
-                      border: 'none',
-                      opacity: isCreatingVerification ? 0.7 : 1
-                    }}
-                  >
-                    {isCreatingVerification ? (
-                      <>
-                        <span className="spinner" style={{
-                          width: '14px',
-                          height: '14px',
-                          border: '2px solid rgba(255,255,255,0.3)',
-                          borderTopColor: 'white',
-                          borderRadius: '50%',
-                          animation: 'spin 0.6s linear infinite'
-                        }} />
-                        Creating...
-                      </>
-                    ) : (
-                      <>
-                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                          <path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
-                          <circle cx="8.5" cy="7" r="4"/>
-                          <polyline points="17 11 19 13 23 9"/>
-                        </svg>
-                        Identity Verification (Test)
-                      </>
-                    )}
-                  </button>
-                </div>
+
+                {isFetchingReasons && (
+                  <p style={{ fontSize: '0.875rem', color: '#6b7280', marginBottom: '0.75rem', fontStyle: 'italic' }}>
+                    Loading onboarding details...
+                  </p>
+                )}
+
                 {reasonsError && (
                   <div style={{
                     fontSize: '0.875rem',
@@ -471,21 +538,9 @@ export function InstructorStripeAccountSection({ instructorId, trueInstructor }:
                     marginBottom: '0.75rem'
                   }}>
                     {reasonsError}
-                  </div>
+          </div>
                 )}
-                {verificationError && (
-                  <div style={{
-                    fontSize: '0.875rem',
-                    color: '#dc2626',
-                    background: '#fef2f2',
-                    border: '1px solid #fecaca',
-                    borderRadius: '0.5rem',
-                    padding: '0.75rem 1rem',
-                    marginBottom: '0.75rem'
-                  }}>
-                    {verificationError}
-                  </div>
-                )}
+
                 {showReasons && reasonsData && (
                   <div style={{
                     background: '#ffffff',
@@ -493,7 +548,8 @@ export function InstructorStripeAccountSection({ instructorId, trueInstructor }:
                     borderRadius: '0.75rem',
                     padding: '1.25rem',
                     marginBottom: '0.75rem',
-                    boxShadow: '0 1px 3px rgba(0,0,0,0.1)'
+                    boxShadow: '0 1px 3px rgba(0,0,0,0.1)',
+                    width: '100%'
                   }}>
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'start', marginBottom: '1rem' }}>
                       <div>
@@ -518,9 +574,9 @@ export function InstructorStripeAccountSection({ instructorId, trueInstructor }:
                           {reasonsData.message}
                         </p>
                       </div>
-                      <button
+          <button
                         onClick={() => setShowReasons(false)}
-                        style={{
+            style={{
                           background: 'transparent',
                           border: 'none',
                           cursor: 'pointer',
@@ -612,7 +668,7 @@ export function InstructorStripeAccountSection({ instructorId, trueInstructor }:
                               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" style={{ color: '#10b981', flexShrink: 0 }}>
                                 <polyline points="9 11 12 14 22 4"/>
                                 <path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/>
-                              </svg>
+                </svg>
                               <span>{step.label}</span>
                             </div>
                           ))}
@@ -626,83 +682,6 @@ export function InstructorStripeAccountSection({ instructorId, trueInstructor }:
                 )}
               </>
             )}
-          </div>
-          
-          <div style={{ display: 'flex', gap: '0.75rem', flexWrap: 'wrap' }}>
-            <button
-              onClick={handleManageLink}
-              disabled={isLinking || isDashboardLinking}
-              className="btn btn-primary"
-              style={{
-                display: 'inline-flex',
-                alignItems: 'center',
-                gap: '0.5rem',
-                opacity: (isLinking || isDashboardLinking) ? 0.7 : 1,
-                cursor: (isLinking || isDashboardLinking) ? 'not-allowed' : 'pointer',
-                position: 'relative'
-              }}
-            >
-              {isLinking ? (
-                <>
-                  <span className="spinner" style={{
-                    width: '16px',
-                    height: '16px',
-                    border: '2px solid rgba(255,255,255,0.3)',
-                    borderTopColor: 'white',
-                    borderRadius: '50%',
-                    animation: 'spin 0.6s linear infinite'
-                  }} />
-                  Redirecting...
-                </>
-              ) : (
-                <>
-                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                    <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
-                    <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
-                  </svg>
-                  Complete Onboarding
-                </>
-              )}
-            </button>
-            
-            <button
-              onClick={handleDashboardLink}
-              disabled={isLinking || isDashboardLinking}
-              className="btn"
-              style={{
-                display: 'inline-flex',
-                alignItems: 'center',
-                gap: '0.5rem',
-                opacity: (isLinking || isDashboardLinking) ? 0.7 : 1,
-                cursor: (isLinking || isDashboardLinking) ? 'not-allowed' : 'pointer',
-                background: '#6366f1',
-                color: 'white',
-                border: 'none'
-              }}
-            >
-              {isDashboardLinking ? (
-                <>
-                  <span className="spinner" style={{
-                    width: '16px',
-                    height: '16px',
-                    border: '2px solid rgba(255,255,255,0.3)',
-                    borderTopColor: 'white',
-                    borderRadius: '50%',
-                    animation: 'spin 0.6s linear infinite'
-                  }} />
-                  Redirecting...
-                </>
-              ) : (
-                <>
-                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                    <rect x="3" y="3" width="18" height="18" rx="2" ry="2"/>
-                    <line x1="3" y1="9" x2="21" y2="9"/>
-                    <line x1="9" y1="21" x2="9" y2="9"/>
-                  </svg>
-                  Manage Stripe Dashboard
-                </>
-              )}
-            </button>
           </div>
         </div>
       )}
