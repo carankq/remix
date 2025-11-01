@@ -110,7 +110,7 @@ export function SearchSection({
 
           {/* Main Search Card */}
           <div style={{
-            background: 'rgba(255, 255, 255, 0.98)',
+            background: 'rgb(255, 255, 255)',
             borderRadius: '0',
             padding: '2.5rem',
             boxShadow: '0 20px 60px rgba(0,0,0,0.3)',
