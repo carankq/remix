@@ -140,7 +140,7 @@ export default function Safeguarding() {
               <div style={{ fontSize: '2.5rem', marginBottom: '0.75rem' }}>🔍</div>
               <h3 style={{ fontSize: '1.25rem', fontWeight: '600', margin: '0 0 0.75rem 0' }}>Verified Community</h3>
               <p style={{ margin: 0, lineHeight: '1.7', opacity: 0.95 }}>
-                All instructors and students are verified with proper documentation. You're learning with real, authenticated people, not anonymous strangers.
+                All instructors undergo identity verification through our trusted partner Stripe. Combined with proper documentation checks, you're learning with real, authenticated people, not anonymous strangers.
               </p>
             </div>
 
@@ -461,6 +461,26 @@ export default function Safeguarding() {
             </div>
           </div>
           
+          <div style={{ 
+            background: '#dbeafe',
+            border: '2px solid #3b82f6',
+            borderRadius: '0.75rem',
+            padding: '1.25rem',
+            marginBottom: '1.5rem'
+          }}>
+            <div style={{ display: 'flex', alignItems: 'start', gap: '0.75rem' }}>
+              <span style={{ fontSize: '1.75rem', lineHeight: 1 }}>✅</span>
+              <div>
+                <h4 style={{ fontSize: '1.125rem', fontWeight: '700', color: '#1e40af', margin: '0 0 0.75rem 0' }}>
+                  Identity Verification Through Stripe
+                </h4>
+                <p style={{ margin: 0, color: '#1e40af', lineHeight: '1.7', fontSize: '0.9375rem' }}>
+                  All instructors on Carank undergo identity verification through our trusted payment partner, <strong>Stripe</strong>. This includes verification of their identity documents to ensure they are who they claim to be. This adds an extra layer of security beyond the manual licence checks.
+                </p>
+              </div>
+            </div>
+          </div>
+
           <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
             <div style={{ display: 'flex', alignItems: 'start', gap: '0.75rem' }}>
               <div style={{ minWidth: '24px', marginTop: '0.125rem' }}>
@@ -610,6 +630,26 @@ export default function Safeguarding() {
             </div>
           </div>
           
+          <div style={{ 
+            background: '#dcfce7',
+            border: '2px solid #22c55e',
+            borderRadius: '0.75rem',
+            padding: '1.25rem',
+            marginBottom: '1.5rem'
+          }}>
+            <div style={{ display: 'flex', alignItems: 'start', gap: '0.75rem' }}>
+              <span style={{ fontSize: '1.75rem', lineHeight: 1 }}>✅</span>
+              <div>
+                <h4 style={{ fontSize: '1.125rem', fontWeight: '700', color: '#166534', margin: '0 0 0.75rem 0' }}>
+                  Your Identity is Verified Through Stripe
+                </h4>
+                <p style={{ margin: 0, color: '#166534', lineHeight: '1.7', fontSize: '0.9375rem' }}>
+                  As an instructor, you undergo identity verification through our trusted payment partner, <strong>Stripe</strong>. This verification process confirms your identity and gives students confidence that you are a legitimate, verified professional. This is part of our commitment to maintaining a safe platform.
+                </p>
+              </div>
+            </div>
+          </div>
+
           <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
             <div style={{ display: 'flex', alignItems: 'start', gap: '0.75rem' }}>
               <div style={{ minWidth: '24px', marginTop: '0.125rem' }}>

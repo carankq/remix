@@ -51,11 +51,12 @@ const InstructorCreateForm: React.FC<InstructorCreateFormProps> = ({ onCreated }
   const [languages, setLanguages] = useState<string[]>([]);
   // Working availability (day + HH:MM inputs rendered as strings)
   const [availability, setAvailability] = useState<{ day: string; start: string; end: string }[]>([]);
-  // Exceptions (date + specific times for that date)
-  const [excDate, setExcDate] = useState(''); // YYYY-MM-DD
-  const [excStart, setExcStart] = useState(''); // HH:MM
-  const [excEnd, setExcEnd] = useState(''); // HH:MM
-  const [exceptions, setExceptions] = useState<{ date: string; start: string; end: string }[]>([]);
+  // Exceptions (date ranges for holidays, etc.)
+  const [excStartDate, setExcStartDate] = useState(''); // YYYY-MM-DD
+  const [excStartTime, setExcStartTime] = useState(''); // HH:MM
+  const [excEndDate, setExcEndDate] = useState(''); // YYYY-MM-DD
+  const [excEndTime, setExcEndTime] = useState(''); // HH:MM
+  const [exceptions, setExceptions] = useState<{ startDate: string; startTime: string; endDate: string; endTime: string }[]>([]);
   const [langSelect, setLangSelect] = useState('');
   const [specSelect, setSpecSelect] = useState('');
   const [postcodes, setPostcodes] = useState<string[]>([]);
@@ -214,7 +215,18 @@ const InstructorCreateForm: React.FC<InstructorCreateFormProps> = ({ onCreated }
       // working.startTime/endTime are strings like 10:30am per new schema
       setAvailability(w.map((a: any) => ({ day: a.day, start: ampmToHHMM(String(a.startTime || '')), end: ampmToHHMM(String(a.endTime || '')) })));
       const ex = Array.isArray(ownerInst.availability.exceptions) ? ownerInst.availability.exceptions : [];
-      setExceptions(ex.map((e: any) => ({ date: new Date(e.date).toISOString().slice(0,10), start: toHHMM(e.startTime), end: toHHMM(e.endTime) })));
+      setExceptions(ex.map((e: any) => {
+        const startMs = typeof e.startTime === 'number' ? e.startTime : new Date(e.startTime).getTime();
+        const endMs = typeof e.endTime === 'number' ? e.endTime : new Date(e.endTime).getTime();
+        const startDate = new Date(startMs);
+        const endDate = new Date(endMs);
+        return {
+          startDate: startDate.toISOString().slice(0, 10),
+          startTime: toHHMM(startMs),
+          endDate: endDate.toISOString().slice(0, 10),
+          endTime: toHHMM(endMs)
+        };
+      }));
     } else {
       setAvailability([]);
       setExceptions([]);
@@ -282,7 +294,8 @@ const InstructorCreateForm: React.FC<InstructorCreateFormProps> = ({ onCreated }
         h = h % 12; if (h === 0) h = 12;
         return `${h}:${m}${ampm}`;
       };
-      const toDateMs = (dateStr: string, timeHHMM: string): number => {
+      const toDateTimeMs = (dateStr: string, timeHHMM: string): number => {
+        // Combine YYYY-MM-DD and HH:MM to create a full timestamp
         const d = new Date(`${dateStr}T${timeHHMM}:00`);
         return d.getTime();
       };
@@ -309,10 +322,9 @@ const InstructorCreateForm: React.FC<InstructorCreateFormProps> = ({ onCreated }
             endTime: toAmPm(a.end)
           })),
           exceptions: exceptions.map(ex => ({
-            // exceptions require timestamps per guidance
-            date: new Date(`${ex.date}T00:00:00`).getTime(),
-            startTime: toDateMs(ex.date, ex.start),
-            endTime: toDateMs(ex.date, ex.end)
+            // exceptions are now Unix ms timestamps spanning a date range
+            startTime: toDateTimeMs(ex.startDate, ex.startTime),
+            endTime: toDateTimeMs(ex.endDate, ex.endTime)
           }))
         },
         languages: languages,
@@ -1150,31 +1162,37 @@ const InstructorCreateForm: React.FC<InstructorCreateFormProps> = ({ onCreated }
             Exceptions (optional)
           </h3>
           <p style={{ fontSize: '0.8125rem', color: '#64748b', marginBottom: '1rem', lineHeight: '1.5' }}>
-            Add one-off exceptions to your schedule for specific dates.
+            Add time ranges when you're unavailable (e.g., holidays). Can span multiple days.
           </p>
           <div style={{ display: 'grid', gridTemplateColumns: '1fr', gap: '0.75rem', marginBottom: '1rem' }}>
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(140px, 1fr))', gap: '0.75rem' }}>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '0.75rem' }}>
               <div>
-                <label style={{ display: 'block', fontSize: '0.75rem', fontWeight: '500', color: '#64748b', marginBottom: '0.375rem', textTransform: 'uppercase', letterSpacing: '0.025em' }}>Date</label>
-                <input type="date" className="input w-full" value={excDate} onChange={(e)=>setExcDate(e.target.value)} />
+                <label style={{ display: 'block', fontSize: '0.75rem', fontWeight: '500', color: '#64748b', marginBottom: '0.375rem', textTransform: 'uppercase', letterSpacing: '0.025em' }}>Start Date</label>
+                <input type="date" className="input w-full" value={excStartDate} onChange={(e)=>setExcStartDate(e.target.value)} />
               </div>
               <div>
-                <label style={{ display: 'block', fontSize: '0.75rem', fontWeight: '500', color: '#64748b', marginBottom: '0.375rem', textTransform: 'uppercase', letterSpacing: '0.025em' }}>Start</label>
-                <input type="time" className="input w-full" value={excStart} onChange={(e)=>setExcStart(e.target.value)} />
+                <label style={{ display: 'block', fontSize: '0.75rem', fontWeight: '500', color: '#64748b', marginBottom: '0.375rem', textTransform: 'uppercase', letterSpacing: '0.025em' }}>Start Time</label>
+                <input type="time" className="input w-full" value={excStartTime} onChange={(e)=>setExcStartTime(e.target.value)} />
               </div>
               <div>
-                <label style={{ display: 'block', fontSize: '0.75rem', fontWeight: '500', color: '#64748b', marginBottom: '0.375rem', textTransform: 'uppercase', letterSpacing: '0.025em' }}>End</label>
-                <input type="time" className="input w-full" value={excEnd} onChange={(e)=>setExcEnd(e.target.value)} />
+                <label style={{ display: 'block', fontSize: '0.75rem', fontWeight: '500', color: '#64748b', marginBottom: '0.375rem', textTransform: 'uppercase', letterSpacing: '0.025em' }}>End Date</label>
+                <input type="date" className="input w-full" value={excEndDate} onChange={(e)=>setExcEndDate(e.target.value)} />
+              </div>
+              <div>
+                <label style={{ display: 'block', fontSize: '0.75rem', fontWeight: '500', color: '#64748b', marginBottom: '0.375rem', textTransform: 'uppercase', letterSpacing: '0.025em' }}>End Time</label>
+                <input type="time" className="input w-full" value={excEndTime} onChange={(e)=>setExcEndTime(e.target.value)} />
               </div>
             </div>
             <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
               <button type="button" className="btn" onClick={()=>{
-                if (!excDate || !excStart || !excEnd) return;
-                if (excStart >= excEnd) return;
-                const key = `${excDate}-${excStart}-${excEnd}`;
-                if (exceptions.some(e => `${e.date}-${e.start}-${e.end}` === key)) return;
-                setExceptions(prev => [...prev, { date: excDate, start: excStart, end: excEnd }]);
-                setExcDate(''); setExcStart(''); setExcEnd('');
+                if (!excStartDate || !excStartTime || !excEndDate || !excEndTime) return;
+                const startMs = new Date(`${excStartDate}T${excStartTime}:00`).getTime();
+                const endMs = new Date(`${excEndDate}T${excEndTime}:00`).getTime();
+                if (startMs >= endMs) return;
+                const key = `${excStartDate}-${excStartTime}-${excEndDate}-${excEndTime}`;
+                if (exceptions.some(e => `${e.startDate}-${e.startTime}-${e.endDate}-${e.endTime}` === key)) return;
+                setExceptions(prev => [...prev, { startDate: excStartDate, startTime: excStartTime, endDate: excEndDate, endTime: excEndTime }]);
+                setExcStartDate(''); setExcStartTime(''); setExcEndDate(''); setExcEndTime('');
               }} style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', fontSize: '0.875rem' }}>
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                   <line x1="12" y1="5" x2="12" y2="19"/>
@@ -1187,7 +1205,11 @@ const InstructorCreateForm: React.FC<InstructorCreateFormProps> = ({ onCreated }
           {exceptions.length > 0 && (
             <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.5rem', paddingTop: '0.75rem', borderTop: '1px solid #e2e8f0' }}>
               {exceptions.map(e => {
-                const key = `${e.date}-${e.start}-${e.end}`;
+                const key = `${e.startDate}-${e.startTime}-${e.endDate}-${e.endTime}`;
+                const isSameDay = e.startDate === e.endDate;
+                const displayText = isSameDay 
+                  ? `${e.startDate} ${e.startTime}–${e.endTime}`
+                  : `${e.startDate} ${e.startTime} → ${e.endDate} ${e.endTime}`;
                 return (
                   <span key={key} style={{
                     display: 'inline-flex', alignItems: 'center', gap: '0.5rem',
@@ -1197,10 +1219,10 @@ const InstructorCreateForm: React.FC<InstructorCreateFormProps> = ({ onCreated }
                     <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                       <path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/>
                     </svg>
-                    {e.date} {e.start}–{e.end}
+                    {displayText}
                     <button
                       type="button"
-                      onClick={()=>setExceptions(prev => prev.filter(x => `${x.date}-${x.start}-${x.end}` !== key))}
+                      onClick={()=>setExceptions(prev => prev.filter(x => `${x.startDate}-${x.startTime}-${x.endDate}-${x.endTime}` !== key))}
                       style={{
                         display: 'flex', alignItems: 'center', justifyContent: 'center', width: '18px', height: '18px', borderRadius: '50%', background: 'transparent', border: 'none', cursor: 'pointer', transition: 'background 0.2s', marginLeft: '0.25rem', padding: 0
                       }}
