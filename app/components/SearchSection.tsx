@@ -75,128 +75,210 @@ export function SearchSection({
   };
 
   return (
-    <section className="bg-deep-navy py-8 md:py-12">
-      <div className="container mx-auto px-4">
-        <div className="max-w-6xl mx-auto py-4" style={{ gap: '1em' }}>
+    <section style={{
+      background: 'linear-gradient(135deg, #1e3a8a 0%, #3b82f6 50%, #60a5fa 100%)',
+      padding: '3.5rem 0 4.5rem',
+      position: 'relative',
+      overflow: 'hidden'
+    }}>
+      {/* Decorative background elements */}
+      <div style={{
+        position: 'absolute',
+        top: '-50%',
+        right: '-10%',
+        width: '500px',
+        height: '500px',
+        background: 'radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%)',
+        borderRadius: '50%'
+      }} />
+      <div style={{
+        position: 'absolute',
+        bottom: '-30%',
+        left: '-5%',
+        width: '400px',
+        height: '400px',
+        background: 'radial-gradient(circle, rgba(255,255,255,0.08) 0%, transparent 70%)',
+        borderRadius: '50%'
+      }} />
 
-          <h1 className="display-title text-white mb-4 brand-name">Find your perfect driving instructor.</h1>
+      <div className="container mx-auto px-4" style={{ position: 'relative', zIndex: 1 }}>
+        <div style={{ maxWidth: '1200px', margin: '0 auto' }}>
 
-          <div className="bg-white rounded-2xl shadow-md overflow-hidden mb-6 slide-in" style={{ 
-            border: '1px solid #e5e7eb'
+          {/* Header */}
+          <div style={{ textAlign: 'center', marginBottom: '3rem' }}>
+            <h1 style={{
+              fontSize: '3rem',
+              fontWeight: '800',
+              color: '#ffffff',
+              marginBottom: '1rem',
+              fontFamily: "'Space Grotesk', sans-serif",
+              letterSpacing: '-0.02em',
+              textShadow: '0 2px 10px rgba(0,0,0,0.1)'
+            }}>
+              Find Your Perfect Driving Instructor
+            </h1>
+            <p style={{
+              fontSize: '1.25rem',
+              color: 'rgba(255,255,255,0.95)',
+              maxWidth: '600px',
+              margin: '0 auto',
+              fontWeight: '400'
+            }}>
+              Search from verified instructors in your area
+            </p>
+          </div>
+
+          {/* Main Search Card */}
+          <div style={{
+            background: 'rgba(255, 255, 255, 0.98)',
+            borderRadius: '1.5rem',
+            padding: '2.5rem',
+            boxShadow: '0 20px 60px rgba(0,0,0,0.3)',
+            backdropFilter: 'blur(10px)',
+            border: '1px solid rgba(255,255,255,0.5)',
+            marginBottom: '2rem'
           }}>
-            <div className="flex flex-col md:flex-row items-stretch filters-row" style={{ padding: '1.5rem', gap: '2rem' }}>
-              <div className="md:flex-1 filters-item">
+            {/* Filter Grid */}
+            <div style={{
+              display: 'grid',
+              gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))',
+              gap: '1.5rem',
+              marginBottom: '2rem'
+            }}>
+              {/* Postcode */}
+              <div>
                 <label style={{
                   display: 'block',
-                  fontSize: '0.875rem',
+                  fontSize: '0.75rem',
                   fontWeight: '600',
-                  color: '#374151',
-                  marginBottom: '0.5rem'
-                }}>From</label>
-                <div className="relative">
-                  <span style={{ 
-                    position: 'absolute', 
-                    left: '1rem', 
-                    top: '50%', 
-                    transform: 'translateY(-50%)',
-                    pointerEvents: 'none',
-                    zIndex: 1
-                  }}>
-                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#9ca3af" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                      <path d="M21 10c0 6-9 12-9 12s-9-6-9-12a9 9 0 1 1 18 0z"/>
-                      <circle cx="12" cy="10" r="3"/>
-                    </svg>
-                  </span>
+                  color: '#64748b',
+                  marginBottom: '0.625rem',
+                  textTransform: 'uppercase',
+                  letterSpacing: '0.05em'
+                }}>
+                  📍 Location
+                </label>
+                <div style={{ position: 'relative' }}>
                   <input 
                     type="text" 
                     value={pendingPostcode} 
                     onChange={(e) => handlePostcodeInputChange(e.target.value)} 
                     onKeyDown={(e) => { if (e.key === 'Enter') { e.preventDefault(); startNewPostcode(); } }} 
-                    placeholder="Enter postcode area" 
+                    placeholder="Enter postcode" 
                     style={{
                       width: '100%',
-                      padding: '0.75rem 1rem 0.75rem 3rem',
+                      padding: '1rem 1rem 1rem 3rem',
                       fontSize: '1rem',
                       color: '#111827',
-                      border: '1px solid #e5e7eb',
+                      border: '2px solid #e5e7eb',
                       borderRadius: '0.75rem',
                       outline: 'none',
                       transition: 'all 0.2s ease',
-                      background: '#f9fafb'
+                      background: '#ffffff',
+                      fontWeight: '500'
                     }}
                     onFocus={(e) => {
-                      e.currentTarget.style.borderColor = '#93c5fd';
-                      e.currentTarget.style.background = '#ffffff';
-                      e.currentTarget.style.boxShadow = '0 0 0 3px rgba(147, 197, 253, 0.1)';
+                      e.currentTarget.style.borderColor = '#3b82f6';
+                      e.currentTarget.style.boxShadow = '0 0 0 4px rgba(59, 130, 246, 0.1)';
                     }}
                     onBlur={(e) => {
                       e.currentTarget.style.borderColor = '#e5e7eb';
-                      e.currentTarget.style.background = '#f9fafb';
                       e.currentTarget.style.boxShadow = 'none';
                     }}
                   />
+                  <svg 
+                    width="20" 
+                    height="20" 
+                    viewBox="0 0 24 24" 
+                    fill="none" 
+                    stroke="#94a3b8" 
+                    strokeWidth="2" 
+                    strokeLinecap="round" 
+                    strokeLinejoin="round"
+                    style={{
+                      position: 'absolute',
+                      left: '1rem',
+                      top: '50%',
+                      transform: 'translateY(-50%)',
+                      pointerEvents: 'none'
+                    }}
+                  >
+                    <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/>
+                    <circle cx="12" cy="10" r="3"/>
+                  </svg>
                 </div>
               </div>
-              <div className="hidden md:block w-px bg-gray-200 filters-divider" />
-              <div className="md:flex-1 filters-item">
+
+              {/* Gender */}
+              <div>
                 <label style={{
                   display: 'block',
-                  fontSize: '0.875rem',
+                  fontSize: '0.75rem',
                   fontWeight: '600',
-                  color: '#374151',
-                  marginBottom: '0.5rem'
-                }}>Instructor gender</label>
-                <div className="relative">
-                  <span style={{ 
-                    position: 'absolute', 
-                    left: '1rem', 
-                    top: '50%', 
-                    transform: 'translateY(-50%)',
-                    pointerEvents: 'none',
-                    zIndex: 1
-                  }}>
-                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#9ca3af" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                      <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
-                      <circle cx="12" cy="7" r="4"/>
-                    </svg>
-                  </span>
+                  color: '#64748b',
+                  marginBottom: '0.625rem',
+                  textTransform: 'uppercase',
+                  letterSpacing: '0.05em'
+                }}>
+                  👤 Instructor Gender
+                </label>
+                <div style={{ position: 'relative' }}>
                   <select 
                     value={filters.gender} 
                     onChange={(e) => handleFilterChange('gender', e.target.value)} 
                     style={{
                       width: '100%',
-                      padding: '0.75rem 3rem 0.75rem 3rem',
+                      padding: '1rem 3rem 1rem 3rem',
                       fontSize: '1rem',
-                      color: filters.gender ? '#111827' : '#9ca3af',
-                      border: '1px solid #e5e7eb',
+                      color: filters.gender ? '#111827' : '#94a3b8',
+                      border: '2px solid #e5e7eb',
                       borderRadius: '0.75rem',
                       outline: 'none',
                       transition: 'all 0.2s ease',
-                      background: '#f9fafb',
+                      background: '#ffffff',
                       cursor: 'pointer',
-                      appearance: 'none'
+                      appearance: 'none',
+                      fontWeight: '500'
                     }}
                     onFocus={(e) => {
-                      e.currentTarget.style.borderColor = '#93c5fd';
-                      e.currentTarget.style.background = '#ffffff';
-                      e.currentTarget.style.boxShadow = '0 0 0 3px rgba(147, 197, 253, 0.1)';
+                      e.currentTarget.style.borderColor = '#3b82f6';
+                      e.currentTarget.style.boxShadow = '0 0 0 4px rgba(59, 130, 246, 0.1)';
                     }}
                     onBlur={(e) => {
                       e.currentTarget.style.borderColor = '#e5e7eb';
-                      e.currentTarget.style.background = '#f9fafb';
                       e.currentTarget.style.boxShadow = 'none';
                     }}
                   >
-                    <option value="" style={{ padding: '0.75rem 1rem', background: '#ffffff', color: '#9ca3af' }}>Any Gender</option>
-                    <option value="Male" style={{ padding: '0.75rem 1rem', background: '#ffffff', color: '#111827' }}>Male</option>
-                    <option value="Female" style={{ padding: '0.75rem 1rem', background: '#ffffff', color: '#111827' }}>Female</option>
+                    <option value="">Any Gender</option>
+                    <option value="Male">Male</option>
+                    <option value="Female">Female</option>
                   </select>
                   <svg 
-                    width="18" 
-                    height="18" 
+                    width="20" 
+                    height="20" 
                     viewBox="0 0 24 24" 
                     fill="none" 
-                    stroke="#9ca3af" 
+                    stroke="#94a3b8" 
+                    strokeWidth="2" 
+                    strokeLinecap="round" 
+                    strokeLinejoin="round"
+                    style={{
+                      position: 'absolute',
+                      left: '1rem',
+                      top: '50%',
+                      transform: 'translateY(-50%)',
+                      pointerEvents: 'none'
+                    }}
+                  >
+                    <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+                    <circle cx="12" cy="7" r="4"/>
+                  </svg>
+                  <svg 
+                    width="20" 
+                    height="20" 
+                    viewBox="0 0 24 24" 
+                    fill="none" 
+                    stroke="#94a3b8" 
                     strokeWidth="2.5" 
                     strokeLinecap="round" 
                     strokeLinejoin="round"
@@ -212,69 +294,80 @@ export function SearchSection({
                   </svg>
                 </div>
               </div>
-              <div className="hidden md:block w-px bg-gray-200 filters-divider" />
-              <div className="md:flex-1 filters-item">
+
+              {/* Vehicle Type */}
+              <div>
                 <label style={{
                   display: 'block',
-                  fontSize: '0.875rem',
+                  fontSize: '0.75rem',
                   fontWeight: '600',
-                  color: '#374151',
-                  marginBottom: '0.5rem'
-                }}>Vehicle type</label>
-                <div className="relative">
-                  <span style={{ 
-                    position: 'absolute', 
-                    left: '1rem', 
-                    top: '50%', 
-                    transform: 'translateY(-50%)',
-                    pointerEvents: 'none',
-                    zIndex: 1
-                  }}>
-                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#9ca3af" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                      <path d="M3 13l2-5a3 3 0 0 1 3-2h6a3 3 0 0 1 3 2l2 5"/>
-                      <rect x="3" y="13" width="18" height="6" rx="2"/>
-                      <circle cx="7.5" cy="17" r="1.5"/>
-                      <circle cx="16.5" cy="17" r="1.5"/>
-                    </svg>
-                  </span>
+                  color: '#64748b',
+                  marginBottom: '0.625rem',
+                  textTransform: 'uppercase',
+                  letterSpacing: '0.05em'
+                }}>
+                  🚗 Vehicle Type
+                </label>
+                <div style={{ position: 'relative' }}>
                   <select 
                     value={filters.vehicleType} 
                     onChange={(e) => handleFilterChange('vehicleType', e.target.value)} 
                     style={{
                       width: '100%',
-                      padding: '0.75rem 3rem 0.75rem 3rem',
+                      padding: '1rem 3rem 1rem 3rem',
                       fontSize: '1rem',
-                      color: filters.vehicleType ? '#111827' : '#9ca3af',
-                      border: '1px solid #e5e7eb',
+                      color: filters.vehicleType ? '#111827' : '#94a3b8',
+                      border: '2px solid #e5e7eb',
                       borderRadius: '0.75rem',
                       outline: 'none',
                       transition: 'all 0.2s ease',
-                      background: '#f9fafb',
+                      background: '#ffffff',
                       cursor: 'pointer',
-                      appearance: 'none'
+                      appearance: 'none',
+                      fontWeight: '500'
                     }}
                     onFocus={(e) => {
-                      e.currentTarget.style.borderColor = '#93c5fd';
-                      e.currentTarget.style.background = '#ffffff';
-                      e.currentTarget.style.boxShadow = '0 0 0 3px rgba(147, 197, 253, 0.1)';
+                      e.currentTarget.style.borderColor = '#3b82f6';
+                      e.currentTarget.style.boxShadow = '0 0 0 4px rgba(59, 130, 246, 0.1)';
                     }}
                     onBlur={(e) => {
                       e.currentTarget.style.borderColor = '#e5e7eb';
-                      e.currentTarget.style.background = '#f9fafb';
                       e.currentTarget.style.boxShadow = 'none';
                     }}
                   >
-                    <option value="" style={{ padding: '0.75rem 1rem', background: '#ffffff', color: '#9ca3af' }}>Any Vehicle Type</option>
-                    <option value="Manual" style={{ padding: '0.75rem 1rem', background: '#ffffff', color: '#111827' }}>Manual</option>
-                    <option value="Automatic" style={{ padding: '0.75rem 1rem', background: '#ffffff', color: '#111827' }}>Automatic</option>
-                    <option value="Both" style={{ padding: '0.75rem 1rem', background: '#ffffff', color: '#111827' }}>Both</option>
+                    <option value="">Any Type</option>
+                    <option value="Manual">Manual</option>
+                    <option value="Automatic">Automatic</option>
+                    <option value="Both">Both</option>
                   </select>
                   <svg 
-                    width="18" 
-                    height="18" 
+                    width="20" 
+                    height="20" 
                     viewBox="0 0 24 24" 
                     fill="none" 
-                    stroke="#9ca3af" 
+                    stroke="#94a3b8" 
+                    strokeWidth="2" 
+                    strokeLinecap="round" 
+                    strokeLinejoin="round"
+                    style={{
+                      position: 'absolute',
+                      left: '1rem',
+                      top: '50%',
+                      transform: 'translateY(-50%)',
+                      pointerEvents: 'none'
+                    }}
+                  >
+                    <path d="M3 13l2-5a3 3 0 0 1 3-2h6a3 3 0 0 1 3 2l2 5"/>
+                    <rect x="3" y="13" width="18" height="6" rx="2"/>
+                    <circle cx="7.5" cy="17" r="1.5"/>
+                    <circle cx="16.5" cy="17" r="1.5"/>
+                  </svg>
+                  <svg 
+                    width="20" 
+                    height="20" 
+                    viewBox="0 0 24 24" 
+                    fill="none" 
+                    stroke="#94a3b8" 
                     strokeWidth="2.5" 
                     strokeLinecap="round" 
                     strokeLinejoin="round"
@@ -290,71 +383,82 @@ export function SearchSection({
                   </svg>
                 </div>
               </div>
-              <div className="hidden md:block w-px bg-gray-200 filters-divider" />
-              <div className="md:flex-1 filters-item">
+
+              {/* Language */}
+              <div>
                 <label style={{
                   display: 'block',
-                  fontSize: '0.875rem',
+                  fontSize: '0.75rem',
                   fontWeight: '600',
-                  color: '#374151',
-                  marginBottom: '0.5rem'
-                }}>Language</label>
-                <div className="relative">
-                  <span style={{ 
-                    position: 'absolute', 
-                    left: '1rem', 
-                    top: '50%', 
-                    transform: 'translateY(-50%)',
-                    pointerEvents: 'none',
-                    zIndex: 1
-                  }}>
-                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#9ca3af" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                      <circle cx="12" cy="12" r="10"/>
-                      <line x1="2" y1="12" x2="22" y2="12"/>
-                      <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/>
-                    </svg>
-                  </span>
+                  color: '#64748b',
+                  marginBottom: '0.625rem',
+                  textTransform: 'uppercase',
+                  letterSpacing: '0.05em'
+                }}>
+                  🌍 Language
+                </label>
+                <div style={{ position: 'relative' }}>
                   <select 
                     value={filters.language} 
                     onChange={(e) => handleFilterChange('language', e.target.value)} 
                     style={{
                       width: '100%',
-                      padding: '0.75rem 3rem 0.75rem 3rem',
+                      padding: '1rem 3rem 1rem 3rem',
                       fontSize: '1rem',
-                      color: filters.language ? '#111827' : '#9ca3af',
-                      border: '1px solid #e5e7eb',
+                      color: filters.language ? '#111827' : '#94a3b8',
+                      border: '2px solid #e5e7eb',
                       borderRadius: '0.75rem',
                       outline: 'none',
                       transition: 'all 0.2s ease',
-                      background: '#f9fafb',
+                      background: '#ffffff',
                       cursor: 'pointer',
-                      appearance: 'none'
+                      appearance: 'none',
+                      fontWeight: '500'
                     }}
                     onFocus={(e) => {
-                      e.currentTarget.style.borderColor = '#93c5fd';
-                      e.currentTarget.style.background = '#ffffff';
-                      e.currentTarget.style.boxShadow = '0 0 0 3px rgba(147, 197, 253, 0.1)';
+                      e.currentTarget.style.borderColor = '#3b82f6';
+                      e.currentTarget.style.boxShadow = '0 0 0 4px rgba(59, 130, 246, 0.1)';
                     }}
                     onBlur={(e) => {
                       e.currentTarget.style.borderColor = '#e5e7eb';
-                      e.currentTarget.style.background = '#f9fafb';
                       e.currentTarget.style.boxShadow = 'none';
                     }}
                   >
-                    <option value="" style={{ padding: '0.75rem 1rem', background: '#ffffff', color: '#9ca3af' }}>Any Language</option>
-                    <option value="British Sign Language" style={{ padding: '0.75rem 1rem', background: '#ffffff', color: '#111827' }}>British Sign Language</option>
-                    <option value="English" style={{ padding: '0.75rem 1rem', background: '#ffffff', color: '#111827' }}>English</option>
-                    <option value="Spanish" style={{ padding: '0.75rem 1rem', background: '#ffffff', color: '#111827' }}>Spanish</option>
-                    <option value="French" style={{ padding: '0.75rem 1rem', background: '#ffffff', color: '#111827' }}>French</option>
-                    <option value="Urdu" style={{ padding: '0.75rem 1rem', background: '#ffffff', color: '#111827' }}>Urdu</option>
-                    <option value="Polish" style={{ padding: '0.75rem 1rem', background: '#ffffff', color: '#111827' }}>Polish</option>
+                    <option value="">Any Language</option>
+                    <option value="British Sign Language">British Sign Language</option>
+                    <option value="English">English</option>
+                    <option value="Spanish">Spanish</option>
+                    <option value="French">French</option>
+                    <option value="Urdu">Urdu</option>
+                    <option value="Polish">Polish</option>
                   </select>
                   <svg 
-                    width="18" 
-                    height="18" 
+                    width="20" 
+                    height="20" 
                     viewBox="0 0 24 24" 
                     fill="none" 
-                    stroke="#9ca3af" 
+                    stroke="#94a3b8" 
+                    strokeWidth="2" 
+                    strokeLinecap="round" 
+                    strokeLinejoin="round"
+                    style={{
+                      position: 'absolute',
+                      left: '1rem',
+                      top: '50%',
+                      transform: 'translateY(-50%)',
+                      pointerEvents: 'none'
+                    }}
+                  >
+                    <circle cx="12" cy="12" r="10"/>
+                    <line x1="2" y1="12" x2="22" y2="12"/>
+                    <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/>
+                  </svg>
+                  <svg 
+                    width="20" 
+                    height="20" 
+                    viewBox="0 0 24 24" 
+                    fill="none" 
+                    stroke="#94a3b8" 
                     strokeWidth="2.5" 
                     strokeLinecap="round" 
                     strokeLinejoin="round"
@@ -371,128 +475,234 @@ export function SearchSection({
                 </div>
               </div>
             </div>
-          </div>
 
-          <div className="summary-card fade-in summary-actions mt-4">
-            <div className="flex items-center gap-3">
-              <span className="text-sm font-medium text-primary">Active filters:</span>
-              <div className="flex flex-wrap gap-2">
-                {postcodes.map((pc, idx) => {
-                  const isLast = idx === postcodes.length - 1;
-                  return (
-                    <span key={`pc-${idx}`} style={{
+            {/* Active Filters Display */}
+            {(postcodes.length > 0 || filters.gender || filters.vehicleType || filters.language) && (
+              <div style={{
+                padding: '1.25rem',
+                background: 'linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%)',
+                borderRadius: '1rem',
+                marginBottom: '1.5rem',
+                border: '1px solid #bfdbfe'
+              }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginBottom: '0.75rem' }}>
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#2563eb" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <line x1="4" y1="21" x2="4" y2="14"/>
+                    <line x1="4" y1="10" x2="4" y2="3"/>
+                    <line x1="12" y1="21" x2="12" y2="12"/>
+                    <line x1="12" y1="8" x2="12" y2="3"/>
+                    <line x1="20" y1="21" x2="20" y2="16"/>
+                    <line x1="20" y1="12" x2="20" y2="3"/>
+                    <line x1="1" y1="14" x2="7" y2="14"/>
+                    <line x1="9" y1="8" x2="15" y2="8"/>
+                    <line x1="17" y1="16" x2="23" y2="16"/>
+                  </svg>
+                  <span style={{ fontSize: '0.875rem', fontWeight: '600', color: '#1e40af' }}>
+                    Active Filters
+                  </span>
+                </div>
+                <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.5rem' }}>
+                  {postcodes.map((pc, idx) => {
+                    const isLast = idx === postcodes.length - 1;
+                    return (
+                      <span key={`pc-${idx}`} style={{
+                        display: 'inline-flex',
+                        alignItems: 'center',
+                        gap: '0.5rem',
+                        padding: '0.5rem 0.875rem',
+                        background: 'white',
+                        color: '#1e40af',
+                        borderRadius: '0.5rem',
+                        fontSize: '0.875rem',
+                        fontWeight: '500',
+                        boxShadow: '0 2px 4px rgba(0,0,0,0.05)'
+                      }}>
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                          <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/>
+                          <circle cx="12" cy="10" r="3"/>
+                        </svg>
+                        <span>{pc}</span>
+                        <button type="button" aria-label="Remove postcode" onClick={() => removePostcode(pc, idx)} style={{
+                          display: 'inline-flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          width: '20px',
+                          height: '20px',
+                          borderRadius: '50%',
+                          background: 'transparent',
+                          border: 'none',
+                          cursor: 'pointer',
+                          transition: 'background 0.2s',
+                          padding: 0
+                        }}
+                        onMouseEnter={(e) => e.currentTarget.style.background = '#dbeafe'}
+                        onMouseLeave={(e) => e.currentTarget.style.background = 'transparent'}>
+                          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M18 6L6 18M6 6l12 12" /></svg>
+                        </button>
+                        {isLast && (
+                          <button type="button" aria-label="Add new postcode" onClick={startNewPostcode} style={{
+                            display: 'inline-flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            width: '20px',
+                            height: '20px',
+                            borderRadius: '50%',
+                            background: 'transparent',
+                            border: 'none',
+                            cursor: 'pointer',
+                            transition: 'background 0.2s',
+                            padding: 0
+                          }}
+                          onMouseEnter={(e) => e.currentTarget.style.background = '#dbeafe'}
+                          onMouseLeave={(e) => e.currentTarget.style.background = 'transparent'}>
+                            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 5v14M5 12h14" /></svg>
+                          </button>
+                        )}
+                      </span>
+                    );
+                  })}
+                  {filters.gender && (
+                    <span style={{
                       display: 'inline-flex',
                       alignItems: 'center',
                       gap: '0.5rem',
-                      padding: '0.5rem 1rem',
+                      padding: '0.5rem 0.875rem',
                       background: 'white',
                       color: '#1e40af',
                       borderRadius: '0.5rem',
                       fontSize: '0.875rem',
                       fontWeight: '500',
-                      border: '1px solid #e5e7eb',
-                      boxShadow: '0 1px 2px rgba(0,0,0,0.05)'
+                      boxShadow: '0 2px 4px rgba(0,0,0,0.05)'
                     }}>
                       <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                        <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/>
-                        <circle cx="12" cy="10" r="3"/>
+                        <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+                        <circle cx="12" cy="7" r="4"/>
                       </svg>
-                      <span>{pc}</span>
-                      
-                      {/* Remove button - always shown */}
-                      <button type="button" aria-label="Remove postcode" onClick={() => removePostcode(pc, idx)} className="inline-flex items-center justify-center w-5 h-5 ml-1 rounded-full bg-transparent text-blue-700 hover:text-blue-900 leading-none active:scale-95 transition" style={{ border: 'none', outline: 'none' }}>
-                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ display: 'block' }}><path d="M18 6L6 18M6 6l12 12" /></svg>
-                      </button>
-                      
-                      {/* Add button - only on last postcode */}
-                      {isLast && (
-                        <button type="button" aria-label="Add new postcode" onClick={startNewPostcode} className="inline-flex items-center justify-center w-5 h-5 rounded-full bg-transparent text-blue-700 hover:text-blue-900 leading-none active:scale-95 transition" style={{ border: 'none', outline: 'none' }}>
-                          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ display: 'block' }}><path d="M12 5v14M5 12h14" /></svg>
-                        </button>
-                      )}
+                      {filters.gender}
                     </span>
-                  );
-                })}
-                {filters.gender && (
-                  <span style={{
-                    display: 'inline-flex',
-                    alignItems: 'center',
-                    gap: '0.5rem',
-                    padding: '0.5rem 1rem',
-                    background: 'white',
-                    color: '#1e40af',
-                    borderRadius: '0.5rem',
-                    fontSize: '0.875rem',
-                    fontWeight: '500',
-                    border: '1px solid #e5e7eb',
-                    boxShadow: '0 1px 2px rgba(0,0,0,0.05)'
-                  }}>
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                      <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
-                      <circle cx="12" cy="7" r="4"/>
-                    </svg>
-                    <span>{filters.gender}</span>
-                  </span>
-                )}
-                {filters.vehicleType && (
-                  <span style={{
-                    display: 'inline-flex',
-                    alignItems: 'center',
-                    gap: '0.5rem',
-                    padding: '0.5rem 1rem',
-                    background: 'white',
-                    color: '#1e40af',
-                    borderRadius: '0.5rem',
-                    fontSize: '0.875rem',
-                    fontWeight: '500',
-                    border: '1px solid #e5e7eb',
-                    boxShadow: '0 1px 2px rgba(0,0,0,0.05)'
-                  }}>
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                      <path d="M5 17h2l.5-1.5h9L17 17h2"/>
-                      <path d="M12 17v-6"/>
-                      <path d="M9 5h6l3 6H6l3-6z"/>
-                      <circle cx="8" cy="17" r="2"/>
-                      <circle cx="16" cy="17" r="2"/>
-                    </svg>
-                    <span>{filters.vehicleType}</span>
-                  </span>
-                )}
-                {filters.language && (
-                  <span style={{
-                    display: 'inline-flex',
-                    alignItems: 'center',
-                    gap: '0.5rem',
-                    padding: '0.5rem 1rem',
-                    background: 'white',
-                    color: '#1e40af',
-                    borderRadius: '0.5rem',
-                    fontSize: '0.875rem',
-                    fontWeight: '500',
-                    border: '1px solid #e5e7eb',
-                    boxShadow: '0 1px 2px rgba(0,0,0,0.05)'
-                  }}>
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                      <circle cx="12" cy="12" r="10"/>
-                      <line x1="2" y1="12" x2="22" y2="12"/>
-                      <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/>
-                    </svg>
-                    <span>{filters.language}</span>
-                  </span>
-                )}
-                {postcodes.length === 0 && Object.values(filters).every(val => val === '' || val === 0 || (Array.isArray(val) && val[0] === 20 && val[1] === 60)) && (<span className="text-gray-500 text-sm">No filters applied</span>)}
+                  )}
+                  {filters.vehicleType && (
+                    <span style={{
+                      display: 'inline-flex',
+                      alignItems: 'center',
+                      gap: '0.5rem',
+                      padding: '0.5rem 0.875rem',
+                      background: 'white',
+                      color: '#1e40af',
+                      borderRadius: '0.5rem',
+                      fontSize: '0.875rem',
+                      fontWeight: '500',
+                      boxShadow: '0 2px 4px rgba(0,0,0,0.05)'
+                    }}>
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                        <path d="M5 17h2l.5-1.5h9L17 17h2"/>
+                        <path d="M12 17v-6"/>
+                        <path d="M9 5h6l3 6H6l3-6z"/>
+                        <circle cx="8" cy="17" r="2"/>
+                        <circle cx="16" cy="17" r="2"/>
+                      </svg>
+                      {filters.vehicleType}
+                    </span>
+                  )}
+                  {filters.language && (
+                    <span style={{
+                      display: 'inline-flex',
+                      alignItems: 'center',
+                      gap: '0.5rem',
+                      padding: '0.5rem 0.875rem',
+                      background: 'white',
+                      color: '#1e40af',
+                      borderRadius: '0.5rem',
+                      fontSize: '0.875rem',
+                      fontWeight: '500',
+                      boxShadow: '0 2px 4px rgba(0,0,0,0.05)'
+                    }}>
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                        <circle cx="12" cy="12" r="10"/>
+                        <line x1="2" y1="12" x2="22" y2="12"/>
+                        <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/>
+                      </svg>
+                      {filters.language}
+                    </span>
+                  )}
+                </div>
               </div>
-            </div>
-            <div className="flex items-center gap-3 buttons-row">
-              <button onClick={clearFilters} className="btn btn-secondary flex items-center gap-2"><RotateCcw size={16} />Clear All Filters</button>
-              <button onClick={handleSearch} className="btn btn-primary flex items-center gap-2"><Search size={16} />Search Instructors</button>
+            )}
+
+            {/* Action Buttons */}
+            <div style={{
+              display: 'flex',
+              gap: '1rem',
+              flexWrap: 'wrap'
+            }}>
+              <button 
+                onClick={clearFilters} 
+                style={{
+                  flex: '1',
+                  minWidth: '200px',
+                  padding: '1rem 2rem',
+                  fontSize: '1rem',
+                  fontWeight: '600',
+                  color: '#64748b',
+                  background: 'white',
+                  border: '2px solid #e5e7eb',
+                  borderRadius: '0.75rem',
+                  cursor: 'pointer',
+                  transition: 'all 0.2s ease',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  gap: '0.5rem'
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.borderColor = '#cbd5e1';
+                  e.currentTarget.style.background = '#f8fafc';
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.borderColor = '#e5e7eb';
+                  e.currentTarget.style.background = 'white';
+                }}
+              >
+                <RotateCcw size={20} />
+                Clear Filters
+              </button>
+              <button 
+                onClick={handleSearch} 
+                style={{
+                  flex: '2',
+                  minWidth: '250px',
+                  padding: '1rem 2rem',
+                  fontSize: '1.0625rem',
+                  fontWeight: '700',
+                  color: 'white',
+                  background: 'linear-gradient(135deg, #2563eb 0%, #3b82f6 100%)',
+                  border: 'none',
+                  borderRadius: '0.75rem',
+                  cursor: 'pointer',
+                  transition: 'all 0.2s ease',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  gap: '0.625rem',
+                  boxShadow: '0 8px 20px rgba(37, 99, 235, 0.3)'
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.transform = 'translateY(-2px)';
+                  e.currentTarget.style.boxShadow = '0 12px 28px rgba(37, 99, 235, 0.4)';
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.transform = 'translateY(0)';
+                  e.currentTarget.style.boxShadow = '0 8px 20px rgba(37, 99, 235, 0.3)';
+                }}
+              >
+                <Search size={22} />
+                Search Instructors
+              </button>
             </div>
           </div>
-
         </div>
       </div>
     </section>
   );
 }
-
 
