@@ -29,6 +29,8 @@ export function InstructorStripeAccountSection({ instructorId, trueInstructor }:
   const [isFetchingReasons, setIsFetchingReasons] = useState(false);
   const [reasonsData, setReasonsData] = useState<any>(null);
   const [reasonsError, setReasonsError] = useState<string | null>(null);
+  const [isCreatingVerification, setIsCreatingVerification] = useState(false);
+  const [verificationError, setVerificationError] = useState<string | null>(null);
 
   useEffect(() => {
     const run = async () => {
@@ -252,6 +254,46 @@ export function InstructorStripeAccountSection({ instructorId, trueInstructor }:
     }
   };
 
+  const handleIdentityVerification = async () => {
+    const host = getApiHost();
+    if (!host) return;
+    if (!token) {
+      setVerificationError('You must be signed in to start identity verification.');
+      return;
+    }
+
+    setIsCreatingVerification(true);
+    setVerificationError(null);
+
+    try {
+      const res = await fetch(`${host}/identity/verification-sessions`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        }
+      });
+      const data = await res.json().catch(() => ({}));
+
+      if (res.status === 200 && data && typeof data.url === 'string' && data.url.length > 0) {
+        // Redirect to Stripe Identity verification page
+        window.location.href = data.url;
+        return;
+      } else if (res.status === 401) {
+        setVerificationError('You are not authorized. Please sign in again.');
+      } else if (res.status === 500) {
+        setVerificationError('Stripe is not configured on the server.');
+      } else {
+        const message = (data && (data.error || data.message)) || `Unexpected status ${res.status}`;
+        setVerificationError(message);
+      }
+    } catch {
+      setVerificationError('Network error while creating verification session.');
+    } finally {
+      setIsCreatingVerification(false);
+    }
+  };
+
   return (
     <div>
       {isLoading && (
@@ -338,7 +380,7 @@ export function InstructorStripeAccountSection({ instructorId, trueInstructor }:
                 <p style={{ fontSize: '0.875rem', color: '#6b7280', marginBottom: '0.75rem' }}>
                   Students can't book lessons with you until onboarding is complete.
                 </p>
-                <div style={{ marginBottom: '0.75rem' }}>
+                <div style={{ marginBottom: '0.75rem', display: 'flex', gap: '0.75rem', flexWrap: 'wrap' }}>
                   <button
                     onClick={handleFetchReasons}
                     disabled={isFetchingReasons}
@@ -378,6 +420,45 @@ export function InstructorStripeAccountSection({ instructorId, trueInstructor }:
                       </>
                     )}
                   </button>
+                  <button
+                    onClick={handleIdentityVerification}
+                    disabled={isCreatingVerification}
+                    className="btn"
+                    style={{
+                      display: 'inline-flex',
+                      alignItems: 'center',
+                      gap: '0.5rem',
+                      fontSize: '0.875rem',
+                      padding: '0.5rem 1rem',
+                      background: '#8b5cf6',
+                      color: 'white',
+                      border: 'none',
+                      opacity: isCreatingVerification ? 0.7 : 1
+                    }}
+                  >
+                    {isCreatingVerification ? (
+                      <>
+                        <span className="spinner" style={{
+                          width: '14px',
+                          height: '14px',
+                          border: '2px solid rgba(255,255,255,0.3)',
+                          borderTopColor: 'white',
+                          borderRadius: '50%',
+                          animation: 'spin 0.6s linear infinite'
+                        }} />
+                        Creating...
+                      </>
+                    ) : (
+                      <>
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                          <path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
+                          <circle cx="8.5" cy="7" r="4"/>
+                          <polyline points="17 11 19 13 23 9"/>
+                        </svg>
+                        Identity Verification (Test)
+                      </>
+                    )}
+                  </button>
                 </div>
                 {reasonsError && (
                   <div style={{
@@ -390,6 +471,19 @@ export function InstructorStripeAccountSection({ instructorId, trueInstructor }:
                     marginBottom: '0.75rem'
                   }}>
                     {reasonsError}
+                  </div>
+                )}
+                {verificationError && (
+                  <div style={{
+                    fontSize: '0.875rem',
+                    color: '#dc2626',
+                    background: '#fef2f2',
+                    border: '1px solid #fecaca',
+                    borderRadius: '0.5rem',
+                    padding: '0.75rem 1rem',
+                    marginBottom: '0.75rem'
+                  }}>
+                    {verificationError}
                   </div>
                 )}
                 {showReasons && reasonsData && (
