@@ -198,7 +198,7 @@ export function TrustTechnologySection() {
                   <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
                     <polyline points="20 6 9 17 4 12"/>
                   </svg>
-                  Strive for authenticity
+                  Striving for authenticity
                 </li>
               </ul>
             </div>
@@ -248,7 +248,7 @@ export function TrustTechnologySection() {
                 lineHeight: '1.6',
                 opacity: 0.9
               }}>
-                All instructor vehicles are verified directly with the DVLA. Registration, make, model, and colour are automatically checked—no room for fake information.
+                All instructor vehicles are verified directly with the DVLA. Registration, make, model, and colour are automatically checked, no room for fake information.
               </p>
               <ul style={{ 
                 listStyle: 'none', 
