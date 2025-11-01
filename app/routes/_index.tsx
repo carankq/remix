@@ -5,6 +5,7 @@ import { Header } from "../components/Header";
 import { Footer } from "../components/Footer";
 import { SearchSection } from "../components/SearchSection";
 import { HeroSection } from "../components/HeroSection";
+import { TrustTechnologySection } from "../components/TrustTechnologySection";
 import { FAQSection } from "../components/FAQSection";
 
 export async function loader({ request }: LoaderFunctionArgs) {
@@ -90,6 +91,7 @@ export default function Index() {
           }} 
         />
         <HeroSection />
+        <TrustTechnologySection />
         <FAQSection blogs={blogsTop3} />
       <Footer />
     </div>
