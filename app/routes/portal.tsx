@@ -395,9 +395,50 @@ export default function PortalRoute() {
   const [proposalLessonId, setProposalLessonId] = useState<string | null>(null);
   const [proposalDateTime, setProposalDateTime] = useState<string>(''); // YYYY-MM-DDTHH:mm
   const [proposalDurationMin, setProposalDurationMin] = useState<string>('60');
+  
+  // Student identity verification state
+  const [studentIdentityVerified, setStudentIdentityVerified] = useState<boolean | null>(null);
+  const [checkingStudentIdentity, setCheckingStudentIdentity] = useState(false);
+  const [studentIdentityError, setStudentIdentityError] = useState<string | null>(null);
+  const [isCreatingStudentVerification, setIsCreatingStudentVerification] = useState(false);
+  const [studentVerificationError, setStudentVerificationError] = useState<string | null>(null);
   const [proposalSubmitting, setProposalSubmitting] = useState(false);
   const [proposalError, setProposalError] = useState<string | null>(null);
   const [proposalActionById, setProposalActionById] = useState<Record<string, boolean>>({});
+
+  // Check student identity verification status when payments tab loads
+  useEffect(() => {
+    if (activeTab !== 'payments' || user?.accountType !== 'student' || !token) return;
+    
+    const checkStudentIdentity = async () => {
+      setCheckingStudentIdentity(true);
+      setStudentIdentityError(null);
+      
+      try {
+        const apiHost = getApiHost();
+        const res = await fetch(`${apiHost}/students/identity/verified`, {
+          headers: { 
+            'Authorization': `Bearer ${token}`,
+            'Accept': 'application/json'
+          }
+        });
+        
+        if (res.ok) {
+          const data = await res.json();
+          setStudentIdentityVerified(data.verified === true);
+        } else {
+          const data = await res.json().catch(() => ({}));
+          setStudentIdentityError(data?.error || 'Unable to check identity verification status');
+        }
+      } catch {
+        setStudentIdentityError('Network error while checking identity verification');
+      } finally {
+        setCheckingStudentIdentity(false);
+      }
+    };
+    
+    checkStudentIdentity();
+  }, [activeTab, user?.accountType, token]);
 
   // Helper to check if a lesson is archived (for UI display)
   const isLessonArchived = (b: BookingItem) => Boolean(b.archived || b.isArchived || b.archivedAt);
@@ -525,6 +566,43 @@ export default function PortalRoute() {
       setProposalError('Network error while sending proposal.');
     } finally {
       setProposalSubmitting(false);
+    }
+  };
+
+  const handleStudentIdentityVerification = async () => {
+    if (!token) {
+      setStudentVerificationError('You must be signed in.');
+      return;
+    }
+    
+    setIsCreatingStudentVerification(true);
+    setStudentVerificationError(null);
+    
+    try {
+      const apiHost = getApiHost();
+      const res = await fetch(`${apiHost}/identity/verification-sessions`, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Accept': 'application/json'
+        }
+      });
+      
+      if (res.ok) {
+        const data = await res.json();
+        if (data.url) {
+          window.location.href = data.url;
+        } else {
+          setStudentVerificationError('Verification URL not received');
+        }
+      } else {
+        const data = await res.json().catch(() => ({}));
+        setStudentVerificationError(data?.error || 'Unable to create verification session');
+      }
+    } catch {
+      setStudentVerificationError('Network error while creating verification session');
+    } finally {
+      setIsCreatingStudentVerification(false);
     }
   };
 
@@ -2138,16 +2216,156 @@ export default function PortalRoute() {
                         : 'Manage your payment methods for booking driving lessons.'}
                     </p>
 
-                    {/* Student Payment Methods */}
+                    {/* Student Payment Methods & Identity Verification */}
                     {user.accountType !== 'instructor' && (
-                      <div style={{
-                        padding: '2rem',
-                        background: 'white',
-                        border: '1px solid #e5e7eb',
-                        borderRadius: '0.75rem'
-                      }}>
-                        <PaymentMethodSection title="" allowDelete={true} />
-                      </div>
+                      <>
+                        {/* Identity Verification Section */}
+                        <div style={{
+                          padding: '2rem',
+                          background: 'white',
+                          border: '1px solid #e5e7eb',
+                          borderRadius: '0',
+                          marginBottom: '2rem'
+                        }}>
+                          <h3 style={{
+                            fontSize: '1.125rem',
+                            fontWeight: '600',
+                            color: '#111827',
+                            marginBottom: '1.5rem'
+                          }}>
+                            Identity Verification
+                          </h3>
+                          
+                          {checkingStudentIdentity ? (
+                            <div style={{
+                              padding: '1.5rem',
+                              textAlign: 'center',
+                              background: '#f9fafb',
+                              border: '1px solid #e5e7eb',
+                              borderRadius: '0'
+                            }}>
+                              <svg className="animate-spin" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#3b82f6" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ margin: '0 auto 0.5rem' }}>
+                                <path d="M21 12a9 9 0 11-6.219-8.56"/>
+                              </svg>
+                              <p style={{ color: '#6b7280', fontSize: '0.875rem', margin: 0 }}>
+                                Checking verification status...
+                              </p>
+                            </div>
+                          ) : studentIdentityError ? (
+                            <div style={{
+                              padding: '1rem',
+                              background: '#fef2f2',
+                              border: '1px solid #fecaca',
+                              borderRadius: '0',
+                              color: '#dc2626',
+                              fontSize: '0.875rem'
+                            }}>
+                              {studentIdentityError}
+                            </div>
+                          ) : studentIdentityVerified === true ? (
+                            <div style={{
+                              padding: '1.5rem',
+                              background: '#f0fdf4',
+                              border: '1px solid #bbf7d0',
+                              borderRadius: '0',
+                              display: 'flex',
+                              alignItems: 'center',
+                              gap: '1rem'
+                            }}>
+                              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#15803d" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/>
+                                <polyline points="22 4 12 14.01 9 11.01"/>
+                              </svg>
+                              <div style={{ flex: 1 }}>
+                                <p style={{ color: '#15803d', fontSize: '0.9375rem', fontWeight: '600', marginBottom: '0.25rem' }}>
+                                  Identity Verified
+                                </p>
+                                <p style={{ color: '#166534', fontSize: '0.8125rem', margin: 0 }}>
+                                  Your identity has been successfully verified
+                                </p>
+                              </div>
+                            </div>
+                          ) : studentIdentityVerified === false ? (
+                            <div>
+                              <div style={{
+                                padding: '1.5rem',
+                                background: '#fef3c7',
+                                border: '1px solid #fde68a',
+                                borderRadius: '0',
+                                marginBottom: '1rem'
+                              }}>
+                                <div style={{ display: 'flex', alignItems: 'start', gap: '1rem' }}>
+                                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#92400e" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0, marginTop: '0.125rem' }}>
+                                    <circle cx="12" cy="12" r="10"/>
+                                    <line x1="12" y1="8" x2="12" y2="12"/>
+                                    <line x1="12" y1="16" x2="12.01" y2="16"/>
+                                  </svg>
+                                  <div style={{ flex: 1 }}>
+                                    <p style={{ color: '#92400e', fontSize: '0.9375rem', fontWeight: '600', marginBottom: '0.5rem' }}>
+                                      Identity Verification Required
+                                    </p>
+                                    <p style={{ color: '#78350f', fontSize: '0.875rem', margin: 0, lineHeight: '1.6' }}>
+                                      To complete bookings on Carank, you need to verify your identity. This is a quick, one-time process that helps keep our platform safe for everyone.
+                                    </p>
+                                  </div>
+                                </div>
+                              </div>
+                              
+                              <button
+                                onClick={handleStudentIdentityVerification}
+                                disabled={isCreatingStudentVerification}
+                                className="btn btn-primary"
+                                style={{
+                                  opacity: isCreatingStudentVerification ? 0.6 : 1,
+                                  cursor: isCreatingStudentVerification ? 'not-allowed' : 'pointer'
+                                }}
+                              >
+                                {isCreatingStudentVerification ? (
+                                  <>
+                                    <svg className="animate-spin" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                      <path d="M21 12a9 9 0 11-6.219-8.56"/>
+                                    </svg>
+                                    Creating Session...
+                                  </>
+                                ) : (
+                                  <>
+                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                      <path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
+                                      <circle cx="8.5" cy="7" r="4"/>
+                                      <polyline points="17 11 19 13 23 9"/>
+                                    </svg>
+                                    Verify Identity
+                                  </>
+                                )}
+                              </button>
+                              
+                              {studentVerificationError && (
+                                <div style={{
+                                  marginTop: '1rem',
+                                  padding: '1rem',
+                                  background: '#fef2f2',
+                                  border: '1px solid #fecaca',
+                                  borderRadius: '0',
+                                  color: '#dc2626',
+                                  fontSize: '0.875rem'
+                                }}>
+                                  {studentVerificationError}
+                                </div>
+                              )}
+                            </div>
+                          ) : null}
+                        </div>
+                        
+                        {/* Payment Methods */}
+                        <div style={{
+                          padding: '2rem',
+                          background: 'white',
+                          border: '1px solid #e5e7eb',
+                          borderRadius: '0'
+                        }}>
+                          <PaymentMethodSection title="" allowDelete={true} />
+                        </div>
+                      </>
                     )}
 
                     {/* Instructor Stripe Account */}

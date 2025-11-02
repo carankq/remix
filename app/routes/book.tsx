@@ -531,27 +531,7 @@ export default function BookingPage() {
                         </svg>
                         <p style={{ color: '#6b7280', fontSize: '0.9375rem' }}>Loading availability...</p>
                       </div>
-                    ) : availability.length === 0 ? (
-                      <div style={{
-                        padding: '2rem',
-                        textAlign: 'center',
-                        background: '#fef2f2',
-                        border: '1px solid #fecaca',
-                        borderRadius: '0'
-                      }}>
-                        <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#ef4444" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ margin: '0 auto 1rem' }}>
-                          <circle cx="12" cy="12" r="10"/>
-                          <line x1="12" y1="8" x2="12" y2="12"/>
-                          <line x1="12" y1="16" x2="12.01" y2="16"/>
-                        </svg>
-                        <p style={{ color: '#dc2626', fontSize: '1rem', fontWeight: '600', marginBottom: '0.5rem' }}>
-                          No availability on this date
-                        </p>
-                        <p style={{ color: '#991b1b', fontSize: '0.875rem', margin: 0 }}>
-                          Please choose a different date or contact the instructor directly.
-                        </p>
-                      </div>
-                    ) : (
+                    ) : availability.length === 0 ? null : (
                       <div style={{
                         display: 'grid',
                         gridTemplateColumns: 'repeat(auto-fill, minmax(140px, 1fr))',
