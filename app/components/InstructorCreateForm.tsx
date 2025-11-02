@@ -64,6 +64,9 @@ const InstructorCreateForm: React.FC<InstructorCreateFormProps> = ({ onCreated }
   const [availSelect, setAvailSelect] = useState('');
   const [availStart, setAvailStart] = useState('');
   const [availEnd, setAvailEnd] = useState('');
+  
+  // Permissions state
+  const [publicAvailability, setPublicAvailability] = useState<string>('off');
 
   // Generate a URL-safe slug from a brand name
   const toBrandSlug = (value: string): string => {
@@ -231,6 +234,13 @@ const InstructorCreateForm: React.FC<InstructorCreateFormProps> = ({ onCreated }
       setAvailability([]);
       setExceptions([]);
     }
+    
+    // Prefill permissions
+    if (ownerInst.permissions && typeof ownerInst.permissions === 'object') {
+      setPublicAvailability(ownerInst.permissions.publicAvailability || 'off');
+    } else {
+      setPublicAvailability('off');
+    }
   }, [mode, ownerInst]);
 
   const onInstChange = (field: keyof typeof instForm) => (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
@@ -345,6 +355,11 @@ const InstructorCreateForm: React.FC<InstructorCreateFormProps> = ({ onCreated }
           }))
         },
         languages: languages,
+        permissions: {
+          publicAvailability: publicAvailability || 'off',
+          publicAvailabilityWhitelist: [],
+          publicAvailabilityBlacklist: []
+        }
       };
       if (!payload.name || !payload.brandName || postcodes.length === 0 || !payload.vehicleType) {
         setInstError('Please complete the required fields: name, brand name, coverage postcode(s), vehicle type.');
@@ -1077,6 +1092,44 @@ const InstructorCreateForm: React.FC<InstructorCreateFormProps> = ({ onCreated }
                 ))}
               </div>
             )}
+          </div>
+        </div>
+
+        {/* Permissions Section */}
+        <div style={sectionStyle}>
+          <div>
+            <label style={{ display: 'block', fontSize: '0.875rem', fontWeight: '500', color: '#374151', marginBottom: '0.5rem' }}>
+              Public Availability Settings
+            </label>
+            <p style={{ fontSize: '0.8125rem', color: '#64748b', marginBottom: '1rem', lineHeight: '1.5' }}>
+              Control who can view your real-time availability calendar
+            </p>
+            
+            <select 
+              className="select w-full" 
+              value={publicAvailability} 
+              onChange={(e) => setPublicAvailability(e.target.value)}
+              style={{ marginBottom: '1rem' }}
+            >
+              <option value="off">Off - No one can see my availability</option>
+              <option value="verified-users">Verified Users - Any verified Carank user can see</option>
+              <option value="booked-with-students">Booked Students Only - Only students I've completed a lesson with on carank</option>
+              <option value="white-list">Whitelist Only - Only specific users I approve</option>
+              <option value="black-list">Blacklist - All verified users except blocked ones</option>
+              <option value="white+black-list">Whitelist + Blacklist - Specific approved users, minus blocked ones</option>
+            </select>
+            
+            <div style={{
+              padding: '1rem',
+              background: '#eff6ff',
+              border: '1px solid #bfdbfe',
+              borderRadius: '0',
+              fontSize: '0.8125rem',
+              color: '#1e40af',
+              lineHeight: '1.6'
+            }}>
+              <strong>Note:</strong> This setting controls the visibility of your available time slots on the booking page. Students will always see your profile, but only those with permission will see when you're available to book.
+            </div>
           </div>
         </div>
 
