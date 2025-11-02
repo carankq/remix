@@ -67,6 +67,11 @@ const InstructorCreateForm: React.FC<InstructorCreateFormProps> = ({ onCreated }
   
   // Permissions state
   const [publicAvailability, setPublicAvailability] = useState<string>('off');
+  const [whitelist, setWhitelist] = useState<string[]>([]);
+  const [blacklist, setBlacklist] = useState<string[]>([]);
+  const [availableStudents, setAvailableStudents] = useState<Array<{ _id: string; fullName: string }>>([]);
+  const [loadingStudents, setLoadingStudents] = useState(false);
+  const [studentsError, setStudentsError] = useState<string | null>(null);
 
   // Generate a URL-safe slug from a brand name
   const toBrandSlug = (value: string): string => {
@@ -238,10 +243,50 @@ const InstructorCreateForm: React.FC<InstructorCreateFormProps> = ({ onCreated }
     // Prefill permissions
     if (ownerInst.permissions && typeof ownerInst.permissions === 'object') {
       setPublicAvailability(ownerInst.permissions.publicAvailability || 'off');
+      setWhitelist(Array.isArray(ownerInst.permissions.publicAvailabilityWhitelist) ? ownerInst.permissions.publicAvailabilityWhitelist : []);
+      setBlacklist(Array.isArray(ownerInst.permissions.publicAvailabilityBlacklist) ? ownerInst.permissions.publicAvailabilityBlacklist : []);
     } else {
       setPublicAvailability('off');
+      setWhitelist([]);
+      setBlacklist([]);
     }
   }, [mode, ownerInst]);
+
+  // Fetch available students when whitelist/blacklist options are selected
+  useEffect(() => {
+    const needsStudentList = publicAvailability === 'white-list' || publicAvailability === 'black-list' || publicAvailability === 'white+black-list';
+    
+    if (!needsStudentList || !token || availableStudents.length > 0) return;
+    
+    const fetchStudents = async () => {
+      setLoadingStudents(true);
+      setStudentsError(null);
+      
+      try {
+        const apiHost = (window as any).__ENV__?.API_HOST || 'http://localhost:3001';
+        const res = await fetch(`${apiHost}/instructors/students`, {
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'Accept': 'application/json'
+          }
+        });
+        
+        if (res.ok) {
+          const data = await res.json();
+          setAvailableStudents(Array.isArray(data) ? data : []);
+        } else {
+          const errorData = await res.json().catch(() => ({}));
+          setStudentsError(errorData?.error || 'Unable to load students');
+        }
+      } catch {
+        setStudentsError('Network error while loading students');
+      } finally {
+        setLoadingStudents(false);
+      }
+    };
+    
+    fetchStudents();
+  }, [publicAvailability, token, availableStudents.length]);
 
   const onInstChange = (field: keyof typeof instForm) => (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     setInstForm(prev => ({ ...prev, [field]: e.target.value }));
@@ -357,8 +402,8 @@ const InstructorCreateForm: React.FC<InstructorCreateFormProps> = ({ onCreated }
         languages: languages,
         permissions: {
           publicAvailability: publicAvailability || 'off',
-          publicAvailabilityWhitelist: [],
-          publicAvailabilityBlacklist: []
+          publicAvailabilityWhitelist: whitelist,
+          publicAvailabilityBlacklist: blacklist
         }
       };
       if (!payload.name || !payload.brandName || postcodes.length === 0 || !payload.vehicleType) {
@@ -1119,6 +1164,98 @@ const InstructorCreateForm: React.FC<InstructorCreateFormProps> = ({ onCreated }
               <option value="white+black-list">Whitelist + Blacklist - Specific approved users, minus blocked ones</option>
             </select>
             
+            {/* Whitelist Management */}
+            {(publicAvailability === 'white-list' || publicAvailability === 'white+black-list') && (
+              <div style={{ marginTop: '1.5rem' }}>
+                <label style={{ display: 'block', fontSize: '0.875rem', fontWeight: '500', color: '#374151', marginBottom: '0.5rem' }}>
+                  Whitelist - Approved Students
+                </label>
+                <p style={{ fontSize: '0.8125rem', color: '#64748b', marginBottom: '0.75rem', lineHeight: '1.5' }}>
+                  Select students who can see your availability
+                </p>
+                
+                {loadingStudents ? (
+                  <div style={{ padding: '1rem', textAlign: 'center', background: '#f9fafb', border: '1px solid #e5e7eb', borderRadius: '0' }}>
+                    <p style={{ fontSize: '0.875rem', color: '#6b7280', margin: 0 }}>Loading students...</p>
+                  </div>
+                ) : studentsError ? (
+                  <div style={{ padding: '1rem', background: '#fef2f2', border: '1px solid #fecaca', borderRadius: '0', color: '#dc2626', fontSize: '0.875rem' }}>
+                    {studentsError}
+                  </div>
+                ) : availableStudents.length === 0 ? (
+                  <div style={{ padding: '1rem', background: '#fef3c7', border: '1px solid #fde68a', borderRadius: '0', color: '#92400e', fontSize: '0.875rem' }}>
+                    No students with completed lessons found. Students will appear here after you complete your first lesson.
+                  </div>
+                ) : (
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem', maxHeight: '200px', overflowY: 'auto', border: '1px solid #e5e7eb', borderRadius: '0', padding: '0.75rem', background: '#f9fafb' }}>
+                    {availableStudents.map(student => (
+                      <label key={student._id} style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', cursor: 'pointer', padding: '0.5rem', background: '#ffffff', border: '1px solid #e5e7eb', borderRadius: '0' }}>
+                        <input
+                          type="checkbox"
+                          checked={whitelist.includes(student._id)}
+                          onChange={(e) => {
+                            if (e.target.checked) {
+                              setWhitelist(prev => [...prev, student._id]);
+                            } else {
+                              setWhitelist(prev => prev.filter(id => id !== student._id));
+                            }
+                          }}
+                          style={{ width: '16px', height: '16px', cursor: 'pointer', accentColor: '#10b981' }}
+                        />
+                        <span style={{ fontSize: '0.875rem', color: '#374151' }}>{student.fullName}</span>
+                      </label>
+                    ))}
+                  </div>
+                )}
+              </div>
+            )}
+            
+            {/* Blacklist Management */}
+            {(publicAvailability === 'black-list' || publicAvailability === 'white+black-list') && (
+              <div style={{ marginTop: '1.5rem' }}>
+                <label style={{ display: 'block', fontSize: '0.875rem', fontWeight: '500', color: '#374151', marginBottom: '0.5rem' }}>
+                  Blacklist - Blocked Students
+                </label>
+                <p style={{ fontSize: '0.8125rem', color: '#64748b', marginBottom: '0.75rem', lineHeight: '1.5' }}>
+                  Select students who cannot see your availability
+                </p>
+                
+                {loadingStudents ? (
+                  <div style={{ padding: '1rem', textAlign: 'center', background: '#f9fafb', border: '1px solid #e5e7eb', borderRadius: '0' }}>
+                    <p style={{ fontSize: '0.875rem', color: '#6b7280', margin: 0 }}>Loading students...</p>
+                  </div>
+                ) : studentsError ? (
+                  <div style={{ padding: '1rem', background: '#fef2f2', border: '1px solid #fecaca', borderRadius: '0', color: '#dc2626', fontSize: '0.875rem' }}>
+                    {studentsError}
+                  </div>
+                ) : availableStudents.length === 0 ? (
+                  <div style={{ padding: '1rem', background: '#fef3c7', border: '1px solid #fde68a', borderRadius: '0', color: '#92400e', fontSize: '0.875rem' }}>
+                    No students with completed lessons found. Students will appear here after you complete your first lesson.
+                  </div>
+                ) : (
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem', maxHeight: '200px', overflowY: 'auto', border: '1px solid #e5e7eb', borderRadius: '0', padding: '0.75rem', background: '#f9fafb' }}>
+                    {availableStudents.map(student => (
+                      <label key={student._id} style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', cursor: 'pointer', padding: '0.5rem', background: '#ffffff', border: '1px solid #e5e7eb', borderRadius: '0' }}>
+                        <input
+                          type="checkbox"
+                          checked={blacklist.includes(student._id)}
+                          onChange={(e) => {
+                            if (e.target.checked) {
+                              setBlacklist(prev => [...prev, student._id]);
+                            } else {
+                              setBlacklist(prev => prev.filter(id => id !== student._id));
+                            }
+                          }}
+                          style={{ width: '16px', height: '16px', cursor: 'pointer', accentColor: '#ef4444' }}
+                        />
+                        <span style={{ fontSize: '0.875rem', color: '#374151' }}>{student.fullName}</span>
+                      </label>
+                    ))}
+                  </div>
+                )}
+              </div>
+            )}
+            
             <div style={{
               padding: '1rem',
               background: '#eff6ff',
@@ -1126,9 +1263,10 @@ const InstructorCreateForm: React.FC<InstructorCreateFormProps> = ({ onCreated }
               borderRadius: '0',
               fontSize: '0.8125rem',
               color: '#1e40af',
-              lineHeight: '1.6'
+              lineHeight: '1.6',
+              marginTop: '1rem'
             }}>
-              <strong>Note:</strong> This setting controls the visibility of your available time slots on the booking page. Students will always see your profile, but only those with permission will see when you're available to book.
+              <strong>Note:</strong> This setting controls the visibility of your available time slots on the booking page. Students will always see your profile, but only those with permission will see when you're available to book. By default, someone who is not verified will NOT be able to see your availability.
             </div>
           </div>
         </div>

@@ -100,9 +100,14 @@ export default function BookingPage() {
         const start = selectedDate.setHours(0, 0, 0, 0);
         const end = selectedDate.setHours(23, 59, 59, 999);
         
+        const headers: Record<string, string> = { 'Accept': 'application/json' };
+        if (token) {
+          headers['Authorization'] = `Bearer ${token}`;
+        }
+        
         const res = await fetch(
-          `${apiHost}/instructors/${encodeURIComponent(instructorId)}/availability-summary?start=${start}&end=${end}`,
-          { headers: { 'Accept': 'application/json' } }
+          `${apiHost}/instructors/${encodeURIComponent(instructorId)}/availability-summary?start=${start}&end=${end}&roundMins=30`,
+          { headers }
         );
 
         if (res.ok) {
@@ -119,7 +124,7 @@ export default function BookingPage() {
     };
     
     fetchAvailability();
-  }, [date, instructorId]);
+  }, [date, instructorId, token]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
