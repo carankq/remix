@@ -55,6 +55,93 @@ export default function VerificationPage() {
           <div className="container mx-auto px-4 md:px-8">
             <div style={{ maxWidth: '1000px', margin: '0 auto' }}>
               
+              {/* Easy Process Summary */}
+              <div style={{
+                background: 'linear-gradient(135deg, #10b981 0%, #059669 100%)',
+                padding: '2rem',
+                marginBottom: '2rem',
+                borderRadius: '0',
+                color: '#ffffff'
+              }}>
+                <div style={{ display: 'flex', alignItems: 'start', gap: '1rem', marginBottom: '1rem' }}>
+                  <div style={{
+                    width: '48px',
+                    height: '48px',
+                    background: 'rgba(255, 255, 255, 0.2)',
+                    borderRadius: '0',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    flexShrink: 0
+                  }}>
+                    <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                      <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/>
+                      <polyline points="22 4 12 14.01 9 11.01"/>
+                    </svg>
+                  </div>
+                  <div style={{ flex: 1 }}>
+                    <h2 style={{
+                      fontSize: '1.75rem',
+                      fontWeight: '700',
+                      marginBottom: '0.75rem',
+                      fontFamily: "'Space Grotesk', sans-serif"
+                    }}>
+                      Simple & Seamless for You
+                    </h2>
+                    <p style={{
+                      fontSize: '1.0625rem',
+                      lineHeight: '1.7',
+                      opacity: 0.95,
+                      marginBottom: '1.25rem'
+                    }}>
+                      While our verification process is comprehensive, <strong>most of it happens automatically in the background</strong>. You only need to take action when absolutely necessary — usually just uploading your ID or providing basic information.
+                    </p>
+                    <div style={{
+                      background: 'rgba(255, 255, 255, 0.2)',
+                      borderRadius: '0',
+                      padding: '0.875rem 1rem',
+                      marginBottom: '1.25rem',
+                      border: '1px solid rgba(255, 255, 255, 0.3)',
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '0.75rem'
+                    }}>
+                      <span style={{ fontSize: '1.5rem' }}>🎉</span>
+                      <p style={{ margin: 0, fontSize: '0.9375rem', opacity: 0.95, lineHeight: '1.6' }}>
+                        <strong>First-time only:</strong> These verification steps are mainly for your first booking. Once trust is established, future bookings require far fewer checks — making your experience even smoother.
+                      </p>
+                    </div>
+                    <div style={{
+                      background: 'rgba(255, 255, 255, 0.15)',
+                      borderRadius: '0',
+                      padding: '1rem',
+                      border: '1px solid rgba(255, 255, 255, 0.2)'
+                    }}>
+                      <h3 style={{
+                        fontSize: '1rem',
+                        fontWeight: '600',
+                        marginBottom: '0.75rem'
+                      }}>
+                        What You'll Experience:
+                      </h3>
+                      <ul style={{ 
+                        margin: 0,
+                        paddingLeft: '1.25rem',
+                        fontSize: '0.9375rem',
+                        lineHeight: '1.8',
+                        opacity: 0.95
+                      }}>
+                        <li><strong>Quick setup:</strong> Create your account in minutes</li>
+                        <li><strong>Automated checks:</strong> DVLA, Stripe, and identity verification happen instantly</li>
+                        <li><strong>Minimal effort:</strong> Upload your ID once, and we handle the rest</li>
+                        <li><strong>Real-time updates:</strong> Get notified when verification is complete</li>
+                        <li><strong>Book immediately:</strong> Start making bookings while checks run in the background</li>
+                      </ul>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
               {/* Overview */}
               <div style={{
                 background: '#ffffff',
@@ -277,6 +364,7 @@ export default function VerificationPage() {
                   </h4>
                   <ul style={{ marginLeft: '1.5rem', color: '#4b5563', lineHeight: '1.8' }}>
                     <li><strong>DVLA database check:</strong> Provisional driving licence verified against government records</li>
+                    <li><strong>Legal requirement:</strong> In the UK, it is a legal requirement to hold a valid provisional driving licence before taking driving lessons on public roads. Carank ensures all students meet this legal standard</li>
                     <li><strong>Eligibility confirmation:</strong> Must have a valid provisional licence to book lessons</li>
                     <li><strong>Document verification:</strong> Licence number and details validated in real time</li>
                     <li><strong>Pre-confirmation requirement:</strong> You can create a booking request immediately, but the booking remains pending until your provisional licence is validated. Only after successful validation can both parties officially agree and confirm the lesson</li>
