@@ -101,10 +101,10 @@ export default function BookingPage() {
         const end = selectedDate.setHours(23, 59, 59, 999);
         
         const res = await fetch(
-          `${apiHost}/instructors/${encodeURIComponent(instructorId)}/availability-summary?start=${start}&end=${end}&roundMins=30`,
+          `${apiHost}/instructors/${encodeURIComponent(instructorId)}/availability-summary?start=${start}&end=${end}`,
           { headers: { 'Accept': 'application/json' } }
         );
-        
+
         if (res.ok) {
           const data = await res.json();
           setAvailability(Array.isArray(data) ? data : []);

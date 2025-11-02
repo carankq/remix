@@ -108,7 +108,7 @@ const InstructorCreateForm: React.FC<InstructorCreateFormProps> = ({ onCreated }
     setOwnerLoading(true);
     setOwnerError(null);
     try {
-      const response = await fetch(`${window.__ENV__?.API_HOST || 'http://localhost:3001'}/instructors/owner/${encodeURIComponent(user.id)}`, {
+      const response = await fetch(`${window.__ENV__?.API_HOST || 'http://localhost:3001'}/instructors/owner`, {
         headers: {
           'Authorization': `Bearer ${token}`,
           'Accept': 'application/json',
