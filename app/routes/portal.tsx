@@ -785,7 +785,7 @@ export default function PortalRoute() {
     setOwnerInstLoading(true);
     setOwnerInstError(null);
     try {
-      const response = await fetch(`${window.__ENV__?.API_HOST || 'http://localhost:3001'}/instructors/owner`, {
+      const response = await fetch(`${window.__ENV__?.API_HOST || 'http://localhost:3001'}/instructors/find/owner`, {
         headers: {
           'Authorization': `Bearer ${token}`,
           'Accept': 'application/json',

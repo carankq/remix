@@ -113,7 +113,7 @@ const InstructorCreateForm: React.FC<InstructorCreateFormProps> = ({ onCreated }
     setOwnerLoading(true);
     setOwnerError(null);
     try {
-      const response = await fetch(`${window.__ENV__?.API_HOST || 'http://localhost:3001'}/instructors/owner`, {
+      const response = await fetch(`${window.__ENV__?.API_HOST || 'http://localhost:3001'}/instructors/find/owner`, {
         headers: {
           'Authorization': `Bearer ${token}`,
           'Accept': 'application/json',
@@ -264,7 +264,7 @@ const InstructorCreateForm: React.FC<InstructorCreateFormProps> = ({ onCreated }
       
       try {
         const apiHost = (window as any).__ENV__?.API_HOST || 'http://localhost:3001';
-        const res = await fetch(`${apiHost}/instructors/students`, {
+        const res = await fetch(`${apiHost}/instructors/find/students`, {
           headers: {
             'Authorization': `Bearer ${token}`,
             'Accept': 'application/json'
