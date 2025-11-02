@@ -1981,7 +1981,7 @@ export default function PortalRoute() {
                                               {canCancel && (
                                                 <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
                                                   <div style={{ fontSize: '0.875rem', color: '#374151' }}>
-                                                    You proposed: {startLabel || '—'}{durLabel ? ` • ${durLabel}` : ''}
+                                                    You proposed: {startLabel || '-'}{durLabel ? ` • ${durLabel}` : ''}
                                   </div>
                                                   <div>
                                                     <button
@@ -1999,7 +1999,7 @@ export default function PortalRoute() {
                                               {canRespond && (
                                                 <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
                                                   <div style={{ fontSize: '0.875rem', color: '#374151' }}>
-                                                    Proposed time: {startLabel || '—'}{durLabel ? ` • ${durLabel}` : ''}
+                                                    Proposed time: {startLabel || '-'}{durLabel ? ` • ${durLabel}` : ''}
                                                   </div>
                                                   <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
                                                     <button

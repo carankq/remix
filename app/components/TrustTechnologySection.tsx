@@ -248,7 +248,7 @@ export function TrustTechnologySection() {
                 lineHeight: '1.6',
                 opacity: 0.9
               }}>
-                All instructor vehicles are verified directly with the DVLA. Registration, make, model, and colour are automatically checked, no room for fake information.
+                All instructor vehicles are verified directly with the DVLA - registration, make, model and colour are checked in real time. Students’ provisional driving licences are also validated before a lesson can be confirmed. You can make a booking at any time; final agreement only happens once both instructor and student are verified to Carank standards.
               </p>
               <ul style={{ 
                 listStyle: 'none', 
@@ -276,6 +276,38 @@ export function TrustTechnologySection() {
                   Visible to students before booking
                 </li>
               </ul>
+              <a 
+                href="/verification" 
+                style={{
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: '0.5rem',
+                  marginTop: '1.25rem',
+                  padding: '0.625rem 1.25rem',
+                  background: 'rgba(255, 255, 255, 0.2)',
+                  color: '#ffffff',
+                  borderRadius: '0',
+                  fontWeight: '600',
+                  textDecoration: 'none',
+                  transition: 'all 0.2s ease',
+                  border: '1px solid rgba(255, 255, 255, 0.3)',
+                  fontSize: '0.875rem'
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.background = 'rgba(255, 255, 255, 0.3)';
+                  e.currentTarget.style.borderColor = 'rgba(255, 255, 255, 0.5)';
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.background = 'rgba(255, 255, 255, 0.2)';
+                  e.currentTarget.style.borderColor = 'rgba(255, 255, 255, 0.3)';
+                }}
+              >
+                View Full Verification Process
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <line x1="5" y1="12" x2="19" y2="12"/>
+                  <polyline points="12 5 19 12 12 19"/>
+                </svg>
+              </a>
             </div>
           </div>
 
