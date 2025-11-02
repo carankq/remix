@@ -343,7 +343,7 @@ export default function VerificationPage() {
                     Step 1: Initial Booking
                   </h4>
                   <ul style={{ marginLeft: '1.5rem', color: '#4b5563', lineHeight: '1.8' }}>
-                    <li><strong>Student selects time:</strong> Choose available time slots from instructor's calendar</li>
+                    <li><strong>Student selects time:</strong> Choose available time</li>
                     <li><strong>Payment method required:</strong> Valid payment card must be on file (not charged yet)</li>
                     <li><strong>Booking created:</strong> System creates pending booking awaiting verification</li>
                   </ul>
