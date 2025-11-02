@@ -508,15 +508,17 @@ export default function BookingPage() {
                 {/* Available Time Slots */}
                 {date && (
                   <div style={{ marginBottom: '2rem' }}>
-                    <h3 style={{
-                      fontSize: '1.125rem',
-                      fontWeight: '600',
-                      color: '#0f172a',
-                      marginBottom: '1rem',
-                      fontFamily: "'Space Grotesk', sans-serif"
-                    }}>
-                      Available Time Slots for {new Date(date).toLocaleDateString('en-GB', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })}
-                    </h3>
+                    {(loadingAvailability || availability.length > 0) && (
+                      <h3 style={{
+                        fontSize: '1.125rem',
+                        fontWeight: '600',
+                        color: '#0f172a',
+                        marginBottom: '1rem',
+                        fontFamily: "'Space Grotesk', sans-serif"
+                      }}>
+                        Available Time Slots for {new Date(date).toLocaleDateString('en-GB', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })}
+                      </h3>
+                    )}
                     
                     {loadingAvailability ? (
                       <div style={{
