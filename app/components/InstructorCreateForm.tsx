@@ -69,6 +69,9 @@ const InstructorCreateForm: React.FC<InstructorCreateFormProps> = ({ onCreated }
   const [publicAvailability, setPublicAvailability] = useState<string>('off');
   const [whitelist, setWhitelist] = useState<string[]>([]);
   const [blacklist, setBlacklist] = useState<string[]>([]);
+  const [numberVisibility, setNumberVisibility] = useState<string>('off');
+  const [numberWhitelist, setNumberWhitelist] = useState<string[]>([]);
+  const [numberBlacklist, setNumberBlacklist] = useState<string[]>([]);
   const [availableStudents, setAvailableStudents] = useState<Array<{ _id: string; fullName: string }>>([]);
   const [loadingStudents, setLoadingStudents] = useState(false);
   const [studentsError, setStudentsError] = useState<string | null>(null);
@@ -245,16 +248,24 @@ const InstructorCreateForm: React.FC<InstructorCreateFormProps> = ({ onCreated }
       setPublicAvailability(ownerInst.permissions.publicAvailability || 'off');
       setWhitelist(Array.isArray(ownerInst.permissions.publicAvailabilityWhitelist) ? ownerInst.permissions.publicAvailabilityWhitelist : []);
       setBlacklist(Array.isArray(ownerInst.permissions.publicAvailabilityBlacklist) ? ownerInst.permissions.publicAvailabilityBlacklist : []);
+      setNumberVisibility(ownerInst.permissions.numberVisibility || 'off');
+      setNumberWhitelist(Array.isArray(ownerInst.permissions.numberVisibilityWhitelist) ? ownerInst.permissions.numberVisibilityWhitelist : []);
+      setNumberBlacklist(Array.isArray(ownerInst.permissions.numberVisibilityBlacklist) ? ownerInst.permissions.numberVisibilityBlacklist : []);
     } else {
       setPublicAvailability('off');
       setWhitelist([]);
       setBlacklist([]);
+      setNumberVisibility('off');
+      setNumberWhitelist([]);
+      setNumberBlacklist([]);
     }
   }, [mode, ownerInst]);
 
   // Fetch available students when whitelist/blacklist options are selected
   useEffect(() => {
-    const needsStudentList = publicAvailability === 'white-list' || publicAvailability === 'black-list' || publicAvailability === 'white+black-list';
+    const needsStudentListForAvailability = publicAvailability === 'white+black-list';
+    const needsStudentListForNumber = numberVisibility === 'white+black-list';
+    const needsStudentList = needsStudentListForAvailability || needsStudentListForNumber;
     
     if (!needsStudentList || !token || availableStudents.length > 0) return;
     
@@ -286,7 +297,7 @@ const InstructorCreateForm: React.FC<InstructorCreateFormProps> = ({ onCreated }
     };
     
     fetchStudents();
-  }, [publicAvailability, token, availableStudents.length]);
+  }, [publicAvailability, numberVisibility, token, availableStudents.length]);
 
   const onInstChange = (field: keyof typeof instForm) => (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     setInstForm(prev => ({ ...prev, [field]: e.target.value }));
@@ -371,6 +382,9 @@ const InstructorCreateForm: React.FC<InstructorCreateFormProps> = ({ onCreated }
         const d = new Date(`${dateStr}T${timeHHMM}:00`);
         return d.getTime();
       };
+
+      console.log('sending jumber vis:', numberVisibility)
+
       const payload: any = {
         ownerId: user.id,
         name: instForm.name.trim(),
@@ -403,7 +417,10 @@ const InstructorCreateForm: React.FC<InstructorCreateFormProps> = ({ onCreated }
         permissions: {
           publicAvailability: publicAvailability || 'off',
           publicAvailabilityWhitelist: whitelist,
-          publicAvailabilityBlacklist: blacklist
+          publicAvailabilityBlacklist: blacklist,
+          numberVisibility: numberVisibility || 'off',
+          numberVisibilityWhitelist: numberWhitelist,
+          numberVisibilityBlacklist: numberBlacklist
         }
       };
       if (!payload.name || !payload.brandName || postcodes.length === 0 || !payload.vehicleType) {
@@ -1157,15 +1174,14 @@ const InstructorCreateForm: React.FC<InstructorCreateFormProps> = ({ onCreated }
               style={{ marginBottom: '1rem' }}
             >
               <option value="off">Off - No one can see my availability</option>
+              <option value="anyone">Anyone - No restrictions, everyone can see</option>
               <option value="verified-users">Verified Users - Any verified Carank user can see</option>
               <option value="booked-with-students">Booked Students Only - Only students I've completed a lesson with on carank</option>
-              <option value="white-list">Whitelist Only - Only specific users I approve</option>
-              <option value="black-list">Blacklist - All verified users except blocked ones</option>
-              <option value="white+black-list">Whitelist + Blacklist - Specific approved users, minus blocked ones</option>
+              <option value="white+black-list">Custom List - Specific approved users, minus blocked ones</option>
             </select>
             
             {/* Whitelist Management */}
-            {(publicAvailability === 'white-list' || publicAvailability === 'white+black-list') && (
+            {publicAvailability === 'white+black-list' && (
               <div style={{ marginTop: '1.5rem' }}>
                 <label style={{ display: 'block', fontSize: '0.875rem', fontWeight: '500', color: '#374151', marginBottom: '0.5rem' }}>
                   Whitelist - Approved Students
@@ -1196,6 +1212,8 @@ const InstructorCreateForm: React.FC<InstructorCreateFormProps> = ({ onCreated }
                           onChange={(e) => {
                             if (e.target.checked) {
                               setWhitelist(prev => [...prev, student._id]);
+                              // Remove from blacklist if present
+                              setBlacklist(prev => prev.filter(id => id !== student._id));
                             } else {
                               setWhitelist(prev => prev.filter(id => id !== student._id));
                             }
@@ -1211,7 +1229,7 @@ const InstructorCreateForm: React.FC<InstructorCreateFormProps> = ({ onCreated }
             )}
             
             {/* Blacklist Management */}
-            {(publicAvailability === 'black-list' || publicAvailability === 'white+black-list') && (
+            {publicAvailability === 'white+black-list' && (
               <div style={{ marginTop: '1.5rem' }}>
                 <label style={{ display: 'block', fontSize: '0.875rem', fontWeight: '500', color: '#374151', marginBottom: '0.5rem' }}>
                   Blacklist - Blocked Students
@@ -1242,6 +1260,8 @@ const InstructorCreateForm: React.FC<InstructorCreateFormProps> = ({ onCreated }
                           onChange={(e) => {
                             if (e.target.checked) {
                               setBlacklist(prev => [...prev, student._id]);
+                              // Remove from whitelist if present
+                              setWhitelist(prev => prev.filter(id => id !== student._id));
                             } else {
                               setBlacklist(prev => prev.filter(id => id !== student._id));
                             }
@@ -1266,7 +1286,141 @@ const InstructorCreateForm: React.FC<InstructorCreateFormProps> = ({ onCreated }
               lineHeight: '1.6',
               marginTop: '1rem'
             }}>
-              <strong>Note:</strong> This setting controls the visibility of your available time slots on the booking page. Students will always see your profile, but only those with permission will see when you're available to book. By default, someone who is not verified will NOT be able to see your availability.
+              <strong>Note:</strong> This setting controls the visibility of your available time slots on the booking page. Students will always see your profile, but only those with permission will see when you're available to book. By default, someone who is not verified will NOT be able to see your availability, unless you choose the 'anyone' option in which case there are no restrctions.
+            </div>
+          </div>
+        </div>
+
+        {/* Phone Number Visibility Section */}
+        <div style={sectionStyle}>
+          <div>
+            <label style={{ display: 'block', fontSize: '0.875rem', fontWeight: '500', color: '#374151', marginBottom: '0.5rem' }}>
+              Phone Number Visibility Settings
+            </label>
+            <p style={{ fontSize: '0.8125rem', color: '#64748b', marginBottom: '1rem', lineHeight: '1.5' }}>
+              Control who can see your phone number on your profile
+            </p>
+            
+            <select 
+              className="select w-full" 
+              value={numberVisibility} 
+              onChange={(e) => setNumberVisibility(e.target.value)}
+              style={{ marginBottom: '1rem' }}
+            >
+              <option value="off">Off - No one can see my phone number</option>
+              <option value="anyone">Anyone - No restrictions, everyone can see</option>
+              <option value="verified-users">Verified Users - Any verified Carank user can see</option>
+              <option value="booked-with-students">Booked Students Only - Only students I've completed a lesson with on carank</option>
+              <option value="white+black-list">Custom List - Specific approved users, minus blocked ones</option>
+            </select>
+            
+            {/* Number Whitelist Management */}
+            {numberVisibility === 'white+black-list' && (
+              <div style={{ marginTop: '1.5rem' }}>
+                <label style={{ display: 'block', fontSize: '0.875rem', fontWeight: '500', color: '#374151', marginBottom: '0.5rem' }}>
+                  Whitelist - Approved Students
+                </label>
+                <p style={{ fontSize: '0.8125rem', color: '#64748b', marginBottom: '0.75rem', lineHeight: '1.5' }}>
+                  Select students who can see your phone number
+                </p>
+                
+                {loadingStudents ? (
+                  <div style={{ padding: '1rem', textAlign: 'center', background: '#f9fafb', border: '1px solid #e5e7eb', borderRadius: '0' }}>
+                    <p style={{ fontSize: '0.875rem', color: '#6b7280', margin: 0 }}>Loading students...</p>
+                  </div>
+                ) : studentsError ? (
+                  <div style={{ padding: '1rem', background: '#fef2f2', border: '1px solid #fecaca', borderRadius: '0', color: '#dc2626', fontSize: '0.875rem' }}>
+                    {studentsError}
+                  </div>
+                ) : availableStudents.length === 0 ? (
+                  <div style={{ padding: '1rem', background: '#fef3c7', border: '1px solid #fde68a', borderRadius: '0', color: '#92400e', fontSize: '0.875rem' }}>
+                    No students with completed lessons found. Students will appear here after you complete your first lesson.
+                  </div>
+                ) : (
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem', maxHeight: '200px', overflowY: 'auto', border: '1px solid #e5e7eb', borderRadius: '0', padding: '0.75rem', background: '#f9fafb' }}>
+                    {availableStudents.map(student => (
+                      <label key={student._id} style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', cursor: 'pointer', padding: '0.5rem', background: '#ffffff', border: '1px solid #e5e7eb', borderRadius: '0' }}>
+                        <input
+                          type="checkbox"
+                          checked={numberWhitelist.includes(student._id)}
+                          onChange={(e) => {
+                            if (e.target.checked) {
+                              setNumberWhitelist(prev => [...prev, student._id]);
+                              // Remove from number blacklist if present
+                              setNumberBlacklist(prev => prev.filter(id => id !== student._id));
+                            } else {
+                              setNumberWhitelist(prev => prev.filter(id => id !== student._id));
+                            }
+                          }}
+                          style={{ width: '16px', height: '16px', cursor: 'pointer', accentColor: '#10b981' }}
+                        />
+                        <span style={{ fontSize: '0.875rem', color: '#374151' }}>{student.fullName}</span>
+                      </label>
+                    ))}
+                  </div>
+                )}
+              </div>
+            )}
+            
+            {/* Number Blacklist Management */}
+            {numberVisibility === 'white+black-list' && (
+              <div style={{ marginTop: '1.5rem' }}>
+                <label style={{ display: 'block', fontSize: '0.875rem', fontWeight: '500', color: '#374151', marginBottom: '0.5rem' }}>
+                  Blacklist - Blocked Students
+                </label>
+                <p style={{ fontSize: '0.8125rem', color: '#64748b', marginBottom: '0.75rem', lineHeight: '1.5' }}>
+                  Select students who cannot see your phone number
+                </p>
+                
+                {loadingStudents ? (
+                  <div style={{ padding: '1rem', textAlign: 'center', background: '#f9fafb', border: '1px solid #e5e7eb', borderRadius: '0' }}>
+                    <p style={{ fontSize: '0.875rem', color: '#6b7280', margin: 0 }}>Loading students...</p>
+                  </div>
+                ) : studentsError ? (
+                  <div style={{ padding: '1rem', background: '#fef2f2', border: '1px solid #fecaca', borderRadius: '0', color: '#dc2626', fontSize: '0.875rem' }}>
+                    {studentsError}
+                  </div>
+                ) : availableStudents.length === 0 ? (
+                  <div style={{ padding: '1rem', background: '#fef3c7', border: '1px solid #fde68a', borderRadius: '0', color: '#92400e', fontSize: '0.875rem' }}>
+                    No students with completed lessons found. Students will appear here after you complete your first lesson.
+                  </div>
+                ) : (
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem', maxHeight: '200px', overflowY: 'auto', border: '1px solid #e5e7eb', borderRadius: '0', padding: '0.75rem', background: '#f9fafb' }}>
+                    {availableStudents.map(student => (
+                      <label key={student._id} style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', cursor: 'pointer', padding: '0.5rem', background: '#ffffff', border: '1px solid #e5e7eb', borderRadius: '0' }}>
+                        <input
+                          type="checkbox"
+                          checked={numberBlacklist.includes(student._id)}
+                          onChange={(e) => {
+                            if (e.target.checked) {
+                              setNumberBlacklist(prev => [...prev, student._id]);
+                              // Remove from number whitelist if present
+                              setNumberWhitelist(prev => prev.filter(id => id !== student._id));
+                            } else {
+                              setNumberBlacklist(prev => prev.filter(id => id !== student._id));
+                            }
+                          }}
+                          style={{ width: '16px', height: '16px', cursor: 'pointer', accentColor: '#ef4444' }}
+                        />
+                        <span style={{ fontSize: '0.875rem', color: '#374151' }}>{student.fullName}</span>
+                      </label>
+                    ))}
+                  </div>
+                )}
+              </div>
+            )}
+            
+            <div style={{
+              padding: '1rem',
+              background: '#eff6ff',
+              border: '1px solid #bfdbfe',
+              borderRadius: '0',
+              fontSize: '0.8125rem',
+              color: '#1e40af',
+              lineHeight: '1.6',
+              marginTop: '1rem'
+            }}>
+              <strong>Note:</strong> This setting controls who can see your phone number on your instructor profile. For privacy and safety, we recommend starting with 'Booked Students Only' so only students you've completed lessons with can contact you directly. By default, unverified users will NOT be able to see your phone number, unless you choose the 'anyone' option in which case there are no restrctions.
             </div>
           </div>
         </div>
