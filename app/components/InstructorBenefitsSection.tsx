@@ -33,16 +33,16 @@ export function InstructorBenefitsSection() {
       background: 'linear-gradient(to bottom, #f9fafb 0%, #ffffff 100%)',
       padding: '4rem 0'
     }}>
-      <div className="container mx-auto px-4 md:px-8">
-        <div className="max-w-5xl mx-auto flex flex-col gap-8 md:gap-12">
+      <div className="container mx-auto px-4">
+        <div style={{ maxWidth: '1200px', margin: '0 auto' }}>
           
           {/* Slideshow */}
-          <div className="relative scale-in" style={{ animationDelay: '0.3s' }}>
+          <div className="relative scale-in" style={{ animationDelay: '0.3s', marginBottom: '3rem' }}>
             <Slideshow slides={slides} height="24rem" />
           </div>
 
           {/* Content */}
-          <div className="fade-in flex flex-col text-center px-4 md:px-12">
+          <div className="fade-in flex flex-col text-center">
             <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-6 leading-tight brand-name">
               Built for Driving Instructors
             </h2>
@@ -50,22 +50,30 @@ export function InstructorBenefitsSection() {
               Get found by local students searching for instructors in their area. Build trust with DVLA verification and receive enquiries directly.
             </p>
             
-            {/* Stats */}
-            <div className="flex flex-col md:grid md:grid-cols-3 gap-4 justify-center items-stretch max-w-4xl mx-auto">
-              <div className="bg-white shadow-md" style={{ padding: '2rem', borderRadius: '0' }}>
+            {/* Stats - Horizontal */}
+            <div className="flex flex-row gap-4 justify-center items-stretch">
+              <div className="flex items-center gap-3 bg-white" style={{ padding: '1.5rem 2rem', borderRadius: '0', flex: 1, maxWidth: '360px', border: '2px solid #e5e7eb' }}>
                 <p className="text-3xl font-bold text-blue-600">✓ DVLA</p>
-                <p className="text-sm text-gray-600 mt-1">Vehicle Verification</p>
-                <p className="text-xs text-gray-500 mt-2">Instant credibility with students</p>
+                <div style={{ textAlign: 'left' }}>
+                  <p className="text-sm font-semibold text-gray-900">Vehicle Verification</p>
+                  <p className="text-xs text-gray-500">Instant credibility</p>
+                </div>
               </div>
-              <div className="bg-white shadow-md" style={{ padding: '2rem', borderRadius: '0' }}>
-                <p className="text-3xl font-bold text-purple-600">📍 Local</p>
-                <p className="text-sm text-gray-600 mt-1">Area-Based Search</p>
-                <p className="text-xs text-gray-500 mt-2">Students find you by postcode</p>
+              
+              <div className="flex items-center gap-3 bg-white" style={{ padding: '1.5rem 2rem', borderRadius: '0', flex: 1, maxWidth: '360px', border: '2px solid #e5e7eb' }}>
+                <p className="text-3xl font-bold text-purple-600">📍</p>
+                <div style={{ textAlign: 'left' }}>
+                  <p className="text-sm font-semibold text-gray-900">Area-Based Search</p>
+                  <p className="text-xs text-gray-500">Students find you locally</p>
+                </div>
               </div>
-              <div className="bg-white shadow-md" style={{ padding: '2rem', borderRadius: '0' }}>
-                <p className="text-3xl font-bold text-green-600">📧 Direct</p>
-                <p className="text-sm text-gray-600 mt-1">Student Enquiries</p>
-                <p className="text-xs text-gray-500 mt-2">Connect directly with learners</p>
+              
+              <div className="flex items-center gap-3 bg-white" style={{ padding: '1.5rem 2rem', borderRadius: '0', flex: 1, maxWidth: '360px', border: '2px solid #e5e7eb' }}>
+                <p className="text-3xl font-bold text-green-600">📧</p>
+                <div style={{ textAlign: 'left' }}>
+                  <p className="text-sm font-semibold text-gray-900">Direct Enquiries</p>
+                  <p className="text-xs text-gray-500">Connect with learners</p>
+                </div>
               </div>
             </div>
           </div>
