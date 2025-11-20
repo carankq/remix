@@ -4,7 +4,7 @@ import { json } from "@remix-run/node";
 import { Header } from "../components/Header";
 import { Footer } from "../components/Footer";
 import { SearchSection } from "../components/SearchSection";
-import { HeroSection } from "../components/HeroSection";
+import { InstructorBenefitsSection } from "../components/InstructorBenefitsSection";
 import { TrustTechnologySection } from "../components/TrustTechnologySection";
 import { FAQSection } from "../components/FAQSection";
 
@@ -90,7 +90,7 @@ export default function Index() {
             navigate(`/results?${params.toString()}`);
           }} 
         />
-        <HeroSection />
+        <InstructorBenefitsSection />
         <TrustTechnologySection />
         <FAQSection blogs={blogsTop3} />
       <Footer />
