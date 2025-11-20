@@ -1,4 +1,5 @@
 import { Link, useNavigate } from "@remix-run/react";
+import { useEffect } from "react";
 
 type Instructor = {
   id: string;
@@ -35,6 +36,11 @@ export function InstructorCard({ instructor, showActions = true }: InstructorCar
   const placeholder = 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><rect width="100" height="100" rx="50" fill="%23e5e7eb"/><circle cx="50" cy="38" r="18" fill="%239ca3af"/><path d="M20 86c4-18 18-28 30-28s26 10 30 28" fill="%239ca3af"/></svg>';
   const imgSrc = hasImage ? instructor.image : placeholder;
   
+  useEffect(()=>{
+    console.log('I see these guys: instructor', instructor);
+    console.log('phone number is:', instructor.phone, instructor.phone ? true : false);
+  }, [])
+
   // Normalize availability to a simple array of slots we can render
   const workingSlots: Array<{ day: string; startTime: string; endTime: string }> = (() => {
     const a: any = instructor.availability as any;
