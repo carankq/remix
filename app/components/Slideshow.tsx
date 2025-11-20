@@ -68,7 +68,8 @@ export function Slideshow({ slides, autoPlayInterval = 5000, height = '24rem' }:
           <button 
             onClick={() => setCurrentSlide(p => (p - 1 + slides.length) % slides.length)} 
             aria-label="Previous slide" 
-            className="carousel-btn absolute left-4 top-1/2 -translate-y-1/2 z-20"
+            className="carousel-btn absolute left-4 z-20"
+            style={{ top: '50%', transform: 'translateY(-50%)' }}
           >
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
               <path d="M15 18L9 12L15 6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
@@ -77,13 +78,21 @@ export function Slideshow({ slides, autoPlayInterval = 5000, height = '24rem' }:
           <button 
             onClick={() => setCurrentSlide(p => (p + 1) % slides.length)} 
             aria-label="Next slide" 
-            className="carousel-btn absolute right-4 top-1/2 -translate-y-1/2 z-20"
+            className="carousel-btn absolute right-4 z-20"
+            style={{ top: '50%', transform: 'translateY(-50%)' }}
           >
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
               <path d="M9 18L15 12L9 6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
             </svg>
           </button>
-          <div className="absolute bottom-6 right-6 flex items-center gap-2 z-20">
+          <div 
+            className="absolute bottom-6 right-6 flex items-center gap-2 z-20"
+            style={{ 
+              background: 'rgba(0, 0, 0, 0.5)', 
+              padding: '0.5rem 0.75rem',
+              borderRadius: '0'
+            }}
+          >
             {slides.map((_, index) => (
               <button 
                 key={index} 

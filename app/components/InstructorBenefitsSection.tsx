@@ -4,26 +4,26 @@ const slides = [
   { 
     id: 1, 
     image: 'https://images.unsplash.com/photo-1449965408869-eaa3f722e40d?w=800&h=600&fit=crop', 
-    title: 'Grow Your Student Base', 
-    description: 'Connect with motivated learners actively searching for quality instruction'
+    title: 'Stand Out with DVLA Verification', 
+    description: 'Build instant trust — prove your vehicle credentials are genuine and verified'
   },
   { 
     id: 2, 
     image: 'https://images.unsplash.com/photo-1554224154-26032ffc0d07?w=800&h=600&fit=crop', 
-    title: 'Secure Payments, Every Time', 
-    description: 'Escrow-style protection ensures you get paid for every lesson you teach'
+    title: 'Students Find You Locally', 
+    description: 'No more driving miles away — students search by postcode to find instructors in their area'
   },
   { 
     id: 3, 
     image: 'https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=800&h=600&fit=crop', 
-    title: 'Manage Your Schedule Easily', 
-    description: 'Set your availability, prices, and preferences — we handle the bookings'
+    title: 'Receive Direct Enquiries', 
+    description: 'Students contact you directly — simple, straightforward communication'
   },
   { 
     id: 4, 
     image: 'https://images.unsplash.com/photo-1551836022-d5d88e9218df?w=800&h=600&fit=crop', 
-    title: 'Build Your Reputation', 
-    description: 'Stand out with verified credentials and genuine student reviews'
+    title: 'Set Your Own Terms', 
+    description: 'List your availability, prices, and preferences — you stay in control'
   }
 ];
 
@@ -47,22 +47,25 @@ export function InstructorBenefitsSection() {
               Built for Driving Instructors
             </h2>
             <p className="text-xl text-gray-600 mb-8 leading-relaxed max-w-3xl mx-auto">
-              Join a platform that puts you first. Get more students, keep 100% of your earnings, and focus on what you do best — teaching.
+              Get found by local students searching for instructors in their area. Build trust with DVLA verification and receive enquiries directly.
             </p>
             
             {/* Stats */}
-            <div className="flex flex-col md:flex-row gap-4 justify-center items-stretch">
-              <div className="bg-white shadow-md flex-1 max-w-xs" style={{ padding: '2rem', borderRadius: '0' }}>
-                <p className="text-3xl font-bold text-blue-600">0%</p>
-                <p className="text-sm text-gray-600 mt-1">Commission Fee</p>
+            <div className="flex flex-col md:grid md:grid-cols-3 gap-4 justify-center items-stretch max-w-4xl mx-auto">
+              <div className="bg-white shadow-md" style={{ padding: '2rem', borderRadius: '0' }}>
+                <p className="text-3xl font-bold text-blue-600">✓ DVLA</p>
+                <p className="text-sm text-gray-600 mt-1">Vehicle Verification</p>
+                <p className="text-xs text-gray-500 mt-2">Instant credibility with students</p>
               </div>
-              <div className="bg-white shadow-md flex-1 max-w-xs" style={{ padding: '2rem', borderRadius: '0' }}>
-                <p className="text-3xl font-bold text-purple-600">100%</p>
-                <p className="text-sm text-gray-600 mt-1">Payment Protection</p>
+              <div className="bg-white shadow-md" style={{ padding: '2rem', borderRadius: '0' }}>
+                <p className="text-3xl font-bold text-purple-600">📍 Local</p>
+                <p className="text-sm text-gray-600 mt-1">Area-Based Search</p>
+                <p className="text-xs text-gray-500 mt-2">Students find you by postcode</p>
               </div>
-              <div className="bg-white shadow-md flex-1 max-w-xs" style={{ padding: '2rem', borderRadius: '0' }}>
-                <p className="text-3xl font-bold text-green-600">24/7</p>
-                <p className="text-sm text-gray-600 mt-1">Booking Access</p>
+              <div className="bg-white shadow-md" style={{ padding: '2rem', borderRadius: '0' }}>
+                <p className="text-3xl font-bold text-green-600">📧 Direct</p>
+                <p className="text-sm text-gray-600 mt-1">Student Enquiries</p>
+                <p className="text-xs text-gray-500 mt-2">Connect directly with learners</p>
               </div>
             </div>
           </div>
