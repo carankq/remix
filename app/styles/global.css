@@ -706,6 +706,21 @@ select {
   .search-hero-title {
     margin-bottom: 0.5rem !important;
   }
+  
+  /* Search buttons on mobile - same row, icon only for clear */
+  .search-buttons-container {
+    flex-wrap: nowrap !important;
+  }
+  
+  .clear-filters-btn {
+    flex: 0 0 auto !important;
+    min-width: auto !important;
+    padding: 1rem !important;
+  }
+  
+  .clear-filters-text {
+    display: none !important;
+  }
 }
 
 /* Desktop and larger */

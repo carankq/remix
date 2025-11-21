@@ -608,13 +608,14 @@ export function SearchSection({
             )}
 
             {/* Action Buttons */}
-            <div style={{
+            <div className="search-buttons-container" style={{
               display: 'flex',
               gap: '1rem',
               flexWrap: 'wrap'
             }}>
               <button 
-                onClick={clearFilters} 
+                onClick={clearFilters}
+                className="clear-filters-btn"
                 style={{
                   flex: '1',
                   minWidth: '200px',
@@ -642,7 +643,7 @@ export function SearchSection({
                 }}
               >
                 <RotateCcw size={20} />
-                Clear Filters
+                <span className="clear-filters-text">Clear Filters</span>
               </button>
               <button 
                 onClick={handleSearch} 
