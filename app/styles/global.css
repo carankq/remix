@@ -696,7 +696,7 @@ select {
   
   /* Reduce search section header spacing on mobile */
   .search-section-mobile {
-    padding: 2rem 0 2.5rem !important;
+    padding: 2rem 0 0 !important;
   }
   
   .search-header-mobile {
