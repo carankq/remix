@@ -429,7 +429,7 @@ export default function ResultsRoute() {
               <div style={{
                 background: 'white',
                 border: '1px solid #e5e7eb',
-                borderRadius: '1rem',
+                borderRadius: '0',
                 padding: '4rem 2rem',
                 textAlign: 'center'
               }}>
