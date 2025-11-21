@@ -772,5 +772,10 @@ select {
     gap: 2rem !important;
     flex-wrap: nowrap !important;
   }
+  
+  /* Slideshow images: contain on desktop to show full content */
+  .slideshow-image {
+    object-fit: contain !important;
+  }
 }
 

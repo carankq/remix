@@ -49,8 +49,8 @@ export function Slideshow({ slides, autoPlayInterval = 5000, height = '24rem' }:
           <img 
             src={slide.image} 
             alt={slide.title} 
-            className="w-full h-full object-cover block" 
-            style={{ display: 'block' }} 
+            className="w-full h-full block slideshow-image" 
+            style={{ display: 'block', objectFit: 'cover' }} 
           />
           <div 
             className="absolute inset-0" 
