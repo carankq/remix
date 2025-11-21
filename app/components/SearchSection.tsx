@@ -41,13 +41,22 @@ export function SearchSection({
   const [postcode, setPostcode] = useState<string>(
     initialFilters?.postcode ? initialFilters.postcode.split(',')[0]?.trim() || '' : ''
   );
+  
+  const [showAlert, setShowAlert] = useState(false);
 
   const handleFilterChange = (key: keyof FilterCriteria, value: any) => {
     const normalizedValue = key === 'postcode' && typeof value === 'string' ? value.toUpperCase() : value;
     setFilters({ ...filters, [key]: normalizedValue });
   };
 
-  const handleSearch = () => { onSearch('', { ...filters, postcode }); };
+  const handleSearch = () => {
+    // Check if postcode is empty or only whitespace
+    if (!postcode || postcode.trim() === '') {
+      setShowAlert(true);
+      return;
+    }
+    onSearch('', { ...filters, postcode });
+  };
   const clearFilters = () => { 
     const d: FilterCriteria = { priceRange: [20, 60], postcode: '', gender: '', vehicleType: '', minExperience: 0, language: '' }; 
     setFilters(d); 
@@ -613,6 +622,96 @@ export function SearchSection({
           </div>
         </div>
       </div>
+
+      {/* Custom Alert */}
+      {showAlert && (
+        <div 
+          style={{
+            position: 'fixed',
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            backgroundColor: 'rgba(0, 0, 0, 0.5)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            zIndex: 9999,
+            padding: '1rem'
+          }}
+          onClick={() => setShowAlert(false)}
+        >
+          <div 
+            style={{
+              backgroundColor: 'white',
+              borderRadius: '0',
+              padding: '2rem',
+              maxWidth: '400px',
+              width: '100%',
+              boxShadow: '0 20px 60px rgba(0, 0, 0, 0.3)',
+              border: '2px solid #1e40af'
+            }}
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginBottom: '1rem' }}>
+              <div style={{
+                width: '48px',
+                height: '48px',
+                borderRadius: '0',
+                background: '#fef2f2',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center'
+              }}>
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#dc2626" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <circle cx="12" cy="12" r="10"/>
+                  <line x1="12" y1="8" x2="12" y2="12"/>
+                  <line x1="12" y1="16" x2="12.01" y2="16"/>
+                </svg>
+              </div>
+              <h3 style={{ 
+                fontSize: '1.25rem', 
+                fontWeight: '700', 
+                color: '#111827',
+                margin: 0 
+              }}>
+                Postcode Required
+              </h3>
+            </div>
+            <p style={{ 
+              color: '#6b7280', 
+              fontSize: '1rem',
+              lineHeight: '1.5',
+              marginBottom: '1.5rem' 
+            }}>
+              Please enter a postcode to search for instructors in your area.
+            </p>
+            <button
+              onClick={() => setShowAlert(false)}
+              style={{
+                width: '100%',
+                padding: '0.75rem 1.5rem',
+                fontSize: '1rem',
+                fontWeight: '600',
+                color: 'white',
+                background: '#1e40af',
+                border: 'none',
+                borderRadius: '0',
+                cursor: 'pointer',
+                transition: 'all 0.2s ease'
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.background = '#1e3a8a';
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.background = '#1e40af';
+              }}
+            >
+              Got it
+            </button>
+          </div>
+        </div>
+      )}
     </section>
   );
 }
