@@ -441,118 +441,103 @@ export function SearchSection({
             </div>
 
             {/* Active Filters Display */}
-            {(postcode || filters.gender || filters.vehicleType || filters.language) && (
-              <div style={{
-                padding: '1.25rem',
-                background: 'linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%)',
-                borderRadius: '0',
-                marginBottom: '1.5rem',
-                border: '1px solid #bfdbfe'
-              }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginBottom: '0.75rem' }}>
-                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#2563eb" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                    <line x1="4" y1="21" x2="4" y2="14"/>
-                    <line x1="4" y1="10" x2="4" y2="3"/>
-                    <line x1="12" y1="21" x2="12" y2="12"/>
-                    <line x1="12" y1="8" x2="12" y2="3"/>
-                    <line x1="20" y1="21" x2="20" y2="16"/>
-                    <line x1="20" y1="12" x2="20" y2="3"/>
-                    <line x1="1" y1="14" x2="7" y2="14"/>
-                    <line x1="9" y1="8" x2="15" y2="8"/>
-                    <line x1="17" y1="16" x2="23" y2="16"/>
-                  </svg>
-                  <span style={{ fontSize: '0.875rem', fontWeight: '600', color: '#1e40af' }}>
-                    Active Filters
-                  </span>
-          </div>
-                <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.5rem' }}>
-                {postcode && (
-                  <span style={{
+            {(() => {
+              const hasFilters = postcode || filters.gender || filters.vehicleType || filters.language;
+              if (!hasFilters) return null;
+              
+              const filterElements = [];
+              
+              if (postcode) {
+                filterElements.push(
+                  <span key="postcode" style={{
                     display: 'inline-flex',
                     alignItems: 'center',
-                    gap: '0.5rem',
-                    padding: '0.5rem 0.875rem',
-                    background: 'white',
+                    gap: '0.4rem',
                     color: '#1e40af',
-                    borderRadius: '0',
-                    fontSize: '0.875rem',
-                    fontWeight: '500',
-                    boxShadow: '0 2px 4px rgba(0,0,0,0.05)'
+                    fontSize: '0.8125rem',
+                    fontWeight: '500'
                   }}>
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
                       <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/>
                       <circle cx="12" cy="10" r="3"/>
                     </svg>
                     {postcode}
                   </span>
-                )}
-                {filters.gender && (
-                  <span style={{
+                );
+              }
+              
+              if (filters.gender) {
+                if (filterElements.length > 0) filterElements.push(<span key="sep-gender" style={{ color: '#d1d5db' }}>|</span>);
+                filterElements.push(
+                  <span key="gender" style={{
                     display: 'inline-flex',
                     alignItems: 'center',
-                    gap: '0.5rem',
-                      padding: '0.5rem 0.875rem',
-                    background: 'white',
+                    gap: '0.4rem',
                     color: '#1e40af',
-                        borderRadius: '0',
-                    fontSize: '0.875rem',
-                    fontWeight: '500',
-                      boxShadow: '0 2px 4px rgba(0,0,0,0.05)'
+                    fontSize: '0.8125rem',
+                    fontWeight: '500'
                   }}>
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
                       <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
                       <circle cx="12" cy="7" r="4"/>
                     </svg>
-                      {filters.gender}
+                    {filters.gender}
                   </span>
-                )}
-                {filters.vehicleType && (
-                  <span style={{
+                );
+              }
+              
+              if (filters.vehicleType) {
+                if (filterElements.length > 0) filterElements.push(<span key="sep-vehicle" style={{ color: '#d1d5db' }}>|</span>);
+                filterElements.push(
+                  <span key="vehicle" style={{
                     display: 'inline-flex',
                     alignItems: 'center',
-                    gap: '0.5rem',
-                      padding: '0.5rem 0.875rem',
-                    background: 'white',
+                    gap: '0.4rem',
                     color: '#1e40af',
-                        borderRadius: '0',
-                    fontSize: '0.875rem',
-                    fontWeight: '500',
-                      boxShadow: '0 2px 4px rgba(0,0,0,0.05)'
+                    fontSize: '0.8125rem',
+                    fontWeight: '500'
                   }}>
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
                       <path d="M5 17h2l.5-1.5h9L17 17h2"/>
                       <path d="M12 17v-6"/>
                       <path d="M9 5h6l3 6H6l3-6z"/>
                       <circle cx="8" cy="17" r="2"/>
                       <circle cx="16" cy="17" r="2"/>
                     </svg>
-                      {filters.vehicleType}
+                    {filters.vehicleType}
                   </span>
-                )}
-                {filters.language && (
-                  <span style={{
+                );
+              }
+              
+              if (filters.language) {
+                if (filterElements.length > 0) filterElements.push(<span key="sep-language" style={{ color: '#d1d5db' }}>|</span>);
+                filterElements.push(
+                  <span key="language" style={{
                     display: 'inline-flex',
                     alignItems: 'center',
-                    gap: '0.5rem',
-                      padding: '0.5rem 0.875rem',
-                    background: 'white',
+                    gap: '0.4rem',
                     color: '#1e40af',
-                        borderRadius: '0',
-                    fontSize: '0.875rem',
-                    fontWeight: '500',
-                      boxShadow: '0 2px 4px rgba(0,0,0,0.05)'
+                    fontSize: '0.8125rem',
+                    fontWeight: '500'
                   }}>
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
                       <circle cx="12" cy="12" r="10"/>
                       <line x1="2" y1="12" x2="22" y2="12"/>
                       <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/>
                     </svg>
-                      {filters.language}
+                    {filters.language}
                   </span>
-                )}
+                );
+              }
+              
+              return (
+                <div style={{ marginTop: '1rem' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', flexWrap: 'wrap' }}>
+                    {filterElements}
+                  </div>
                 </div>
-              </div>
-            )}
+              );
+            })()}
 
             {/* Action Buttons */}
             <div className="search-buttons-container" style={{
