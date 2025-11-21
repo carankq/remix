@@ -645,5 +645,55 @@ select {
     height: 100% !important;
     object-position: center !important;
   }
+  
+  /* Smaller hero title on mobile */
+  .search-hero-title {
+    font-size: 1.75rem !important;
+  }
+  
+  /* Smaller subtitle on mobile */
+  .search-hero-subtitle {
+    font-size: 1rem !important;
+  }
+  
+  /* Full width search card on mobile */
+  .search-card {
+    margin-left: -1rem !important;
+    margin-right: -1rem !important;
+    border-radius: 0 !important;
+    padding: 1.5rem 1rem !important;
+  }
+  
+  /* Stack instructor stats vertically on mobile */
+  .instructor-stats-grid {
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 1rem !important;
+    align-items: stretch !important;
+  }
+  
+  .instructor-stats-grid > div {
+    max-width: 100% !important;
+  }
+}
+
+/* Desktop and larger */
+@media (min-width: 768px) {
+  .search-hero-title {
+    font-size: 3rem;
+  }
+  
+  .search-hero-subtitle {
+    font-size: 1.25rem;
+  }
+  
+  /* Horizontal instructor stats on desktop */
+  .instructor-stats-grid {
+    display: flex !important;
+    flex-direction: row !important;
+    gap: 1rem !important;
+    justify-content: center !important;
+    align-items: stretch !important;
+  }
 }
 

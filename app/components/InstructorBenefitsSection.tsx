@@ -52,15 +52,9 @@ export function InstructorBenefitsSection() {
 
           {/* Content */}
           <div className="fade-in flex flex-col text-center">
-            {/* <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-6 leading-tight brand-name">
-              Built for Driving Instructors
-            </h2>
-            <p className="text-xl text-gray-600 mb-8 leading-relaxed max-w-3xl mx-auto">
-              Get found by local students searching for instructors in their area. Build trust with DVLA verification and receive enquiries directly.
-            </p> */}
-            
+
             {/* Stats - Horizontal */}
-            <div className="flex flex-row gap-4 justify-center items-stretch">
+            <div className="instructor-stats-grid">
               <div className="flex items-center gap-3 bg-white" style={{ padding: '1.5rem 2rem', borderRadius: '0', flex: 1, maxWidth: '360px', border: '2px solid #e5e7eb' }}>
                 <p className="text-3xl font-bold text-blue-600">✓ DVLA</p>
                 <div style={{ textAlign: 'left' }}>

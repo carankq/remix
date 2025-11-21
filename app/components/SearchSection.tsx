@@ -86,8 +86,7 @@ export function SearchSection({
 
           {/* Header */}
           <div style={{ textAlign: 'center', marginBottom: '3rem' }}>
-            <h1 style={{
-              fontSize: '3rem',
+            <h1 className="search-hero-title" style={{
               fontWeight: '800',
               color: '#ffffff',
               marginBottom: '1rem',
@@ -97,8 +96,7 @@ export function SearchSection({
             }}>
               Find Your Perfect Driving Instructor
             </h1>
-            <p style={{
-              fontSize: '1.25rem',
+            <p className="search-hero-subtitle" style={{
               color: 'rgba(255,255,255,0.95)',
               maxWidth: '600px',
               margin: '0 auto',
@@ -109,7 +107,7 @@ export function SearchSection({
           </div>
 
           {/* Main Search Card */}
-          <div style={{
+          <div className="search-card" style={{
             background: 'rgb(255, 255, 255)',
             borderRadius: '0',
             padding: '2.5rem',

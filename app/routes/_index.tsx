@@ -91,7 +91,7 @@ export default function Index() {
           }} 
         />
         <InstructorBenefitsSection />
-        <TrustTechnologySection />
+        {/* <TrustTechnologySection /> */}
         <FAQSection blogs={blogsTop3} />
       <Footer />
     </div>
