@@ -675,6 +675,16 @@ select {
   .instructor-stats-grid > div {
     max-width: 100% !important;
   }
+  
+  /* Stack how it works on mobile */
+  .how-it-works-grid {
+    grid-template-columns: 1fr !important;
+  }
+  
+  /* Center CTA on mobile */
+  .instructor-cta {
+    text-align: center !important;
+  }
 }
 
 /* Desktop and larger */
@@ -694,6 +704,11 @@ select {
     gap: 1rem !important;
     justify-content: center !important;
     align-items: stretch !important;
+  }
+  
+  /* Two column how it works on desktop */
+  .how-it-works-grid {
+    grid-template-columns: 1fr 1fr !important;
   }
 }
 

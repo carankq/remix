@@ -79,6 +79,26 @@ export function InstructorBenefitsSection() {
                 </div>
               </div>
             </div>
+            
+            {/* CTA Button */}
+            <div className="instructor-cta" style={{ marginTop: '3rem' }}>
+              <a 
+                href="/auth" 
+                className="btn"
+                style={{ 
+                  display: 'inline-block',
+                  padding: '1rem 2.5rem',
+                  fontSize: '1.125rem',
+                  fontWeight: '600',
+                  textDecoration: 'none'
+                }}
+              >
+                Join as an Instructor
+              </a>
+              <p style={{ fontSize: '0.875rem', color: '#6b7280', marginTop: '1rem' }}>
+                Already registered? <a href="/portal" style={{ color: '#2563eb', fontWeight: '600', textDecoration: 'none' }}>Sign in to your dashboard</a>
+              </p>
+            </div>
           </div>
         </div>
       </div>

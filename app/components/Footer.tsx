@@ -14,10 +14,8 @@ export function Footer() {
           
           {/* Main Footer Content */}
           <div style={{ 
-            display: 'grid',
-            gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))',
-            gap: '3rem',
-            marginBottom: '3rem'
+            marginBottom: '3rem',
+            textAlign: 'center'
           }}>
             
             {/* Brand & Tagline */}
@@ -37,7 +35,8 @@ export function Footer() {
                 color: '#6b7280',
                 lineHeight: '1.7',
                 marginBottom: '1.5rem',
-                maxWidth: '280px'
+                maxWidth: '400px',
+                margin: '0 auto 1.5rem'
               }}>
                 Helping students connect with brilliant driving instructors.
               </p>
@@ -64,81 +63,6 @@ export function Footer() {
                 </svg>
                 <span style={{ fontWeight: '500' }}>United Kingdom · English (UK)</span>
               </div>
-            </div>
-            
-            {/* Quick Links */}
-            <div>
-              <h4 style={{
-                fontSize: '1.125rem',
-                fontWeight: '600',
-                color: '#111827',
-                marginBottom: '1.25rem',
-                fontFamily: "'Space Grotesk', 'Poppins', sans-serif"
-              }}>
-                Quick Links
-              </h4>
-              <ul style={{ listStyle: 'none', padding: 0, margin: 0 }}>
-                {[
-                  { label: 'Find Instructors', to: '/results' },
-                  { label: 'How it Works', to: '/#how-it-works' },
-                  { label: 'Blogs & Insights', to: '/blogs' },
-                  { label: 'Contact Us', to: '/contact' }
-                ].map((link) => (
-                  <li key={link.to} style={{ marginBottom: '0.75rem' }}>
-                    <Link 
-                      to={link.to}
-                      className="no-underline"
-                      style={{
-                        color: '#6b7280',
-                        fontSize: '0.95rem',
-                        transition: 'color 0.2s ease'
-                      }}
-                      onMouseEnter={(e) => e.currentTarget.style.color = '#2563eb'}
-                      onMouseLeave={(e) => e.currentTarget.style.color = '#6b7280'}
-                    >
-                      {link.label}
-                    </Link>
-                  </li>
-                ))}
-              </ul>
-            </div>
-            
-            {/* Legal & Support */}
-            <div>
-              <h4 style={{
-                fontSize: '1.125rem',
-                fontWeight: '600',
-                color: '#111827',
-                marginBottom: '1.25rem',
-                fontFamily: "'Space Grotesk', 'Poppins', sans-serif"
-              }}>
-                Support & Legal
-              </h4>
-              <ul style={{ listStyle: 'none', padding: 0, margin: 0 }}>
-                {[
-                  { label: 'Help Center', to: '/help' },
-                  { label: 'Privacy Settings', to: '/privacy-settings' },
-                  { label: 'Cookie Policy', to: '/cookie-policy' },
-                  { label: 'Privacy Policy', to: '/privacy-policy' },
-                  { label: 'Terms of Service', to: '/terms' }
-                ].map((link) => (
-                  <li key={link.to} style={{ marginBottom: '0.75rem' }}>
-                    <Link 
-                      to={link.to}
-                      className="no-underline"
-                      style={{
-                        color: '#6b7280',
-                        fontSize: '0.95rem',
-                        transition: 'color 0.2s ease'
-                      }}
-                      onMouseEnter={(e) => e.currentTarget.style.color = '#2563eb'}
-                      onMouseLeave={(e) => e.currentTarget.style.color = '#6b7280'}
-                    >
-                      {link.label}
-                    </Link>
-                  </li>
-                ))}
-              </ul>
             </div>
             
           </div>
