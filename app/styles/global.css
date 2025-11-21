@@ -702,15 +702,26 @@ select {
   
   /* Reduce search section header spacing on mobile */
   .search-section-mobile {
-    padding: 2rem 0 0 !important;
+    padding: 1.25rem 0 0 !important;
   }
   
   .search-header-mobile {
-    margin-bottom: 1.5rem !important;
+    margin-bottom: 1rem !important;
+    padding-top: 0 !important;
+    padding-bottom: 0 !important;
   }
   
   .search-hero-title {
     margin-bottom: 0.5rem !important;
+    padding-top: 0 !important;
+    padding-bottom: 0 !important;
+  }
+  
+  .search-hero-subtitle {
+    margin-top: 0 !important;
+    margin-bottom: 0 !important;
+    padding-top: 0 !important;
+    padding-bottom: 0 !important;
   }
   
   /* Search buttons on mobile - same row, icon only for clear */
