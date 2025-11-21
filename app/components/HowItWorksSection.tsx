@@ -2,7 +2,7 @@ export function HowItWorksSection() {
   return (
     <section style={{ 
       background: '#ffffff',
-      padding: '4rem 0'
+      padding: '2rem 0 4rem 0'
     }}>
       <div className="container mx-auto px-4">
         <div style={{ maxWidth: '1200px', margin: '0 auto' }}>
@@ -26,7 +26,7 @@ export function HowItWorksSection() {
           className="how-it-works-grid">
             
             {/* For Students */}
-            <div style={{ 
+            <div className="how-it-works-card" style={{ 
               background: 'linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%)',
               padding: '2.5rem',
               borderRadius: '0',
@@ -115,7 +115,7 @@ export function HowItWorksSection() {
             </div>
 
             {/* For Instructors */}
-            <div style={{ 
+            <div className="how-it-works-card" style={{ 
               background: 'linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%)',
               padding: '2.5rem',
               borderRadius: '0',

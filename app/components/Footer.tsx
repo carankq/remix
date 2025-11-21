@@ -78,7 +78,7 @@ export function Footer() {
           }}>
             
             {/* Social Links */}
-            <div style={{
+            {/* <div style={{
               display: 'flex',
               gap: '1rem'
             }}>
@@ -118,7 +118,7 @@ export function Footer() {
                   </svg>
                 </a>
               ))}
-            </div>
+            </div> */}
             
             {/* Copyright */}
             <p style={{

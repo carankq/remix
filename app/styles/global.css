@@ -681,9 +681,30 @@ select {
     grid-template-columns: 1fr !important;
   }
   
+  /* Full width how it works cards on mobile */
+  .how-it-works-card {
+    margin-left: -1rem !important;
+    margin-right: -1rem !important;
+    border-radius: 0 !important;
+    padding: 1.5rem 1rem !important;
+  }
+  
   /* Center CTA on mobile */
   .instructor-cta {
     text-align: center !important;
+  }
+  
+  /* Reduce search section header spacing on mobile */
+  .search-section-mobile {
+    padding: 2rem 0 2.5rem !important;
+  }
+  
+  .search-header-mobile {
+    margin-bottom: 1.5rem !important;
+  }
+  
+  .search-hero-title {
+    margin-bottom: 0.5rem !important;
   }
 }
 
