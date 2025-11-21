@@ -36,6 +36,15 @@ export function InstructorBenefitsSection() {
       <div className="container mx-auto px-4">
         <div style={{ maxWidth: '1200px', margin: '0 auto' }}>
           
+        <div className="fade-in flex flex-col text-center">
+            <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-6 leading-tight brand-name">
+              Built for Driving Instructors
+            </h2>
+            <p className="text-xl text-gray-600 mb-8 leading-relaxed max-w-3xl mx-auto">
+              Get found by local students searching for instructors in their area. Build trust with DVLA verification and receive enquiries directly.
+            </p>
+        </div>
+
           {/* Slideshow */}
           <div className="relative scale-in" style={{ animationDelay: '0.3s', marginBottom: '3rem' }}>
             <Slideshow slides={slides} height="24rem" />
@@ -43,12 +52,12 @@ export function InstructorBenefitsSection() {
 
           {/* Content */}
           <div className="fade-in flex flex-col text-center">
-            <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-6 leading-tight brand-name">
+            {/* <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-6 leading-tight brand-name">
               Built for Driving Instructors
             </h2>
             <p className="text-xl text-gray-600 mb-8 leading-relaxed max-w-3xl mx-auto">
               Get found by local students searching for instructors in their area. Build trust with DVLA verification and receive enquiries directly.
-            </p>
+            </p> */}
             
             {/* Stats - Horizontal */}
             <div className="flex flex-row gap-4 justify-center items-stretch">
