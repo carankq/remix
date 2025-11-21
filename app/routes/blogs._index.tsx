@@ -70,7 +70,7 @@ export default function BlogsIndexRoute() {
             
             {/* Header */}
             <div style={{ textAlign: 'center', marginBottom: '4rem' }}>
-              <h1 className="brand-name" style={{
+              <h1 className="brand-name blog-title" style={{
                 fontSize: '3.5rem',
                 fontWeight: '700',
                 color: '#111827',
@@ -93,7 +93,7 @@ export default function BlogsIndexRoute() {
             {items.length === 0 ? (
               <div style={{
                 background: 'white',
-                borderRadius: '1rem',
+                borderRadius: '0',
                 padding: '4rem 2rem',
                 textAlign: 'center',
                 boxShadow: '0 1px 3px rgba(0,0,0,0.05)'
@@ -126,7 +126,7 @@ export default function BlogsIndexRoute() {
                       style={{
                         display: 'block',
                         background: 'white',
-                        borderRadius: '1rem',
+                        borderRadius: '0',
                         overflow: 'hidden',
                         boxShadow: '0 1px 3px rgba(0,0,0,0.05)',
                         border: '1px solid #e5e7eb',

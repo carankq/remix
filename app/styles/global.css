@@ -652,6 +652,11 @@ select {
     font-size: 1.4rem !important;
   }
   
+  /* Blog title matches homepage on mobile */
+  .blog-title {
+    font-size: 1.4rem !important;
+  }
+  
   /* Smaller subtitle on mobile */
   .search-hero-subtitle {
     font-size: 1rem !important;

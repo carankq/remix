@@ -451,12 +451,13 @@ export function SearchSection({
 
             {/* Active Filters Display */}
             {(() => {
-              const hasFilters = postcode || filters.gender || filters.vehicleType || filters.language;
+              const hasValidPostcode = postcode && postcode.trim() !== '';
+              const hasFilters = hasValidPostcode || filters.gender || filters.vehicleType || filters.language;
               if (!hasFilters) return null;
               
               const filterElements = [];
               
-              if (postcode) {
+              if (hasValidPostcode) {
                 filterElements.push(
                   <span key="postcode" style={{
                     display: 'inline-flex',

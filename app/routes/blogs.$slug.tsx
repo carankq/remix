@@ -110,7 +110,7 @@ export default function BlogSlugRoute() {
             {/* Article Header */}
             <header style={{
               background: 'white',
-              borderRadius: '1rem 1rem 0 0',
+              borderRadius: '0',
               padding: '3rem 3rem 2rem 3rem',
               borderBottom: '1px solid #e5e7eb'
             }}>
@@ -180,7 +180,7 @@ export default function BlogSlugRoute() {
             <article
               style={{
                 background: 'white',
-                borderRadius: '0 0 1rem 1rem',
+                borderRadius: '0',
                 padding: '3rem',
                 boxShadow: '0 1px 3px rgba(0,0,0,0.05)'
               }}
