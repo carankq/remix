@@ -722,6 +722,16 @@ select {
   .clear-filters-text {
     display: none !important;
   }
+  
+  /* Results header layout - mobile: row */
+  .results-header-layout {
+    display: flex !important;
+    flex-direction: row !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+    gap: 1rem !important;
+    flex-wrap: wrap !important;
+  }
 }
 
 /* Desktop and larger */
@@ -746,6 +756,16 @@ select {
   /* Two column how it works on desktop */
   .how-it-works-grid {
     grid-template-columns: 1fr 1fr !important;
+  }
+  
+  /* Results header layout - desktop: space-between */
+  .results-header-layout {
+    display: flex !important;
+    flex-direction: row !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+    gap: 2rem !important;
+    flex-wrap: nowrap !important;
   }
 }
 
