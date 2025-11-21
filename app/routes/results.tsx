@@ -313,6 +313,108 @@ export default function ResultsRoute() {
                 </div>
               </div>
             </div>
+            
+            {/* Second Row: Active Filters */}
+            {(() => {
+              const postcodes = searchParams.getAll('postcode');
+              const gender = searchParams.get('gender');
+              const vehicleType = searchParams.get('vehicleType');
+              const language = searchParams.get('language');
+              const hasFilters = postcodes.length > 0 || gender || vehicleType || language;
+              
+              if (!hasFilters) return null;
+              
+              return (
+                <div style={{ marginTop: '1rem' }}>
+                  <div className="flex items-center gap-2 flex-wrap">
+                    {postcodes.map((pc, idx) => (
+                      <span key={`pc-${idx}`} style={{
+                        display: 'inline-flex',
+                        alignItems: 'center',
+                        gap: '0.4rem',
+                        padding: '0.4rem 0.75rem',
+                        background: 'rgba(255,255,255,0.15)',
+                        color: 'white',
+                        borderRadius: '0',
+                        fontSize: '0.8125rem',
+                        fontWeight: '500',
+                        border: '1px solid rgba(255,255,255,0.2)'
+                      }}>
+                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                          <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/>
+                          <circle cx="12" cy="10" r="3"/>
+                        </svg>
+                        {pc}
+                      </span>
+                    ))}
+                    {gender && (
+                      <span style={{
+                        display: 'inline-flex',
+                        alignItems: 'center',
+                        gap: '0.4rem',
+                        padding: '0.4rem 0.75rem',
+                        background: 'rgba(255,255,255,0.15)',
+                        color: 'white',
+                        borderRadius: '0',
+                        fontSize: '0.8125rem',
+                        fontWeight: '500',
+                        border: '1px solid rgba(255,255,255,0.2)'
+                      }}>
+                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                          <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+                          <circle cx="12" cy="7" r="4"/>
+                        </svg>
+                        {gender}
+                      </span>
+                    )}
+                    {vehicleType && (
+                      <span style={{
+                        display: 'inline-flex',
+                        alignItems: 'center',
+                        gap: '0.4rem',
+                        padding: '0.4rem 0.75rem',
+                        background: 'rgba(255,255,255,0.15)',
+                        color: 'white',
+                        borderRadius: '0',
+                        fontSize: '0.8125rem',
+                        fontWeight: '500',
+                        border: '1px solid rgba(255,255,255,0.2)'
+                      }}>
+                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                          <path d="M5 17h2l.5-1.5h9L17 17h2"/>
+                          <path d="M12 17v-6"/>
+                          <path d="M9 5h6l3 6H6l3-6z"/>
+                          <circle cx="8" cy="17" r="2"/>
+                          <circle cx="16" cy="17" r="2"/>
+                        </svg>
+                        {vehicleType}
+                      </span>
+                    )}
+                    {language && (
+                      <span style={{
+                        display: 'inline-flex',
+                        alignItems: 'center',
+                        gap: '0.4rem',
+                        padding: '0.4rem 0.75rem',
+                        background: 'rgba(255,255,255,0.15)',
+                        color: 'white',
+                        borderRadius: '0',
+                        fontSize: '0.8125rem',
+                        fontWeight: '500',
+                        border: '1px solid rgba(255,255,255,0.2)'
+                      }}>
+                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                          <circle cx="12" cy="12" r="10"/>
+                          <line x1="2" y1="12" x2="22" y2="12"/>
+                          <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/>
+                        </svg>
+                        {language}
+                      </span>
+                    )}
+                  </div>
+                </div>
+              );
+            })()}
 
           </div>
         </div>
