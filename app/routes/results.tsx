@@ -216,7 +216,7 @@ export default function ResultsRoute() {
       <Header />
       
       {/* Hero Header */}
-      <section className="bg-deep-navy py-8 md:py-12">
+      <section className="py-8 md:py-12" style={{ background: '#1e40af' }}>
         <div className="container mx-auto px-4 md:px-8">
           <div className="max-w-6xl mx-auto">
             {/* First Row: Title, Count, Actions */}
