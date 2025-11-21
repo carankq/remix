@@ -91,20 +91,21 @@ export default function AuthRoute() {
   return (
     <div>
       <Header />
-      <main style={{ 
+      <main className="auth-main" style={{ 
         minHeight: '100vh',
         background: '#f9fafb',
         padding: '1.5rem 0',
         display: 'flex',
         alignItems: 'center'
       }}>
-        <div className="container mx-auto px-4 md:px-8">
-          <div style={{ maxWidth: '900px', width: '100%', margin: '0 auto' }}>
+        {/* */}
+        <div className="mx-auto px-4 md:px-8 container auth-container" style={{ width: '100%', }}>
+          <div className="auth-wrapper">
             
             {/* Auth Card */}
             <div style={{
               background: 'white',
-              borderRadius: '1rem',
+              borderRadius: '0',
               boxShadow: '0 1px 3px rgba(0,0,0,0.1)',
               border: '1px solid #e5e7eb',
               overflow: 'hidden'
@@ -112,7 +113,7 @@ export default function AuthRoute() {
             className="auth-card">
               
               {/* Tab Switcher */}
-              <div style={{
+              <div className="auth-tab-switcher" style={{
                 display: 'grid',
                 gridTemplateColumns: '1fr 1fr',
                 background: '#f9fafb',
@@ -124,7 +125,7 @@ export default function AuthRoute() {
                   disabled={isSubmitting || isTransitioning}
                   style={{
                     padding: '1rem',
-                    borderRadius: '0.75rem',
+                    borderRadius: '0',
                     border: 'none',
                     background: isLogin ? 'white' : 'transparent',
                     color: isLogin ? '#111827' : '#6b7280',
@@ -142,7 +143,7 @@ export default function AuthRoute() {
                   disabled={isSubmitting || isTransitioning}
                   style={{
                     padding: '1rem',
-                    borderRadius: '0.75rem',
+                    borderRadius: '0',
                     border: 'none',
                     background: !isLogin ? 'white' : 'transparent',
                     color: !isLogin ? '#111827' : '#6b7280',
@@ -158,7 +159,7 @@ export default function AuthRoute() {
               </div>
 
               {/* Form Content */}
-              <div style={{ 
+              <div className="auth-form-content" style={{ 
                 padding: '2.5rem',
                 opacity: isTransitioning ? 0 : 1,
                 transform: isTransitioning ? 'translateY(10px)' : 'translateY(0)',
@@ -171,7 +172,7 @@ export default function AuthRoute() {
                   marginBottom: '0.5rem',
                   fontFamily: "'Space Grotesk', 'Poppins', sans-serif"
                 }}>
-                  {isLogin ? 'Welcome back' : 'Create account'}
+                  {isLogin ? 'Welcome back' : 'Sign up'}
                 </h2>
                 <p style={{
                   color: '#6b7280',
@@ -219,7 +220,7 @@ export default function AuthRoute() {
                             fontSize: '1rem',
                             color: role === 'account_type' ? '#9ca3af' : '#111827',
                             border: '1px solid #e5e7eb',
-                            borderRadius: '0.75rem',
+                            borderRadius: '0',
                             outline: 'none',
                             transition: 'all 0.2s ease',
                             background: '#f9fafb',
@@ -302,7 +303,7 @@ export default function AuthRoute() {
                             fontSize: '1rem',
                             color: '#111827',
                             border: '1px solid #e5e7eb',
-                            borderRadius: '0.75rem',
+                            borderRadius: '0',
                             outline: 'none',
                             transition: 'all 0.2s ease',
                             background: '#f9fafb'
@@ -360,7 +361,7 @@ export default function AuthRoute() {
                           fontSize: '1rem',
                           color: '#111827',
                           border: '1px solid #e5e7eb',
-                          borderRadius: '0.75rem',
+                          borderRadius: '0',
                           outline: 'none',
                           transition: 'all 0.2s ease',
                           background: '#f9fafb'
@@ -417,7 +418,7 @@ export default function AuthRoute() {
                           fontSize: '1rem',
                           color: '#111827',
                           border: '1px solid #e5e7eb',
-                          borderRadius: '0.75rem',
+                          borderRadius: '0',
                           outline: 'none',
                           transition: 'all 0.2s ease',
                           background: '#f9fafb'
@@ -473,7 +474,7 @@ export default function AuthRoute() {
                             fontSize: '1rem',
                             color: '#111827',
                             border: '1px solid #e5e7eb',
-                            borderRadius: '0.75rem',
+                            borderRadius: '0',
                             outline: 'none',
                             transition: 'all 0.2s ease',
                             background: '#f9fafb'
@@ -529,7 +530,7 @@ export default function AuthRoute() {
                             fontSize: '1rem',
                             color: ageRange ? '#111827' : '#9ca3af',
                             border: '1px solid #e5e7eb',
-                            borderRadius: '0.75rem',
+                            borderRadius: '0',
                             outline: 'none',
                             transition: 'all 0.2s ease',
                             background: '#f9fafb',
@@ -583,7 +584,7 @@ export default function AuthRoute() {
                       padding: '0.75rem 1rem',
                       background: '#fef2f2',
                       border: '1px solid #fecaca',
-                      borderRadius: '0.5rem',
+                      borderRadius: '0',
                       color: '#dc2626',
                       fontSize: '0.875rem'
                     }}>
@@ -616,13 +617,13 @@ export default function AuthRoute() {
                           height: '16px',
                           border: '2px solid rgba(255,255,255,0.3)',
                           borderTopColor: 'white',
-                          borderRadius: '50%',
+                          borderRadius: '0',
                           animation: 'spin 0.6s linear infinite'
                         }} />
                         {isLogin ? 'Signing in...' : 'Creating account...'}
                       </>
                     ) : (
-                      isLogin ? 'Log in' : 'Create account'
+                      isLogin ? 'Log in' : 'Sign up'
                     )}
                   </button>
                 </form>

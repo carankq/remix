@@ -748,10 +748,63 @@ select {
     gap: 1rem !important;
     flex-wrap: wrap !important;
   }
+  
+  /* Auth page: full screen on mobile */
+  .auth-main {
+    padding: 0 !important;
+    background: white !important;
+    min-height: 100vh !important;
+  }
+  
+  .auth-container {
+    padding: 0 !important;
+    max-width: 100% !important;
+    height: 100% !important;
+  }
+  
+  .auth-wrapper {
+    max-width: 100% !important;
+    margin: 0 !important;
+    height: 100% !important;
+  }
+  
+  .auth-card {
+    border: none !important;
+    box-shadow: none !important;
+    border-radius: 0 !important;
+    min-height: 100vh !important;
+    display: flex !important;
+    flex-direction: column !important;
+  }
+  
+  .auth-tab-switcher {
+    padding: 0.25rem !important;
+    gap: 0.25rem !important;
+  }
+  
+  .auth-form-content {
+    padding: 2rem 1.5rem !important;
+    flex: 1 !important;
+  }
+  
+  .auth-form-content h2 {
+    padding: 0 !important;
+  }
+  
+  .auth-form-content p {
+    padding: 0 !important;
+  }
 }
 
 /* Desktop and larger */
 @media (min-width: 768px) {
+  /* Auth wrapper desktop styles */
+  .auth-wrapper {
+    max-width: 900px;
+    width: 100%;
+    margin: 0 auto;
+  }
+  
   .search-hero-title {
     font-size: 3rem;
   }
