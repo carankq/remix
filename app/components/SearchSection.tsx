@@ -85,7 +85,7 @@ export function SearchSection({
         <div style={{ maxWidth: '1200px', margin: '0 auto' }}>
 
           {/* Header */}
-          <div className="search-header-mobile" style={{ textAlign: 'center', marginBottom: '3rem' }}>
+          <div className="search-header-mobile" style={{ textAlign: 'center', marginBottom: '2rem' }}>
             <h1 className="search-hero-title" style={{
               fontWeight: '800',
               color: '#ffffff',

@@ -648,7 +648,8 @@ select {
   
   /* Smaller hero title on mobile */
   .search-hero-title {
-    font-size: 1.75rem !important;
+    /* font-size: 1.75rem !important; */
+    font-size: 1.4rem !important;
   }
   
   /* Smaller subtitle on mobile */
