@@ -531,7 +531,7 @@ export function SearchSection({
               }
               
               return (
-                <div style={{ marginTop: '1rem' }}>
+                <div style={{ marginTop: '1.5rem', marginBottom: '1.5rem' }}>
                   <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', flexWrap: 'wrap' }}>
                     {filterElements}
                   </div>
