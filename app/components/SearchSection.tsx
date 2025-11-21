@@ -37,41 +37,28 @@ export function SearchSection({
     language: initialFilters?.language || ''
   });
   
-  // Initialize postcodes from initialFilters
-  const [postcodes, setPostcodes] = useState<string[]>(
-    initialFilters?.postcode ? initialFilters.postcode.split(',').map(p => p.trim()).filter(Boolean) : []
+  // Single postcode only
+  const [postcode, setPostcode] = useState<string>(
+    initialFilters?.postcode ? initialFilters.postcode.split(',')[0]?.trim() || '' : ''
   );
-  const [pendingPostcode, setPendingPostcode] = useState('');
-  const [editingIndex, setEditingIndex] = useState<number>(-1);
 
   const handleFilterChange = (key: keyof FilterCriteria, value: any) => {
     const normalizedValue = key === 'postcode' && typeof value === 'string' ? value.toUpperCase() : value;
     setFilters({ ...filters, [key]: normalizedValue });
   };
 
-  const startNewPostcode = () => { setPendingPostcode(''); setEditingIndex(-1); };
-  const removePostcode = (pc: string, idx?: number) => {
-    const next = postcodes.filter((p, i) => !(p === pc && (idx === undefined || idx === i)));
-    setPostcodes(next);
-    if (idx !== undefined && idx === editingIndex) { setPendingPostcode(''); setEditingIndex(-1); }
+  const handleSearch = () => { onSearch('', { ...filters, postcode }); };
+  const clearFilters = () => { 
+    const d: FilterCriteria = { priceRange: [20, 60], postcode: '', gender: '', vehicleType: '', minExperience: 0, language: '' }; 
+    setFilters(d); 
+    setPostcode(''); 
+    if (autoSearch) onSearch('', d); 
   };
 
-  const handleSearch = () => { onSearch('', { ...filters, postcode: postcodes.join(',') }); };
-  const clearFilters = () => { const d: FilterCriteria = { priceRange: [20, 60], postcode: '', gender: '', vehicleType: '', minExperience: 0, language: '' }; setFilters(d); setPostcodes([]); setPendingPostcode(''); if (autoSearch) onSearch('', d); };
+  useEffect(() => { if (autoSearch) { onSearch('', { ...filters, postcode }); } }, []);
 
-  useEffect(() => { if (autoSearch) { onSearch('', { ...filters, postcode: postcodes.join(',') }); } }, []);
-
-  const handlePostcodeInputChange = (raw: string) => {
-    const value = raw.toUpperCase();
-    setPendingPostcode(value);
-    const trimmed = value.trim();
-    if (editingIndex === -1) {
-      if (trimmed.length > 0) { const next = [...postcodes, trimmed]; setPostcodes(next); setEditingIndex(next.length - 1); }
-    } else {
-      const next = [...postcodes];
-      if (trimmed.length === 0) { next.splice(editingIndex, 1); setPostcodes(next); setEditingIndex(-1); }
-      else { next[editingIndex] = trimmed; setPostcodes(next); }
-    }
+  const handlePostcodeInputChange = (value: string) => {
+    setPostcode(value.toUpperCase());
   };
 
   return (
@@ -139,9 +126,8 @@ export function SearchSection({
                 <div style={{ position: 'relative' }}>
                   <input 
                     type="text" 
-                    value={pendingPostcode} 
+                    value={postcode} 
                     onChange={(e) => handlePostcodeInputChange(e.target.value)} 
-                    onKeyDown={(e) => { if (e.key === 'Enter') { e.preventDefault(); startNewPostcode(); } }} 
                     placeholder="Enter postcode" 
                     style={{
                       width: '100%',
@@ -455,7 +441,7 @@ export function SearchSection({
             </div>
 
             {/* Active Filters Display */}
-            {(postcodes.length > 0 || filters.gender || filters.vehicleType || filters.language) && (
+            {(postcode || filters.gender || filters.vehicleType || filters.language) && (
               <div style={{
                 padding: '1.25rem',
                 background: 'linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%)',
@@ -480,65 +466,26 @@ export function SearchSection({
                   </span>
           </div>
                 <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.5rem' }}>
-                {postcodes.map((pc, idx) => {
-                  const isLast = idx === postcodes.length - 1;
-                  return (
-                    <span key={`pc-${idx}`} style={{
-                      display: 'inline-flex',
-                      alignItems: 'center',
-                      gap: '0.5rem',
-                        padding: '0.5rem 0.875rem',
-                      background: 'white',
-                      color: '#1e40af',
-                        borderRadius: '0',
-                      fontSize: '0.875rem',
-                      fontWeight: '500',
-                        boxShadow: '0 2px 4px rgba(0,0,0,0.05)'
-                    }}>
-                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                        <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/>
-                        <circle cx="12" cy="10" r="3"/>
-                      </svg>
-                      <span>{pc}</span>
-                        <button type="button" aria-label="Remove postcode" onClick={() => removePostcode(pc, idx)} style={{
-                          display: 'inline-flex',
-                          alignItems: 'center',
-                          justifyContent: 'center',
-                          width: '20px',
-                          height: '20px',
-                          borderRadius: '50%',
-                          background: 'transparent',
-                          border: 'none',
-                          cursor: 'pointer',
-                          transition: 'background 0.2s',
-                          padding: 0
-                        }}
-                        onMouseEnter={(e) => e.currentTarget.style.background = '#dbeafe'}
-                        onMouseLeave={(e) => e.currentTarget.style.background = 'transparent'}>
-                          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M18 6L6 18M6 6l12 12" /></svg>
-                      </button>
-                      {isLast && (
-                          <button type="button" aria-label="Add new postcode" onClick={startNewPostcode} style={{
-                            display: 'inline-flex',
-                            alignItems: 'center',
-                            justifyContent: 'center',
-                            width: '20px',
-                            height: '20px',
-                            borderRadius: '50%',
-                            background: 'transparent',
-                            border: 'none',
-                            cursor: 'pointer',
-                            transition: 'background 0.2s',
-                            padding: 0
-                          }}
-                          onMouseEnter={(e) => e.currentTarget.style.background = '#dbeafe'}
-                          onMouseLeave={(e) => e.currentTarget.style.background = 'transparent'}>
-                            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 5v14M5 12h14" /></svg>
-                        </button>
-                      )}
-                    </span>
-                  );
-                })}
+                {postcode && (
+                  <span style={{
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: '0.5rem',
+                    padding: '0.5rem 0.875rem',
+                    background: 'white',
+                    color: '#1e40af',
+                    borderRadius: '0',
+                    fontSize: '0.875rem',
+                    fontWeight: '500',
+                    boxShadow: '0 2px 4px rgba(0,0,0,0.05)'
+                  }}>
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                      <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/>
+                      <circle cx="12" cy="10" r="3"/>
+                    </svg>
+                    {postcode}
+                  </span>
+                )}
                 {filters.gender && (
                   <span style={{
                     display: 'inline-flex',
