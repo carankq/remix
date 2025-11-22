@@ -26,6 +26,8 @@ interface InstructorProfile {
   image?: string;
   company?: string;
   areas?: string[];
+  vehicles?: Array<{ type: 'Manual' | 'Automatic' | 'Electric' }>;
+  deals?: string[];
 }
 
 interface LoaderData {

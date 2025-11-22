@@ -6,13 +6,14 @@ import { Header } from "../components/Header";
 import { Footer } from "../components/Footer";
 import { InstructorCard } from "../components/InstructorCard";
 import { useAuth } from "../context/AuthContext";
+import { getUserFromSession } from "../session.server";
 
 type Instructor = {
   id: string;
   name: string;
   description?: string;
   pricePerHour?: number;
-  vehicleType?: string;
+  vehicles?: Array<{ type: 'Manual' | 'Automatic' | 'Electric' }>;
   yearsOfExperience?: number;
   rating?: number;
   totalReviews?: number;
@@ -21,7 +22,7 @@ type Instructor = {
   company?: string;
   phone?: string;
   email?: string;
-  specializations?: string[];
+  deals?: string[];
   availability?:
     | Array<{ day: string; start?: string; end?: string; startTime?: string; endTime?: string }>
     | { working?: Array<{ day: string; startTime: string; endTime: string }>; exceptions?: Array<any> };
@@ -34,17 +35,23 @@ export async function loader({ request }: LoaderFunctionArgs) {
   const url = new URL(request.url);
   const params = url.searchParams;
   
+  // Get user session for auth token
+  const userSession = await getUserFromSession(request);
+  
   // Build API base: prefer env, otherwise same origin as the current request
   const envBase = process.env.API_HOST ? String(process.env.API_HOST).replace(/\/$/, "") : "";
   const base = envBase || url.origin;
   const apiUrl = `${base}/instructors?${params.toString()}`;
   
-  // Note: Auth is handled client-side via localStorage, so loader fetches public data
-  // The component will refetch with auth token on mount if user is logged in
+  // Include auth token if user is logged in
   const headers: Record<string, string> = {
     "Accept": "application/json",
     "Accept-Encoding": "gzip, deflate, br"
   };
+  
+  if (userSession?.token) {
+    headers["Authorization"] = `Bearer ${userSession.token}`;
+  }
   
   try {
     const res = await fetch(apiUrl, { headers });
@@ -59,7 +66,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
       description: typeof r.description === 'string' ? r.description?.substring(0, 200) : '', // Limit description length
       pricePerHour: Number(r.pricePerHour ?? r.hourlyRate ?? r.price ?? 0) || undefined,
       brandName: String(r.brandName) || undefined,
-      vehicleType: r.vehicleType ?? r.transmission,
+      vehicles: Array.isArray(r.vehicles) ? r.vehicles.map((v: any) => ({ type: v.type })) : undefined,
       yearsOfExperience: Number(r.yearsOfExperience ?? r.experienceYears ?? 0) || undefined,
       rating: Number(r.rating ?? r.averageRating ?? 0) || undefined,
       totalReviews: Number(r.totalReviews ?? r.reviewCount ?? 0) || undefined,
@@ -68,7 +75,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
       company: r.company,
       phone: r.phone,
       email: r.email,
-      specializations: Array.isArray(r.specializations) ? r.specializations.slice(0, 5) : undefined, // Limit array size
+      deals: Array.isArray(r.deals) ? r.deals : undefined,
       availability: (() => {
         // Handle both old array format and new object format
         if (Array.isArray(r.availability)) {
@@ -119,76 +126,7 @@ export default function ResultsRoute() {
   const [instructors, setInstructors] = useState<Instructor[]>(loaderData.instructors);
   const [isRefetching, setIsRefetching] = useState(false);
   
-  // Refetch instructors with auth token if user is logged in
-  useEffect(() => {
-    if (!isAuthenticated || !token) return;
-    
-    let cancelled = false;
-    const refetchWithAuth = async () => {
-      setIsRefetching(true);
-      try {
-        const apiHost = (window as any).__ENV__?.API_HOST || window.location.origin;
-        const apiUrl = `${apiHost}/instructors?${searchParams.toString()}`;
-        
-        const res = await fetch(apiUrl, {
-          headers: {
-            'Accept': 'application/json',
-            'Authorization': `Bearer ${token}`
-          }
-        });
-        
-        if (res.ok && !cancelled) {
-          const data = await res.json();
-          const rawList: any[] = Array.isArray(data) ? data : (Array.isArray(data?.instructors) ? data.instructors : []);
-          
-          const list: Instructor[] = rawList.map((r) => ({
-            id: String(r.id ?? r._id ?? ""),
-            name: String(r.name ?? r.fullName ?? "Unknown"),
-            description: typeof r.description === 'string' ? r.description?.substring(0, 200) : '',
-            pricePerHour: Number(r.pricePerHour ?? r.hourlyRate ?? r.price ?? 0) || undefined,
-            brandName: String(r.brandName) || undefined,
-            vehicleType: r.vehicleType ?? r.transmission,
-            yearsOfExperience: Number(r.yearsOfExperience ?? r.experienceYears ?? 0) || undefined,
-            rating: Number(r.rating ?? r.averageRating ?? 0) || undefined,
-            totalReviews: Number(r.totalReviews ?? r.reviewCount ?? 0) || undefined,
-            postcode: Array.isArray(r.postcode) ? r.postcode : (r.postcode ? [String(r.postcode)] : undefined),
-            gender: r.gender,
-            company: r.company,
-            phone: r.phone,
-            email: r.email,
-            specializations: Array.isArray(r.specializations) ? r.specializations.slice(0, 5) : undefined,
-            availability: (() => {
-              if (Array.isArray(r.availability)) {
-                return r.availability.slice(0, 7);
-              } else if (r.availability && typeof r.availability === 'object' && Array.isArray(r.availability.working)) {
-                return { working: r.availability.working.slice(0, 7), exceptions: [] };
-              }
-              return undefined;
-            })(),
-            languages: Array.isArray(r.languages) ? r.languages.slice(0, 3) : undefined,
-            enabled: r.enabled,
-            image: r.image || r.profileImage || r.avatar,
-          })).filter(i => i.id);
-          
-          setInstructors(list);
-        }
-      } catch (err) {
-        console.error('Failed to refetch instructors with auth:', err);
-      } finally {
-        if (!cancelled) {
-          setIsRefetching(false);
-        }
-      }
-    };
-    
-    // won't be used until booking system is implemented properly
-    // refetchWithAuth();
-    
-    return () => {
-      cancelled = true;
-    };
-  }, [isAuthenticated, token, searchParams]);
-  
+
   // Sort instructors based on selected option
   const sortedInstructors = useMemo(() => {
     const sorted = [...instructors];

@@ -18,15 +18,20 @@ const PRESET_LANGUAGES = [
   'Polish'
 ];
 
-const PRESET_SPECIALIZATIONS = [
-  'Beginner lessons',
-  'Refresher lessons',
-  'Test preparation',
-  'Intensive courses',
-  'Pass Plus',
-  'Motorway driving',
-  'Nervous drivers'
-];
+const VEHICLE_TYPES = ['Manual', 'Automatic', 'Electric'] as const;
+
+const DEAL_OPTIONS = [
+  '1st hour free',
+  '1st hour 50% off',
+  '1st 2 hours 5% off',
+  '1st 2 hours 10% off',
+  '1st 2 hours 15% off',
+  '1st 2 hours 20% off',
+  '1st 4 hours 5% off',
+  '1st 4 hours 10% off',
+  '1st 4 hours 15% off',
+  '1st 4 hours 20% off'
+] as const;
 
 const DAYS_OF_WEEK = [
   'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'
@@ -53,14 +58,14 @@ const InstructorCreateForm: React.FC<InstructorCreateFormProps> = ({
     description: '',
     pricePerHour: '',
     gender: '',
-    vehicleType: '',
     yearsOfExperience: '',
     company: '',
     phone: '',
     email: '',
     image: '',
   });
-  const [specializations, setSpecializations] = useState<string[]>([]);
+  const [vehicles, setVehicles] = useState<Array<{ type: string; licensePlateNumber: string }>>([]);
+  const [deals, setDeals] = useState<string[]>([]);
   const [languages, setLanguages] = useState<string[]>([]);
   // Working availability (day + HH:MM inputs rendered as strings)
   const [availability, setAvailability] = useState<{ day: string; start: string; end: string }[]>([]);
@@ -208,7 +213,6 @@ const InstructorCreateForm: React.FC<InstructorCreateFormProps> = ({
       description: ownerInst.description || '',
       pricePerHour: ownerInst.pricePerHour != null ? String(ownerInst.pricePerHour) : '',
       gender: ownerInst.gender || '',
-      vehicleType: ownerInst.vehicleType || '',
       yearsOfExperience: ownerInst.yearsOfExperience != null ? String(ownerInst.yearsOfExperience) : '',
       company: ownerInst.company || '',
       phone: ownerInst.phone || prev.phone,
@@ -216,7 +220,11 @@ const InstructorCreateForm: React.FC<InstructorCreateFormProps> = ({
       image: ownerInst.image || ''
     }));
     setPostcodes(Array.isArray(ownerInst.postcode) ? ownerInst.postcode : (ownerInst.postcode ? [ownerInst.postcode] : []));
-    setSpecializations(Array.isArray(ownerInst.specializations) ? ownerInst.specializations : []);
+    setVehicles(Array.isArray(ownerInst.vehicles) ? ownerInst.vehicles.map((v: any) => ({ 
+      type: v.type || 'Manual', 
+      licensePlateNumber: v.licensePlateNumber || '' 
+    })) : []);
+    setDeals(Array.isArray(ownerInst.deals) ? ownerInst.deals : []);
     setLanguages(Array.isArray(ownerInst.languages) ? ownerInst.languages : []);
     // Prefill availability (support both legacy array and new object with .working/.exceptions)
     if (Array.isArray(ownerInst.availability)) {
@@ -321,16 +329,8 @@ const InstructorCreateForm: React.FC<InstructorCreateFormProps> = ({
     setInstForm(prev => ({ ...prev, pricePerHour: value }));
   };
 
-  const addSpec = () => {
-    const v = specSelect.trim();
-    if (!v) return;
-    if (!specializations.includes(v)) setSpecializations(prev => [...prev, v]);
-    setSpecSelect('');
-  };
-
-  const removeItem = (type: 'spec' | 'lang' | 'pc' | 'av', value: string) => {
-    if (type === 'spec') setSpecializations(prev => prev.filter(x => x !== value));
-    else if (type === 'lang') setLanguages(prev => prev.filter(x => x !== value));
+  const removeItem = (type: 'lang' | 'pc' | 'av', value: string) => {
+    if (type === 'lang') setLanguages(prev => prev.filter(x => x !== value));
     else if (type === 'pc') setPostcodes(prev => prev.filter(x => x !== value));
     else setAvailability(prev => prev.filter(x => `${x.day}-${x.start}-${x.end}` !== value));
   };
@@ -392,13 +392,13 @@ const InstructorCreateForm: React.FC<InstructorCreateFormProps> = ({
         pricePerHour: instForm.pricePerHour.trim() !== '' ? Math.min(60, parseFloat(instForm.pricePerHour)) : undefined,
         postcode: postcodes, // array of strings as required
         gender: instForm.gender || undefined,
-        vehicleType: instForm.vehicleType,
+        vehicles: vehicles.filter(v => v.type && v.licensePlateNumber), // Only include complete vehicles
+        deals: deals,
         yearsOfExperience: instForm.yearsOfExperience ? Number(instForm.yearsOfExperience) : undefined,
         company: instForm.company.trim() || undefined,
         phone: instForm.phone.trim() || undefined,
         email: instForm.email.trim() || undefined,
         image: instForm.image.trim() || undefined,
-        specializations: specializations,
         availability: {
           working: availability.map(a => ({
             day: a.day,
@@ -422,10 +422,10 @@ const InstructorCreateForm: React.FC<InstructorCreateFormProps> = ({
           numberVisibilityBlacklist: numberBlacklist
         }
       };
-      if (!payload.name || !payload.brandName || postcodes.length === 0 || !payload.vehicleType) {
+      if (!payload.name || !payload.brandName || postcodes.length === 0 || vehicles.length === 0) {
         showAlertPopup(
           'Missing Required Fields',
-          'Please complete the required fields: name, brand name, coverage postcode(s), and vehicle type.',
+          'Please complete the required fields: name, brand name, coverage postcode(s), and at least one vehicle.',
           'warning'
         );
         setInstSubmitting(false);
@@ -453,9 +453,10 @@ const InstructorCreateForm: React.FC<InstructorCreateFormProps> = ({
       if (!isUpdate && response.status === 201) {
         setInstSuccess('Instructor listing created successfully.');
         setInstForm({
-          name: '', brandName: '', description: '', pricePerHour: '', gender: '', vehicleType: '', yearsOfExperience: '', company: '', phone: '', email: '', image: ''
+          name: '', brandName: '', description: '', pricePerHour: '', gender: '', yearsOfExperience: '', company: '', phone: '', email: '', image: ''
         });
-        setSpecializations([]);
+        setVehicles([]);
+        setDeals([]);
         setLanguages([]);
         setAvailability([]);
         setExceptions([]);
@@ -465,7 +466,6 @@ const InstructorCreateForm: React.FC<InstructorCreateFormProps> = ({
         setAvailSelect('');
         setAvailStart('');
         setAvailEnd('');
-        setSpecSelect('');
         showAlertPopup(
           'Success!',
           'Instructor listing created successfully.',
@@ -825,20 +825,89 @@ const InstructorCreateForm: React.FC<InstructorCreateFormProps> = ({
               <line x1="7" y1="11" x2="7" y2="11.01"/>
               <line x1="11" y1="11" x2="17" y2="11"/>
             </svg>
-            Vehicle & Pricing
+            Vehicles & Pricing
           </h3>
+          
+          {/* Vehicles */}
+          <div style={{ marginBottom: '1.5rem' }}>
+            <label style={{ display: 'block', fontSize: '0.875rem', fontWeight: '600', color: '#374151', marginBottom: '0.75rem' }}>
+              Vehicles <span style={{ color: '#dc2626' }}>*</span>
+            </label>
+            <p style={{ fontSize: '0.8125rem', color: '#64748b', marginBottom: '1rem' }}>
+              Add the vehicles you use for instruction
+            </p>
+            
+            {vehicles.map((vehicle, idx) => (
+              <div key={idx} style={{ 
+                display: 'grid', 
+                gridTemplateColumns: '1fr 2fr auto', 
+                gap: '0.5rem', 
+                marginBottom: '0.75rem',
+                alignItems: 'start'
+              }}>
+                <select 
+                  className="instructor-form-select"
+                  value={vehicle.type}
+                  onChange={(e) => {
+                    const updated = [...vehicles];
+                    updated[idx].type = e.target.value;
+                    setVehicles(updated);
+                  }}
+                >
+                  <option value="">Type</option>
+                  {VEHICLE_TYPES.map(type => (
+                    <option key={type} value={type}>{type}</option>
+                  ))}
+                </select>
+                <input
+                  className="instructor-form-input"
+                  placeholder="License Plate (e.g., ABC 123)"
+                  value={vehicle.licensePlateNumber}
+                  onChange={(e) => {
+                    const updated = [...vehicles];
+                    updated[idx].licensePlateNumber = e.target.value;
+                    setVehicles(updated);
+                  }}
+                />
+                <button
+                  type="button"
+                  onClick={() => setVehicles(vehicles.filter((_, i) => i !== idx))}
+                  style={{
+                    padding: '0.75rem',
+                    background: '#fef2f2',
+                    border: '2px solid #ef4444',
+                    borderRadius: '0',
+                    color: '#dc2626',
+                    cursor: 'pointer',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center'
+                  }}
+                >
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <line x1="18" y1="6" x2="6" y2="18"/>
+                    <line x1="6" y1="6" x2="18" y2="18"/>
+                  </svg>
+                </button>
+              </div>
+            ))}
+            
+            <button
+              type="button"
+              onClick={() => setVehicles([...vehicles, { type: '', licensePlateNumber: '' }])}
+              className="btn btn-secondary"
+              style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', fontSize: '0.875rem', marginTop: '0.5rem' }}
+            >
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <line x1="12" y1="5" x2="12" y2="19"/>
+                <line x1="5" y1="12" x2="19" y2="12"/>
+              </svg>
+              Add Vehicle
+            </button>
+          </div>
+
+          {/* Pricing & Experience */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div>
-              <label style={{ display: 'block', fontSize: '0.875rem', fontWeight: '500', color: '#374151', marginBottom: '0.5rem' }}>
-                Vehicle Type <span style={{ color: '#dc2626' }}>*</span>
-              </label>
-              <select className="instructor-form-select" value={instForm.vehicleType} onChange={onInstChange('vehicleType')}>
-                <option value="">Select vehicle type</option>
-                <option value="Manual">Manual</option>
-                <option value="Automatic">Automatic</option>
-                <option value="Electric">Electric</option>
-              </select>
-            </div>
             <div>
               <label htmlFor="instructor-price-per-hour" style={{ display: 'block', fontSize: '0.875rem', fontWeight: '500', color: '#374151', marginBottom: '0.5rem' }}>
                 Price per Hour (£)
@@ -877,6 +946,50 @@ const InstructorCreateForm: React.FC<InstructorCreateFormProps> = ({
               <input className="instructor-form-input" type="number" placeholder="5" value={instForm.yearsOfExperience} onChange={onInstChange('yearsOfExperience')} />
             </div>
           </div>
+          
+          {/* Deals */}
+          <div style={{ marginTop: '1.5rem' }}>
+            <label style={{ display: 'block', fontSize: '0.875rem', fontWeight: '600', color: '#374151', marginBottom: '0.75rem' }}>
+              Deals & Offers
+            </label>
+            <p style={{ fontSize: '0.8125rem', color: '#64748b', marginBottom: '0.75rem' }}>
+              Select any deals you want to offer to new students
+            </p>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))', gap: '0.5rem' }}>
+              {DEAL_OPTIONS.map(deal => (
+                <label key={deal} style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  padding: '0.75rem',
+                  border: `2px solid ${deals.includes(deal) ? '#1e40af' : '#e5e7eb'}`,
+                  background: deals.includes(deal) ? '#eff6ff' : '#ffffff',
+                  borderRadius: '0',
+                  cursor: 'pointer',
+                  transition: 'all 0.2s ease'
+                }}>
+                  <input
+                    type="checkbox"
+                    checked={deals.includes(deal)}
+                    onChange={(e) => {
+                      if (e.target.checked) {
+                        setDeals([...deals, deal]);
+                      } else {
+                        setDeals(deals.filter(d => d !== deal));
+                      }
+                    }}
+                    style={{ marginRight: '0.5rem' }}
+                  />
+                  <span style={{ 
+                    fontSize: '0.8125rem', 
+                    fontWeight: deals.includes(deal) ? '600' : '500',
+                    color: deals.includes(deal) ? '#1e40af' : '#374151'
+                  }}>
+                    {deal}
+                  </span>
+                </label>
+              ))}
+            </div>
+          </div>
         </div>
 
         {/* Contact Information Section */}
@@ -904,91 +1017,6 @@ const InstructorCreateForm: React.FC<InstructorCreateFormProps> = ({
         </div>
 
         {/* Specializations Section */}
-        <div style={sectionStyle}>
-          <h3 style={sectionHeaderStyle}>
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ color: '#3b82f6' }}>
-              <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/>
-              <polyline points="22 4 12 14.01 9 11.01"/>
-            </svg>
-            Specializations
-          </h3>
-          <div>
-            <label style={{ display: 'block', fontSize: '0.875rem', fontWeight: '500', color: '#334155', marginBottom: '0.375rem' }}>
-              Teaching Specializations
-            </label>
-            <p style={{ fontSize: '0.8125rem', color: '#64748b', marginBottom: '0.75rem', lineHeight: '1.5' }}>
-              Select areas where you have expertise
-            </p>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '1.25rem' }}>
-              <select className="instructor-form-select" value={specSelect} onChange={(e)=>setSpecSelect(e.target.value)}>
-                <option value="">Choose a specialization</option>
-                {PRESET_SPECIALIZATIONS.map(s => (
-                  <option key={s} value={s}>{s}</option>
-                ))}
-              </select>
-              <button type="button" className="btn" onClick={addSpec} style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', fontSize: '0.875rem' }}>
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                  <line x1="12" y1="5" x2="12" y2="19"/>
-                  <line x1="5" y1="12" x2="19" y2="12"/>
-                </svg>
-                Add
-              </button>
-            </div>
-            {specializations.length > 0 && (
-              <div style={{ 
-                display: 'flex', 
-                flexWrap: 'wrap', 
-                gap: '0.5rem',
-                paddingTop: '1rem',
-                borderTop: '1px solid #e2e8f0'
-              }}>
-                {specializations.map(item => (
-                  <span key={item} style={{
-                    display: 'inline-flex',
-                    alignItems: 'center',
-                    gap: '0.5rem',
-                    padding: '0.5rem 0.875rem',
-                    borderRadius: '0',
-                    background: '#dbeafe',
-                    color: '#1e40af',
-                    fontSize: '0.8125rem',
-                    fontWeight: '500'
-                  }}>
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                      <polyline points="20 6 9 17 4 12"/>
-                    </svg>
-                    {item}
-                    <button 
-                      type="button" 
-                      onClick={()=>removeItem('spec', item)}
-                      style={{ 
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        width: '18px',
-                        height: '18px',
-                        borderRadius: '50%',
-                        background: 'transparent',
-                        border: 'none',
-                        cursor: 'pointer',
-                        transition: 'background 0.2s',
-                        marginLeft: '0.25rem',
-                        padding: 0
-                      }}
-                      onMouseEnter={(e) => e.currentTarget.style.background = '#bfdbfe'}
-                      onMouseLeave={(e) => e.currentTarget.style.background = 'transparent'}
-                    >
-                      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" style={{ color: '#1e40af' }}>
-                        <line x1="18" y1="6" x2="6" y2="18"/>
-                        <line x1="6" y1="6" x2="18" y2="18"/>
-                      </svg>
-                    </button>
-                  </span>
-                ))}
-              </div>
-            )}
-          </div>
-        </div>
 
         {/* Languages Section */}
         <div style={sectionStyle}>
@@ -1098,9 +1126,9 @@ const InstructorCreateForm: React.FC<InstructorCreateFormProps> = ({
             >
               <option value="off">Off - No one can see my availability</option>
               <option value="anyone">Anyone - No restrictions, everyone can see</option>
-              <option value="verified-users">Verified Users - Any verified Carank user can see</option>
+              {/* <option value="verified-users">Verified Users - Any verified Carank user can see</option>
               <option value="booked-with-students">Booked Students Only - Only students I've completed a lesson with on carank</option>
-              <option value="white+black-list">Custom List - Specific approved users, minus blocked ones</option>
+              <option value="white+black-list">Custom List - Specific approved users, minus blocked ones</option> */}
             </select>
             
             {/* Whitelist Management */}
@@ -1209,7 +1237,7 @@ const InstructorCreateForm: React.FC<InstructorCreateFormProps> = ({
               lineHeight: '1.6',
               marginTop: '1rem'
             }}>
-              <strong>Note:</strong> This setting controls the visibility of your available time slots on the booking page. Students will always see your profile, but only those with permission will see when you're available to book. By default, someone who is not verified will NOT be able to see your availability, unless you choose the 'anyone' option in which case there are no restrctions.
+              <strong>Note:</strong> This setting controls the visibility of your available time slots on the enquiry section. Students will always see your profile if its active.
             </div>
           </div>
         </div>
@@ -1232,9 +1260,9 @@ const InstructorCreateForm: React.FC<InstructorCreateFormProps> = ({
             >
               <option value="off">Off - No one can see my phone number</option>
               <option value="anyone">Anyone - No restrictions, everyone can see</option>
-              <option value="verified-users">Verified Users - Any verified Carank user can see</option>
+              {/* <option value="verified-users">Verified Users - Any verified Carank user can see</option>
               <option value="booked-with-students">Booked Students Only - Only students I've completed a lesson with on carank</option>
-              <option value="white+black-list">Custom List - Specific approved users, minus blocked ones</option>
+              <option value="white+black-list">Custom List - Specific approved users, minus blocked ones</option> */}
             </select>
             
             {/* Number Whitelist Management */}
@@ -1343,7 +1371,7 @@ const InstructorCreateForm: React.FC<InstructorCreateFormProps> = ({
               lineHeight: '1.6',
               marginTop: '1rem'
             }}>
-              <strong>Note:</strong> This setting controls who can see your phone number on your instructor profile. For privacy and safety, we recommend starting with 'Booked Students Only' so only students you've completed lessons with can contact you directly. By default, unverified users will NOT be able to see your phone number, unless you choose the 'anyone' option in which case there are no restrctions.
+              <strong>Note:</strong> This setting controls who can see your phone number on your instructor profile. Students can still make enquires to you via the website, and you can view their messages in your dashboard without the need of making your number public.
             </div>
           </div>
         </div>

@@ -3,6 +3,7 @@ import type { LoaderFunctionArgs, MetaFunction } from '@remix-run/node';
 import { json } from '@remix-run/node';
 import { Header } from '../components/Header';
 import { Footer } from '../components/Footer';
+import { getUserFromSession } from '../session.server';
 
 interface InstructorData {
   _id?: string;
@@ -11,7 +12,7 @@ interface InstructorData {
   brandName?: string;
   description?: string;
   pricePerHour?: number;
-  vehicleType?: string;
+  vehicles?: Array<{ type: 'Manual' | 'Automatic' | 'Electric' }>;
   yearsOfExperience?: number;
   rating?: number;
   totalReviews?: number;
@@ -19,7 +20,7 @@ interface InstructorData {
   company?: string;
   phone?: string;
   email?: string;
-  specializations?: string[];
+  deals?: string[];
   availability?:
     | Array<{ day: string; start?: string; end?: string; startTime?: string; endTime?: string }>
     | { working?: Array<{ day: string; startTime: string; endTime: string }>; exceptions?: Array<any> };
@@ -52,15 +53,23 @@ export async function loader({ params, request }: LoaderFunctionArgs) {
     throw new Response('Brand name is required', { status: 400 });
   }
   
+  // Get user session for auth token
+  const userSession = await getUserFromSession(request);
+  
   const apiHost = (process.env.API_HOST || request.url.split('/')[0] + '//' + request.url.split('/')[2]).replace(/\/$/, '');
   
+  // Include auth token if user is logged in
+  const headers: Record<string, string> = {
+    'Accept': 'application/json',
+    'Accept-Encoding': 'gzip, deflate, br'
+  };
+  
+  if (userSession?.token) {
+    headers['Authorization'] = `Bearer ${userSession.token}`;
+  }
+  
   try {
-    const response = await fetch(`${apiHost}/instructors/${encodeURIComponent(brandName)}`, {
-      headers: {
-        'Accept': 'application/json',
-        'Accept-Encoding': 'gzip, deflate, br'
-      }
-    });
+    const response = await fetch(`${apiHost}/instructors/${encodeURIComponent(brandName)}`, { headers });
     
     if (!response.ok) {
       if (response.status === 404) {
