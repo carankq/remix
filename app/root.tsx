@@ -9,6 +9,8 @@ import {
 } from "@remix-run/react";
 import stylesHref from "./styles/global.css?url";
 import { AuthProvider } from "./context/AuthContext";
+import { getUserFromSession } from "./session.server";
+import { json } from "@remix-run/node";
 
 export const links: LinksFunction = () => [
   { rel: "stylesheet", href: stylesHref },
@@ -17,12 +19,24 @@ export const links: LinksFunction = () => [
 ];
 
 export async function loader({ request }: LoaderFunctionArgs) {
-  return { 
+  const userSession = await getUserFromSession(request);
+  
+  return json({ 
     ENV: { 
       API_HOST: process.env.API_HOST || "",
       STRIPE_PUBLISHABLE_KEY: process.env.STRIPE_PUBLISHABLE_KEY || ""
-    } 
-  };
+    },
+    user: userSession ? {
+      id: userSession.id,
+      email: userSession.email || '',
+      accountType: userSession.accountType || 'student',
+      fullName: userSession.fullName,
+      phoneNumber: userSession.phoneNumber,
+      ageRange: userSession.ageRange,
+      memberSince: userSession.memberSince
+    } : null,
+    token: userSession?.token || null
+  });
 }
 
 // Optimize headers for caching
@@ -45,7 +59,7 @@ export default function App() {
         <script src="https://js.stripe.com/v3/" async></script>
       </head>
       <body>
-        <AuthProvider>
+        <AuthProvider initialUser={data.user} initialToken={data.token}>
           <Outlet />
         </AuthProvider>
         <ScrollRestoration />

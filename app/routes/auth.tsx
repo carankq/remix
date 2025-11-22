@@ -74,10 +74,10 @@ export default function AuthRoute() {
           fullName
         });
       }
-      // navigate('/');
+      // Use window.location for full page reload to ensure cookie is sent
+      window.location.href = '/';
     } catch (err: any) {
       setError(err?.message || 'Something went wrong. Please try again.');
-    } finally {
       setIsSubmitting(false);
     }
   };

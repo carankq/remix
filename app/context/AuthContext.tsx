@@ -63,12 +63,16 @@ async function setServerSession(user: AuthUser, token: string) {
   }
 }
 
-export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [user, setUser] = useState<AuthUser | null>(null);
-  const [token, setToken] = useState<string | null>(null);
+export const AuthProvider: React.FC<{ 
+  children: React.ReactNode;
+  initialUser?: AuthUser | null;
+  initialToken?: string | null;
+}> = ({ children, initialUser = null, initialToken = null }) => {
+  const [user, setUser] = useState<AuthUser | null>(initialUser);
+  const [token, setToken] = useState<string | null>(initialToken);
   const [isHydrated, setIsHydrated] = useState(false);
 
-  // On mount, just mark as hydrated - server session will handle auth
+  // On mount, just mark as hydrated - user/token come from server
   useEffect(() => {
     setIsHydrated(true);
   }, []);
