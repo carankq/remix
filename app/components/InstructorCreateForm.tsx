@@ -455,21 +455,24 @@ const InstructorCreateForm: React.FC<InstructorCreateFormProps> = ({ onCreated }
   const sectionStyle = {
     padding: '1.5rem',
     background: '#ffffff',
-    borderRadius: '0.75rem',
-    border: '1px solid #e2e8f0'
+    borderRadius: '0',
+    border: '2px solid #e5e7eb',
+    marginBottom: '1.5rem'
   };
 
   const sectionHeaderStyle = {
-    fontSize: '0.8125rem',
-    fontWeight: '600' as const,
-    color: '#0f172a',
-    marginBottom: '1.25rem',
+    fontSize: '0.875rem',
+    fontWeight: '700' as const,
+    color: '#111827',
+    marginBottom: '1rem',
     display: 'flex',
     alignItems: 'center',
-    gap: '0.625rem',
+    gap: '0.5rem',
     fontFamily: "'Space Grotesk', sans-serif",
     textTransform: 'uppercase' as const,
-    letterSpacing: '0.05em'
+    letterSpacing: '0.025em',
+    paddingBottom: '0.75rem',
+    borderBottom: '2px solid #e5e7eb'
   };
 
   // Initial loading view to avoid jerky UI
@@ -477,12 +480,13 @@ const InstructorCreateForm: React.FC<InstructorCreateFormProps> = ({ onCreated }
     return (
       <div style={{
         background: '#ffffff',
-        borderRadius: '1rem',
-        padding: '2rem',
-        boxShadow: '0 1px 3px rgba(0,0,0,0.1)'
+        borderRadius: '0',
+        border: '2px solid #e5e7eb',
+        padding: '3rem 2rem',
+        textAlign: 'center'
       }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
-          <svg className="animate-spin" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '1rem' }}>
+          <svg className="animate-spin" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
             <path d="M21 12a9 9 0 11-6.219-8.56"/>
           </svg>
           <div>
@@ -490,8 +494,8 @@ const InstructorCreateForm: React.FC<InstructorCreateFormProps> = ({ onCreated }
               fontSize: '1.25rem', 
               fontWeight: '600', 
               color: '#111827',
-              marginBottom: '0.25rem',
-              fontFamily: "'Space Grotesk', 'Poppins', sans-serif"
+              marginBottom: '0.5rem',
+              fontFamily: "'Space Grotesk', sans-serif"
             }}>
               Loading your instructor profile
             </h2>
@@ -558,36 +562,45 @@ const InstructorCreateForm: React.FC<InstructorCreateFormProps> = ({ onCreated }
   // Edit/Create form view
   return (
     <div>
-      <h2 style={{ 
-        fontSize: '1.75rem', 
-        fontWeight: '700', 
-        color: '#0f172a',
-        marginBottom: '0.5rem',
-        fontFamily: "'Space Grotesk', sans-serif",
-        letterSpacing: '-0.025em'
+      {/* Form Header */}
+      <div style={{
+        background: '#ffffff',
+        border: '2px solid #e5e7eb',
+        borderRadius: '0',
+        padding: '1.5rem',
+        marginBottom: '1.5rem'
       }}>
-        {ownerInst ? 'Edit Your Listing' : 'Create Instructor Listing'}
-      </h2>
-      <p style={{
-        fontSize: '0.9375rem',
-        color: '#64748b',
-        marginBottom: '2rem',
-        fontWeight: '400'
-      }}>
-        {ownerInst ? 'Update your instructor profile information below' : 'Set up your instructor profile to start connecting with students'}
-      </p>
+        <h2 style={{ 
+          fontSize: '1.5rem', 
+          fontWeight: '700', 
+          color: '#111827',
+          marginBottom: '0.5rem',
+          fontFamily: "'Space Grotesk', sans-serif"
+        }}>
+          {ownerInst ? 'Edit Your Instructor Profile' : 'Create Your Instructor Profile'}
+        </h2>
+        <p style={{
+          fontSize: '0.875rem',
+          color: '#6b7280',
+          margin: 0
+        }}>
+          {ownerInst ? 'Update your profile information to keep students informed' : 'Fill out the form below to create your instructor listing and start connecting with students'}
+        </p>
+      </div>
+      
       {ownerError && (
         <div style={{
           fontSize: '0.875rem',
           color: '#dc2626',
           background: '#fef2f2',
-          border: '1px solid #fecaca',
-          borderRadius: '0.5rem',
-          padding: '0.75rem 1rem',
-          marginBottom: '1rem'
+          border: '2px solid #ef4444',
+          borderRadius: '0',
+          padding: '1rem',
+          marginBottom: '1.5rem'
         }}>
+          <strong style={{ display: 'block', marginBottom: '0.5rem' }}>Error</strong>
           {ownerError}
-          <div style={{ marginTop: '0.5rem' }}>
+          <div style={{ marginTop: '0.75rem' }}>
             <button type="button" className="btn btn-secondary" onClick={refreshOwner}>Retry</button>
           </div>
         </div>
@@ -597,10 +610,10 @@ const InstructorCreateForm: React.FC<InstructorCreateFormProps> = ({ onCreated }
           fontSize: '0.875rem',
           color: '#059669',
           background: '#f0fdf4',
-          border: '1px solid #86efac',
-          borderRadius: '0.5rem',
-          padding: '0.75rem 1rem',
-          marginBottom: '1rem'
+          border: '2px solid #10b981',
+          borderRadius: '0',
+          padding: '1rem',
+          marginBottom: '1.5rem'
         }}>
           {instSuccess}
         </div>
@@ -610,10 +623,10 @@ const InstructorCreateForm: React.FC<InstructorCreateFormProps> = ({ onCreated }
           fontSize: '0.875rem',
           color: '#dc2626',
           background: '#fef2f2',
-          border: '1px solid #fecaca',
-          borderRadius: '0.5rem',
-          padding: '0.75rem 1rem',
-          marginBottom: '1rem'
+          border: '2px solid #ef4444',
+          borderRadius: '0',
+          padding: '1rem',
+          marginBottom: '1.5rem'
         }}>
           {instError}
         </div>
@@ -631,25 +644,25 @@ const InstructorCreateForm: React.FC<InstructorCreateFormProps> = ({ onCreated }
           </h3>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
-              <label style={{ display: 'block', fontSize: '0.875rem', fontWeight: '500', color: '#374151', marginBottom: '0.5rem' }}>
+              <label className="instructor-form-label">
                 Full Name <span style={{ color: '#dc2626' }}>*</span>
               </label>
-              <input className="input w-full" placeholder="e.g., John Smith" value={instForm.name} onChange={onInstChange('name')} />
+              <input className="instructor-form-input" placeholder="e.g., John Smith" value={instForm.name} onChange={onInstChange('name')} />
             </div>
             <div>
-              <label style={{ display: 'block', fontSize: '0.875rem', fontWeight: '500', color: '#374151', marginBottom: '0.5rem' }}>
+              <label className="instructor-form-label">
                 Brand Name <span style={{ color: '#dc2626' }}>*</span>
               </label>
-              <input className="input w-full" placeholder="e.g., Smith Driving School" value={instForm.brandName} onChange={onInstChange('brandName')} />
-              <p style={{ fontSize: '0.8125rem', color: '#64748b', marginTop: '0.5rem', lineHeight: '1.4' }}>
+              <input className="instructor-form-input" placeholder="e.g., Smith Driving School" value={instForm.brandName} onChange={onInstChange('brandName')} />
+              <p className="instructor-form-helper">
                 How learners will identify you
               </p>
               <div style={{ 
                 marginTop: '0.5rem',
                 padding: '0.5rem 0.75rem',
                 background: '#f8fafc',
-                border: '1px solid #e2e8f0',
-                borderRadius: '0.375rem',
+                border: '2px solid #e5e7eb',
+                borderRadius: '0',
                 display: 'inline-flex',
                 alignItems: 'center',
                 gap: '0.375rem'
@@ -669,16 +682,16 @@ const InstructorCreateForm: React.FC<InstructorCreateFormProps> = ({ onCreated }
               </div>
             </div>
             <div>
-              <label style={{ display: 'block', fontSize: '0.875rem', fontWeight: '500', color: '#374151', marginBottom: '0.5rem' }}>
+              <label className="instructor-form-label">
                 Company Name
               </label>
-              <input className="input w-full" placeholder="e.g., ABC Driving Academy" value={instForm.company} onChange={onInstChange('company')} />
+              <input className="instructor-form-input" placeholder="e.g., ABC Driving Academy" value={instForm.company} onChange={onInstChange('company')} />
             </div>
             <div>
-              <label style={{ display: 'block', fontSize: '0.875rem', fontWeight: '500', color: '#374151', marginBottom: '0.5rem' }}>
+              <label className="instructor-form-label">
                 Profile Image URL
               </label>
-              <input className="input w-full" placeholder="https://example.com/image.jpg" value={instForm.image} onChange={onInstChange('image')} />
+              <input className="instructor-form-input" placeholder="https://example.com/image.jpg" value={instForm.image} onChange={onInstChange('image')} />
             </div>
           </div>
         </div>
@@ -701,7 +714,7 @@ const InstructorCreateForm: React.FC<InstructorCreateFormProps> = ({ onCreated }
             </p>
             <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '1.25rem' }}>
               <input 
-                className="input w-full" 
+                className="instructor-form-input" 
                 placeholder="Enter postcode or area code" 
                 value={postcodeInput} 
                 onChange={(e)=>setPostcodeInput(e.target.value)} 
@@ -729,7 +742,7 @@ const InstructorCreateForm: React.FC<InstructorCreateFormProps> = ({ onCreated }
                     alignItems: 'center',
                     gap: '0.5rem',
                     padding: '0.5rem 0.875rem',
-                    borderRadius: '0.5rem',
+                    borderRadius: '0',
                     background: '#eff6ff',
                     color: '#1e40af',
                     fontSize: '0.8125rem',
@@ -787,7 +800,7 @@ const InstructorCreateForm: React.FC<InstructorCreateFormProps> = ({ onCreated }
               <label style={{ display: 'block', fontSize: '0.875rem', fontWeight: '500', color: '#374151', marginBottom: '0.5rem' }}>
                 Vehicle Type <span style={{ color: '#dc2626' }}>*</span>
               </label>
-              <select className="select w-full" value={instForm.vehicleType} onChange={onInstChange('vehicleType')}>
+              <select className="instructor-form-select" value={instForm.vehicleType} onChange={onInstChange('vehicleType')}>
                 <option value="">Select vehicle type</option>
                 <option value="Manual">Manual</option>
                 <option value="Automatic">Automatic</option>
@@ -812,7 +825,7 @@ const InstructorCreateForm: React.FC<InstructorCreateFormProps> = ({ onCreated }
                 <input 
                   id="instructor-price-per-hour"
                   name="pricePerHour"
-                  className="input w-full" 
+                  className="instructor-form-input" 
                   type="text"
                   inputMode="decimal"
                   placeholder="25"
@@ -829,7 +842,7 @@ const InstructorCreateForm: React.FC<InstructorCreateFormProps> = ({ onCreated }
               <label style={{ display: 'block', fontSize: '0.875rem', fontWeight: '500', color: '#374151', marginBottom: '0.5rem' }}>
                 Years of Experience
               </label>
-              <input className="input w-full" type="number" placeholder="5" value={instForm.yearsOfExperience} onChange={onInstChange('yearsOfExperience')} />
+              <input className="instructor-form-input" type="number" placeholder="5" value={instForm.yearsOfExperience} onChange={onInstChange('yearsOfExperience')} />
             </div>
           </div>
         </div>
@@ -847,13 +860,13 @@ const InstructorCreateForm: React.FC<InstructorCreateFormProps> = ({ onCreated }
               <label style={{ display: 'block', fontSize: '0.875rem', fontWeight: '500', color: '#374151', marginBottom: '0.5rem' }}>
                 Phone Number
               </label>
-              <input className="input w-full" placeholder="+44 7123 456789" value={instForm.phone} onChange={onInstChange('phone')} />
+              <input className="instructor-form-input" placeholder="+44 7123 456789" value={instForm.phone} onChange={onInstChange('phone')} />
             </div>
             <div>
               <label style={{ display: 'block', fontSize: '0.875rem', fontWeight: '500', color: '#374151', marginBottom: '0.5rem' }}>
                 Email Address
               </label>
-              <input className="input w-full" placeholder="instructor@example.com" value={instForm.email} onChange={onInstChange('email')} />
+              <input className="instructor-form-input" placeholder="instructor@example.com" value={instForm.email} onChange={onInstChange('email')} />
             </div>
           </div>
         </div>
@@ -875,7 +888,7 @@ const InstructorCreateForm: React.FC<InstructorCreateFormProps> = ({ onCreated }
               Select areas where you have expertise
             </p>
             <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '1.25rem' }}>
-              <select className="select w-full" value={specSelect} onChange={(e)=>setSpecSelect(e.target.value)}>
+              <select className="instructor-form-select" value={specSelect} onChange={(e)=>setSpecSelect(e.target.value)}>
                 <option value="">Choose a specialization</option>
                 {PRESET_SPECIALIZATIONS.map(s => (
                   <option key={s} value={s}>{s}</option>
@@ -903,7 +916,7 @@ const InstructorCreateForm: React.FC<InstructorCreateFormProps> = ({ onCreated }
                     alignItems: 'center',
                     gap: '0.5rem',
                     padding: '0.5rem 0.875rem',
-                    borderRadius: '0.5rem',
+                    borderRadius: '0',
                     background: '#dbeafe',
                     color: '#1e40af',
                     fontSize: '0.8125rem',
@@ -963,7 +976,7 @@ const InstructorCreateForm: React.FC<InstructorCreateFormProps> = ({ onCreated }
               Add languages you can teach in
             </p>
             <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '1.25rem' }}>
-              <select className="select w-full" value={langSelect} onChange={(e)=>setLangSelect(e.target.value)}>
+              <select className="instructor-form-select" value={langSelect} onChange={(e)=>setLangSelect(e.target.value)}>
                 <option value="">Choose a language</option>
                 {PRESET_LANGUAGES.map(l => (
                   <option key={l} value={l}>{l}</option>
@@ -991,7 +1004,7 @@ const InstructorCreateForm: React.FC<InstructorCreateFormProps> = ({ onCreated }
                     alignItems: 'center',
                     gap: '0.5rem',
                     padding: '0.5rem 0.875rem',
-                    borderRadius: '0.5rem',
+                    borderRadius: '0',
                     background: '#f3e8ff',
                     color: '#7c3aed',
                     fontSize: '0.8125rem',
@@ -1046,7 +1059,7 @@ const InstructorCreateForm: React.FC<InstructorCreateFormProps> = ({ onCreated }
             </p>
             
             <select 
-              className="select w-full" 
+              className="instructor-form-select" 
               value={publicAvailability} 
               onChange={(e) => setPublicAvailability(e.target.value)}
               style={{ marginBottom: '1rem' }}
@@ -1180,7 +1193,7 @@ const InstructorCreateForm: React.FC<InstructorCreateFormProps> = ({ onCreated }
             </p>
             
             <select 
-              className="select w-full" 
+              className="instructor-form-select" 
               value={numberVisibility} 
               onChange={(e) => setNumberVisibility(e.target.value)}
               style={{ marginBottom: '1rem' }}
@@ -1325,7 +1338,7 @@ const InstructorCreateForm: React.FC<InstructorCreateFormProps> = ({ onCreated }
               <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(140px, 1fr))', gap: '0.75rem' }}>
                 <div>
                   <label style={{ display: 'block', fontSize: '0.75rem', fontWeight: '500', color: '#64748b', marginBottom: '0.375rem', textTransform: 'uppercase', letterSpacing: '0.025em' }}>Day</label>
-                  <select className="select w-full" value={availSelect} onChange={(e)=>setAvailSelect(e.target.value)}>
+                  <select className="instructor-form-select" value={availSelect} onChange={(e)=>setAvailSelect(e.target.value)}>
                     <option value="">Choose day</option>
                     {DAYS_OF_WEEK.map(d => (
                       <option key={d} value={d}>{d}</option>
@@ -1334,11 +1347,11 @@ const InstructorCreateForm: React.FC<InstructorCreateFormProps> = ({ onCreated }
                 </div>
                 <div>
                   <label style={{ display: 'block', fontSize: '0.75rem', fontWeight: '500', color: '#64748b', marginBottom: '0.375rem', textTransform: 'uppercase', letterSpacing: '0.025em' }}>Start</label>
-                  <input type="time" className="input w-full" value={availStart} onChange={(e)=>setAvailStart(e.target.value)} />
+                  <input type="time" className="instructor-form-input" value={availStart} onChange={(e)=>setAvailStart(e.target.value)} />
                 </div>
                 <div>
                   <label style={{ display: 'block', fontSize: '0.75rem', fontWeight: '500', color: '#64748b', marginBottom: '0.375rem', textTransform: 'uppercase', letterSpacing: '0.025em' }}>End</label>
-                  <input type="time" className="input w-full" value={availEnd} onChange={(e)=>setAvailEnd(e.target.value)} />
+                  <input type="time" className="instructor-form-input" value={availEnd} onChange={(e)=>setAvailEnd(e.target.value)} />
                 </div>
               </div>
               <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
@@ -1361,7 +1374,7 @@ const InstructorCreateForm: React.FC<InstructorCreateFormProps> = ({ onCreated }
                       alignItems: 'center',
                       gap: '0.5rem',
                       padding: '0.5rem 0.875rem',
-                      borderRadius: '0.5rem',
+                      borderRadius: '0',
                       background: '#fef3c7',
                       color: '#78350f',
                       fontSize: '0.8125rem',
@@ -1421,19 +1434,19 @@ const InstructorCreateForm: React.FC<InstructorCreateFormProps> = ({ onCreated }
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '0.75rem' }}>
               <div>
                 <label style={{ display: 'block', fontSize: '0.75rem', fontWeight: '500', color: '#64748b', marginBottom: '0.375rem', textTransform: 'uppercase', letterSpacing: '0.025em' }}>Start Date</label>
-                <input type="date" className="input w-full" value={excStartDate} onChange={(e)=>setExcStartDate(e.target.value)} />
+                <input type="date" className="instructor-form-input" value={excStartDate} onChange={(e)=>setExcStartDate(e.target.value)} />
               </div>
               <div>
                 <label style={{ display: 'block', fontSize: '0.75rem', fontWeight: '500', color: '#64748b', marginBottom: '0.375rem', textTransform: 'uppercase', letterSpacing: '0.025em' }}>Start Time</label>
-                <input type="time" className="input w-full" value={excStartTime} onChange={(e)=>setExcStartTime(e.target.value)} />
+                <input type="time" className="instructor-form-input" value={excStartTime} onChange={(e)=>setExcStartTime(e.target.value)} />
               </div>
               <div>
                 <label style={{ display: 'block', fontSize: '0.75rem', fontWeight: '500', color: '#64748b', marginBottom: '0.375rem', textTransform: 'uppercase', letterSpacing: '0.025em' }}>End Date</label>
-                <input type="date" className="input w-full" value={excEndDate} onChange={(e)=>setExcEndDate(e.target.value)} />
+                <input type="date" className="instructor-form-input" value={excEndDate} onChange={(e)=>setExcEndDate(e.target.value)} />
               </div>
               <div>
                 <label style={{ display: 'block', fontSize: '0.75rem', fontWeight: '500', color: '#64748b', marginBottom: '0.375rem', textTransform: 'uppercase', letterSpacing: '0.025em' }}>End Time</label>
-                <input type="time" className="input w-full" value={excEndTime} onChange={(e)=>setExcEndTime(e.target.value)} />
+                <input type="time" className="instructor-form-input" value={excEndTime} onChange={(e)=>setExcEndTime(e.target.value)} />
               </div>
             </div>
             <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
@@ -1466,7 +1479,7 @@ const InstructorCreateForm: React.FC<InstructorCreateFormProps> = ({ onCreated }
                 return (
                   <span key={key} style={{
                     display: 'inline-flex', alignItems: 'center', gap: '0.5rem',
-                    padding: '0.5rem 0.875rem', borderRadius: '0.5rem',
+                    padding: '0.5rem 0.875rem', borderRadius: '0',
                     background: '#fee2e2', color: '#991b1b', fontSize: '0.8125rem', fontWeight: '500'
                   }}>
                     <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -1513,7 +1526,7 @@ const InstructorCreateForm: React.FC<InstructorCreateFormProps> = ({ onCreated }
               Share your teaching philosophy, experience, and what makes you a great instructor
             </p>
             <textarea 
-              className="input w-full" 
+              className="instructor-form-input" 
               rows={6} 
               placeholder="Example: I'm a patient and enthusiastic driving instructor with 10+ years of experience. I specialize in helping nervous learners build confidence and have a 95% first-time pass rate. My calm teaching approach and flexible schedule make learning to drive stress-free and enjoyable." 
               value={instForm.description} 
@@ -1530,17 +1543,18 @@ const InstructorCreateForm: React.FC<InstructorCreateFormProps> = ({ onCreated }
         </div>
         
         {/* Form Actions Footer */}
-      <div style={{ 
+      <div className="instructor-form-actions" style={{ 
         display: 'flex', 
         alignItems: 'center', 
         justifyContent: 'flex-end',
         marginTop: '2rem',
         paddingTop: '1.5rem',
-        borderTop: '2px solid #e2e8f0',
+        borderTop: '2px solid #e5e7eb',
         gap: '0.75rem'
       }}>
         {ownerInst && (
           <button
+            type="button"
             className="btn btn-secondary"
             onClick={() => setMode('summary')}
             style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', fontSize: '0.875rem' }}
