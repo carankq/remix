@@ -91,10 +91,6 @@ const InstructorCreateForm: React.FC<InstructorCreateFormProps> = ({ onCreated }
   const [ownerError, setOwnerError] = useState<string | null>(null);
   const [mode, setMode] = useState<'summary' | 'edit' | 'loading'>('loading');
 
-  // Stripe onboarding status
-  const [onboarded, setOnboarded] = useState<boolean | null>(null);
-  const [onboardLoading, setOnboardLoading] = useState(false);
-
   // Prefill from user profile when fields are empty
   useEffect(() => {
     setInstForm(prev => ({
@@ -150,35 +146,6 @@ const InstructorCreateForm: React.FC<InstructorCreateFormProps> = ({ onCreated }
   };
 
   useEffect(() => { if (user?.accountType === 'instructor') refreshOwner(); }, [user?.accountType, user?.id]);
-
-  // Load Stripe onboarding status (disable listing when not complete)
-  useEffect(() => {
-    const loadOnboard = async () => {
-      if (!user?.id || user?.accountType !== 'instructor') return;
-      setOnboardLoading(true);
-      try {
-        const response = await fetch(`${window.__ENV__?.API_HOST || 'http://localhost:3001'}/instructors/${encodeURIComponent(user.id)}/account/onboarded`, {
-          headers: {
-            'Authorization': `Bearer ${token}`,
-            'Accept': 'application/json',
-            'Accept-Encoding': 'gzip, deflate, br'
-          }
-        });
-        
-        const data = await response.json().catch(() => ({}));
-        if (response.ok && typeof data?.onboarded === 'boolean') {
-          setOnboarded(Boolean(data.onboarded));
-        } else if (response.status === 404) {
-          setOnboarded(false);
-        }
-      } catch {
-        // ignore; keep null -> do not block
-      } finally {
-        setOnboardLoading(false);
-      }
-    };
-    loadOnboard();
-  }, [user?.accountType, user?.id, token]);
 
   // When entering edit mode with an existing ownerInst, prefill the form
   useEffect(() => {
@@ -531,93 +498,6 @@ const InstructorCreateForm: React.FC<InstructorCreateFormProps> = ({ onCreated }
               Loading your instructor profile
             </h2>
             <p style={{ fontSize: '0.875rem', color: '#6b7280' }}>Please wait a moment...</p>
-          </div>
-        </div>
-      </div>
-    );
-  }
-
-  // If not fully onboarded, disable listing UI and prompt to complete onboarding
-  if (user?.accountType === 'instructor' && onboarded === false) {
-    return (
-      <div>
-        <h2 style={{ 
-          fontSize: '1.5rem', 
-          fontWeight: '600', 
-          color: '#111827',
-          marginBottom: '1.5rem',
-          fontFamily: "'Space Grotesk', 'Poppins', sans-serif"
-        }}>
-          Instructor Profile
-        </h2>
-        
-        <div style={{
-          width: '100%',
-          background: '#ffffff',
-          border: '1px solid #fdba74',
-          borderRadius: '0.75rem',
-          padding: '1.5rem',
-          boxShadow: '0 1px 3px rgba(0,0,0,0.05)'
-        }}>
-          <div style={{ display: 'flex', alignItems: 'start', gap: '1rem' }}>
-            <div style={{
-              flexShrink: 0,
-              width: '40px',
-              height: '40px',
-              borderRadius: '50%',
-              background: '#fff7ed',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center'
-            }}>
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#f97316" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                <path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0Z"/>
-                <line x1="12" y1="9" x2="12" y2="13"/>
-                <line x1="12" y1="17" x2="12.01" y2="17"/>
-              </svg>
-            </div>
-            <div style={{ flex: 1 }}>
-              <h4 style={{
-                fontSize: '1rem',
-                fontWeight: '600',
-                color: '#0f172a',
-                marginBottom: '0.5rem',
-                fontFamily: "'Space Grotesk', sans-serif"
-              }}>
-                Stripe Account Setup Required
-              </h4>
-              <p style={{ fontSize: '0.875rem', color: '#64748b', marginBottom: '1rem', lineHeight: '1.5' }}>
-                Complete your Stripe onboarding to enable your instructor listing and start receiving payments from students.
-              </p>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', flexWrap: 'wrap' }}>
-                <button 
-                  className="btn btn-primary" 
-                  onClick={() => {
-                    const tabButtons = document.querySelectorAll('[data-tab]');
-                    tabButtons.forEach(btn => {
-                      if (btn.getAttribute('data-tab') === 'payments') {
-                        (btn as HTMLButtonElement).click();
-                      }
-                    });
-                  }}
-                  style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', fontSize: '0.875rem' }}
-                >
-                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                    <rect x="1" y="4" width="22" height="16" rx="2" ry="2"/>
-                    <line x1="1" y1="10" x2="23" y2="10"/>
-                  </svg>
-                  Go to Payments
-                </button>
-                <button 
-                  className="btn" 
-                  disabled 
-                  title="Complete onboarding to edit your listing"
-                  style={{ fontSize: '0.875rem', opacity: 0.5, cursor: 'not-allowed' }}
-                >
-                  Edit Listing
-                </button>
-              </div>
-            </div>
           </div>
         </div>
       </div>

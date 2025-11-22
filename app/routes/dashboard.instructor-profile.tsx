@@ -4,8 +4,8 @@ import { useLoaderData } from "@remix-run/react";
 import { Header } from "../components/Header";
 import { Footer } from "../components/Footer";
 import { getUserFromSession } from "../session.server";
-import { useState, useEffect } from "react";
-import { useAuth } from "../context/AuthContext";
+import { useState } from "react";
+import InstructorCreateForm from "../components/InstructorCreateForm";
 
 interface InstructorProfile {
   _id: string;
@@ -29,20 +29,25 @@ interface InstructorProfile {
 }
 
 interface LoaderData {
-  serverProfile: InstructorProfile | null;
+  profile: InstructorProfile | null;
   profileError: string | null;
-  useClientAuth: boolean;
+  isInstructor: boolean;
 }
 
 export async function loader({ request }: LoaderFunctionArgs) {
   const userSession = await getUserFromSession(request);
   
-  // If no session, use client-side auth (fallback)
-  if (!userSession || userSession.accountType !== 'instructor') {
+  // Redirect to login if not authenticated
+  if (!userSession) {
+    return redirect('/auth');
+  }
+  
+  // If not an instructor, redirect to home or show error
+  if (userSession.accountType !== 'instructor') {
     return json<LoaderData>({ 
-      serverProfile: null,
-      profileError: null,
-      useClientAuth: true
+      profile: null,
+      profileError: 'Only instructors can access this page.',
+      isInstructor: false
     });
   }
   
@@ -60,19 +65,20 @@ export async function loader({ request }: LoaderFunctionArgs) {
     });
     
     if (response.status === 404) {
+      // No profile found - this is okay, they can create one
       return json<LoaderData>({ 
-        serverProfile: null,
+        profile: null,
         profileError: null,
-        useClientAuth: false
+        isInstructor: true
       });
     }
     
     if (!response.ok) {
       const errorData = await response.json().catch(() => ({}));
       return json<LoaderData>({ 
-        serverProfile: null,
+        profile: null,
         profileError: errorData?.error || 'Unable to load instructor profile.',
-        useClientAuth: false
+        isInstructor: true
       });
     }
     
@@ -80,82 +86,30 @@ export async function loader({ request }: LoaderFunctionArgs) {
     const profile = data?.instructor || data;
     
     return json<LoaderData>({ 
-      serverProfile: profile,
+      profile,
       profileError: null,
-      useClientAuth: false
+      isInstructor: true
     });
     
   } catch (error) {
     console.error('Error fetching instructor profile:', error);
     return json<LoaderData>({ 
-      serverProfile: null,
+      profile: null,
       profileError: 'Network error while loading instructor profile.',
-      useClientAuth: false
+      isInstructor: true
     });
   }
 }
 
-function getApiHost(): string {
-  if (typeof window !== 'undefined' && (window as any).__ENV__?.API_HOST) {
-    const host = String((window as any).__ENV__.API_HOST).trim();
-    return host.replace(/\/$/, '') || window.location.origin;
-  }
-  return typeof window !== 'undefined' ? window.location.origin : '';
-}
-
 export default function DashboardInstructorProfileRoute() {
-  const { serverProfile, profileError: serverError, useClientAuth } = useLoaderData<typeof loader>();
-  const { user, token, isAuthenticated } = useAuth();
+  const { profile, profileError, isInstructor } = useLoaderData<typeof loader>();
+  const [showForm, setShowForm] = useState(false);
   
-  const [clientProfile, setClientProfile] = useState<InstructorProfile | null>(null);
-  const [clientLoading, setClientLoading] = useState(false);
-  const [clientError, setClientError] = useState<string | null>(null);
-  
-  // Load instructor profile on client side if needed
-  useEffect(() => {
-    if (!useClientAuth || !isAuthenticated || user?.accountType !== 'instructor') return;
-    
-    const loadProfile = async () => {
-      setClientLoading(true);
-      setClientError(null);
-      try {
-        const response = await fetch(`${getApiHost()}/instructors/find/owner`, {
-          headers: {
-            'Authorization': `Bearer ${token}`,
-            'Accept': 'application/json',
-            'Accept-Encoding': 'gzip, deflate, br'
-          }
-        });
-        
-        if (response.status === 404) {
-          setClientProfile(null);
-          return;
-        }
-        
-        if (!response.ok) {
-          const errorData = await response.json().catch(() => ({}));
-          setClientError(errorData?.error || 'Unable to load instructor profile.');
-          return;
-        }
-        
-        const data = await response.json();
-        const profile = data?.instructor || data;
-        setClientProfile(profile);
-      } catch (error) {
-        console.error('Error fetching instructor profile:', error);
-        setClientError('Network error while loading instructor profile.');
-      } finally {
-        setClientLoading(false);
-      }
-    };
-    
-    loadProfile();
-  }, [useClientAuth, isAuthenticated, user?.accountType, token]);
-  
-  // Use server data if available, otherwise use client data
-  const profile = serverProfile || clientProfile;
-  const error = serverError || clientError;
-  const loading = useClientAuth && clientLoading;
+  // Callback to handle profile creation/update - reload the page to get fresh data
+  const handleProfileCreated = () => {
+    // Reload the page to fetch updated data from server
+    window.location.reload();
+  };
   
   // Calculate profile completion percentage
   const calculateCompletion = (profile: InstructorProfile | null) => {
@@ -187,6 +141,40 @@ export default function DashboardInstructorProfileRoute() {
   const availability = profile?.availability || 'Not set';
   const bio = profile?.description || 'No bio provided yet.';
   const verified = profile?.verified || false;
+  
+  // If not an instructor, show error
+  if (!isInstructor) {
+    return (
+      <div>
+        <Header />
+        <main style={{ 
+          minHeight: '70vh',
+          background: '#f9fafb',
+          padding: '3rem 0'
+        }}>
+          <div className="container mx-auto px-4 md:px-8">
+            <div style={{ maxWidth: '1000px', margin: '0 auto' }}>
+              <div style={{
+                background: 'white',
+                border: '2px solid #ef4444',
+                borderRadius: '0',
+                padding: '2rem',
+                textAlign: 'center'
+              }}>
+                <h3 style={{ fontSize: '1.25rem', fontWeight: '600', color: '#111827', marginBottom: '0.5rem' }}>
+                  Access Denied
+                </h3>
+                <p style={{ color: '#6b7280' }}>
+                  {profileError || 'Only instructors can access this page.'}
+                </p>
+              </div>
+            </div>
+          </div>
+        </main>
+        <Footer />
+      </div>
+    );
+  }
 
   return (
     <div>
@@ -215,21 +203,8 @@ export default function DashboardInstructorProfileRoute() {
               </p>
             </div>
 
-            {/* Loading State */}
-            {loading && (
-              <div style={{
-                background: 'white',
-                border: '2px solid #e5e7eb',
-                borderRadius: '0',
-                padding: '3rem',
-                textAlign: 'center'
-              }}>
-                <p style={{ color: '#6b7280' }}>Loading your instructor profile...</p>
-              </div>
-            )}
-
             {/* Error State */}
-            {error && !loading && (
+            {profileError && (
               <div style={{
                 background: 'white',
                 border: '2px solid #ef4444',
@@ -238,67 +213,78 @@ export default function DashboardInstructorProfileRoute() {
                 marginBottom: '2rem'
               }}>
                 <p style={{ color: '#dc2626', fontWeight: '600' }}>
-                  {error}
+                  {profileError}
                 </p>
               </div>
             )}
 
-            {/* No Profile State */}
-            {!profile && !loading && !error && (
-              <div style={{
-                background: 'white',
-                border: '2px solid #f59e0b',
-                borderRadius: '0',
-                padding: '2rem',
-                textAlign: 'center'
-              }}>
-                <h3 style={{ fontSize: '1.25rem', fontWeight: '600', color: '#111827', marginBottom: '0.5rem' }}>
-                  No Instructor Profile Found
-                </h3>
-                <p style={{ color: '#6b7280', marginBottom: '1.5rem' }}>
-                  You haven't created your instructor profile yet. Create one to start receiving bookings!
-                </p>
-                <button className="btn btn-primary">
-                  Create Instructor Profile
-                </button>
-              </div>
+            {/* No Profile State or Form */}
+            {!profile && !profileError && (
+              <>
+                {!showForm ? (
+                  <div style={{
+                    background: 'white',
+                    border: '2px solid #f59e0b',
+                    borderRadius: '0',
+                    padding: '2rem',
+                    textAlign: 'center'
+                  }}>
+                    <h3 style={{ fontSize: '1.25rem', fontWeight: '600', color: '#111827', marginBottom: '0.5rem' }}>
+                      No Instructor Profile Found
+                    </h3>
+                    <p style={{ color: '#6b7280', marginBottom: '1.5rem' }}>
+                      You haven't created your instructor profile yet. Create one to start receiving bookings!
+                    </p>
+                    <button 
+                      className="btn btn-primary"
+                      onClick={() => setShowForm(true)}
+                    >
+                      Create Instructor Profile
+                    </button>
+                  </div>
+                ) : (
+                  <InstructorCreateForm onCreated={handleProfileCreated} />
+                )}
+              </>
             )}
 
             {/* Profile Content */}
-            {profile && !loading && (
+            {profile && (
               <>
-                {/* Profile Completion */}
-                <div style={{
-                  background: 'white',
-                  border: '2px solid #2563eb',
-                  borderRadius: '0',
-                  padding: '1.5rem',
-                  marginBottom: '2rem'
-                }}>
-                  <div style={{ marginBottom: '1rem' }}>
-                    <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.5rem' }}>
-                      <span style={{ fontSize: '0.875rem', fontWeight: '600', color: '#111827' }}>Profile Completion</span>
-                      <span style={{ fontSize: '0.875rem', fontWeight: '600', color: '#2563eb' }}>{profileComplete}%</span>
-                    </div>
+                {!showForm ? (
+                  <>
+                    {/* Profile Completion */}
                     <div style={{
-                      width: '100%',
-                      height: '8px',
-                      background: '#e5e7eb',
+                      background: 'white',
+                      border: '2px solid #2563eb',
                       borderRadius: '0',
-                      overflow: 'hidden'
+                      padding: '1.5rem',
+                      marginBottom: '2rem'
                     }}>
-                      <div style={{
-                        width: `${profileComplete}%`,
-                        height: '100%',
-                        background: '#2563eb',
-                        transition: 'width 0.3s ease'
-                      }}/>
+                      <div style={{ marginBottom: '1rem' }}>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.5rem' }}>
+                          <span style={{ fontSize: '0.875rem', fontWeight: '600', color: '#111827' }}>Profile Completion</span>
+                          <span style={{ fontSize: '0.875rem', fontWeight: '600', color: '#2563eb' }}>{profileComplete}%</span>
+                        </div>
+                        <div style={{
+                          width: '100%',
+                          height: '8px',
+                          background: '#e5e7eb',
+                          borderRadius: '0',
+                          overflow: 'hidden'
+                        }}>
+                          <div style={{
+                            width: `${profileComplete}%`,
+                            height: '100%',
+                            background: '#2563eb',
+                            transition: 'width 0.3s ease'
+                          }}/>
+                        </div>
+                      </div>
+                      <p style={{ fontSize: '0.875rem', color: '#6b7280' }}>
+                        Complete your profile to attract more students and appear higher in search results
+                      </p>
                     </div>
-                  </div>
-                  <p style={{ fontSize: '0.875rem', color: '#6b7280' }}>
-                    Complete your profile to attract more students and appear higher in search results
-                  </p>
-                </div>
 
                 {/* Two Column Layout */}
                 <div className="instructor-profile-grid" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '2rem' }}>
@@ -489,7 +475,10 @@ export default function DashboardInstructorProfileRoute() {
 
                 {/* Actions */}
                 <div className="instructor-profile-actions" style={{ marginTop: '2rem', display: 'flex', gap: '1rem' }}>
-                  <button className="btn btn-primary">
+                  <button 
+                    className="btn btn-primary"
+                    onClick={() => setShowForm(true)}
+                  >
                     Edit Profile
                   </button>
                   <button style={{
@@ -507,7 +496,11 @@ export default function DashboardInstructorProfileRoute() {
                   </button>
                 </div>
               </>
+            ) : (
+              <InstructorCreateForm onCreated={handleProfileCreated} />
             )}
+          </>
+        )}
 
           </div>
         </div>
