@@ -390,7 +390,7 @@ const InstructorCreateForm: React.FC<InstructorCreateFormProps> = ({
         brandName: instForm.brandName.trim(),
         description: instForm.description.trim() || undefined,
         pricePerHour: instForm.pricePerHour.trim() !== '' ? Math.min(60, parseFloat(instForm.pricePerHour)) : undefined,
-        postcode: postcodes, // array of strings as required
+        outcodes: postcodes, // array of outcodes (first part of postcodes)
         gender: instForm.gender || undefined,
         vehicles: vehicles.filter(v => v.type && v.licensePlateNumber), // Only include complete vehicles
         deals: deals,
@@ -425,7 +425,7 @@ const InstructorCreateForm: React.FC<InstructorCreateFormProps> = ({
       if (!payload.name || !payload.brandName || postcodes.length === 0 || vehicles.length === 0) {
         showAlertPopup(
           'Missing Required Fields',
-          'Please complete the required fields: name, brand name, coverage postcode(s), and at least one vehicle.',
+          'Please complete the required fields: name, brand name, coverage outcode(s), and at least one vehicle.',
           'warning'
         );
         setInstSubmitting(false);
@@ -738,18 +738,32 @@ const InstructorCreateForm: React.FC<InstructorCreateFormProps> = ({
             Service Area
           </h3>
           <div>
-            <label style={{ display: 'block', fontSize: '0.875rem', fontWeight: '500', color: '#334155', marginBottom: '0.375rem' }}>
-              Coverage Areas <span style={{ color: '#dc2626' }}>*</span>
+            <label style={{ display: 'block', fontSize: '0.875rem', fontWeight: '600', color: '#334155', marginBottom: '0.5rem' }}>
+              Coverage Areas (Outcodes) <span style={{ color: '#dc2626' }}>*</span>
             </label>
-            <p style={{ fontSize: '0.8125rem', color: '#64748b', marginBottom: '0.75rem', lineHeight: '1.5' }}>
-              Add postcodes (e.g., "NW1 2AB") or areas (e.g., "NW") you cover
+            <p style={{ fontSize: '0.8125rem', color: '#64748b', marginBottom: '0.5rem', lineHeight: '1.5' }}>
+              Add outcodes (the first part of a postcode before the space) to define your teaching area
             </p>
+            <div style={{ 
+              fontSize: '0.75rem', 
+              color: '#1e40af', 
+              background: '#eff6ff', 
+              border: '2px solid #bfdbfe',
+              borderRadius: '0',
+              padding: '0.75rem',
+              marginBottom: '1rem',
+              lineHeight: '1.5'
+            }}>
+              <strong>Examples:</strong> SW1, NW3, M1, B15<br/>
+              <strong>What's an outcode?</strong> The first part of a UK postcode (e.g., "SW1" from "SW1A 1AA")<br/>
+              <strong>How it works:</strong> Students search using outcodes to find instructors in their area. The more outcodes you add, the larger your coverage area.
+            </div>
             <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '1.25rem' }}>
               <input 
                 className="instructor-form-input" 
-                placeholder="Enter postcode or area code" 
+                placeholder="Enter outcode (e.g., SW1, NW3, M1)" 
                 value={postcodeInput} 
-                onChange={(e)=>setPostcodeInput(e.target.value)} 
+                onChange={(e)=>setPostcodeInput(e.target.value.toUpperCase())} 
                 onKeyDown={(e)=>{ if(e.key==='Enter'){ e.preventDefault(); addPostcode(); } }} 
               />
               <button type="button" className="btn" onClick={addPostcode} style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', fontSize: '0.875rem' }}>
@@ -833,8 +847,11 @@ const InstructorCreateForm: React.FC<InstructorCreateFormProps> = ({
             <label style={{ display: 'block', fontSize: '0.875rem', fontWeight: '600', color: '#374151', marginBottom: '0.75rem' }}>
               Vehicles <span style={{ color: '#dc2626' }}>*</span>
             </label>
-            <p style={{ fontSize: '0.8125rem', color: '#64748b', marginBottom: '1rem' }}>
+            <p style={{ fontSize: '0.8125rem', color: '#64748b', marginBottom: '0.5rem' }}>
               Add the vehicles you use for instruction
+            </p>
+            <p style={{ fontSize: '0.75rem', color: '#059669', marginBottom: '1rem', fontStyle: 'italic' }}>
+              🔒 License plate numbers are kept private and not shown publicly
             </p>
             
             {vehicles.map((vehicle, idx) => (
