@@ -488,17 +488,24 @@ const InstructorCreateForm: React.FC<InstructorCreateFormProps> = ({
           'Instructor listing created successfully.',
           'success'
         );
-        onCreated && onCreated(data);
-        await refreshOwner();
-        setMode('summary');
+        if (onCreated) {
+          onCreated(data);
+        } else {
+          await refreshOwner();
+          setMode('summary');
+        }
       } else if (isUpdate && response.status === 200) {
         showAlertPopup(
           'Success!',
           'Instructor listing updated successfully.',
           'success'
         );
-        await refreshOwner();
-        setMode('summary');
+        if (onCreated) {
+          onCreated(data);
+        } else {
+          await refreshOwner();
+          setMode('summary');
+        }
       } else if (response.status === 400) {
         showAlertPopup(
           'Validation Error',
