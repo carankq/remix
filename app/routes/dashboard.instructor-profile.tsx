@@ -213,21 +213,23 @@ export default function DashboardInstructorProfileRoute() {
         <div className="container mx-auto px-4 md:px-8">
           <div style={{ maxWidth: '1000px', margin: '0 auto' }}>
             
-            {/* Header */}
-            <div style={{ marginBottom: '2rem' }}>
-              <h1 style={{
-                fontSize: '2rem',
-                fontWeight: '700',
-                color: '#111827',
-                marginBottom: '0.5rem',
-                fontFamily: "'Space Grotesk', sans-serif"
-              }}>
-                Instructor Profile
-              </h1>
-              <p style={{ color: '#6b7280', fontSize: '1rem' }}>
-                Manage your public instructor profile and teaching information
-              </p>
-            </div>
+            {/* Header - Only show when not in form view */}
+            {(profile && !showForm) && (
+              <div style={{ marginBottom: '2rem' }}>
+                <h1 style={{
+                  fontSize: '2rem',
+                  fontWeight: '700',
+                  color: '#111827',
+                  marginBottom: '0.5rem',
+                  fontFamily: "'Space Grotesk', sans-serif"
+                }}>
+                  Instructor Profile
+                </h1>
+                <p style={{ color: '#6b7280', fontSize: '1rem' }}>
+                  Manage your public instructor profile and teaching information
+                </p>
+              </div>
+            )}
 
             {/* Error State */}
             {profileError && (
@@ -244,34 +246,9 @@ export default function DashboardInstructorProfileRoute() {
               </div>
             )}
 
-            {/* No Profile State or Form */}
+            {/* No Profile State - Show Form Immediately */}
             {!profile && !profileError && (
-              <>
-                {!showForm ? (
-                  <div style={{
-                    background: 'white',
-                    border: '2px solid #f59e0b',
-                    borderRadius: '0',
-                    padding: '2rem',
-                    textAlign: 'center'
-                  }}>
-                    <h3 style={{ fontSize: '1.25rem', fontWeight: '600', color: '#111827', marginBottom: '0.5rem' }}>
-                      No Instructor Profile Found
-                    </h3>
-                    <p style={{ color: '#6b7280', marginBottom: '1.5rem' }}>
-                      You haven't created your instructor profile yet. Create one to start receiving bookings!
-                    </p>
-                    <button 
-                      className="btn btn-primary"
-                      onClick={() => setShowForm(true)}
-                    >
-                      Create Instructor Profile
-                    </button>
-                  </div>
-                ) : (
-                  <InstructorCreateForm onCreated={handleProfileCreated} />
-                )}
-              </>
+              <InstructorCreateForm onCreated={handleProfileCreated} />
             )}
 
             {/* Profile Content */}
@@ -522,8 +499,8 @@ export default function DashboardInstructorProfileRoute() {
                   </button>
                 </div>
               </>
-            ) : (null
-              // <InstructorCreateForm onCreated={handleProfileCreated} />
+            ) : (
+              <InstructorCreateForm onCreated={handleProfileCreated} />
             )}
           </>
         )}
