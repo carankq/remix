@@ -952,5 +952,10 @@ select {
   .instructor-form-actions button {
     width: 100%;
   }
+  
+  /* Stack ALL grid columns vertically on mobile */
+  .instructor-form-section .grid {
+    grid-template-columns: 1fr !important;
+  }
 }
 

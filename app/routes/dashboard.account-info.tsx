@@ -1,11 +1,9 @@
-import { useLoaderData, useNavigate } from "@remix-run/react";
+import { useLoaderData } from "@remix-run/react";
 import type { LoaderFunctionArgs } from "@remix-run/node";
 import { json, redirect } from "@remix-run/node";
 import { Header } from "../components/Header";
 import { Footer } from "../components/Footer";
 import { getUserFromSession } from "../session.server";
-import { useAuth } from "../context/AuthContext";
-import { useEffect } from "react";
 
 interface LoaderData {
   serverUser: {
@@ -35,33 +33,9 @@ export async function loader({ request }: LoaderFunctionArgs) {
 
 export default function DashboardAccountInfoRoute() {
   const { serverUser } = useLoaderData<typeof loader>();
-  const { user: clientUser, isAuthenticated } = useAuth();
-  const navigate = useNavigate();
   
-  // Client-side auth check - redirect if not authenticated
-  useEffect(() => {
-    if (!isAuthenticated) {
-      navigate('/auth', { replace: true });
-    }
-  }, [isAuthenticated, navigate]);
-  
-  // Show loading state while auth is initializing
-  if (!isAuthenticated) {
-    return (
-      <div style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
-        <Header />
-        <main style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-          <div style={{ textAlign: 'center', color: '#6b7280' }}>
-            Loading...
-          </div>
-        </main>
-        <Footer />
-      </div>
-    );
-  }
-  
-  // Use server data if available, otherwise fall back to client auth
-  const user = serverUser || clientUser || {
+  // Use server data
+  const user = serverUser || {
     id: '',
     email: '',
     accountType: 'Instructor',

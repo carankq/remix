@@ -23,8 +23,6 @@ interface AuthContextValue {
 
 const AuthContext = createContext<AuthContextValue | undefined>(undefined);
 
-const STORAGE_KEY = 'auth_state_v1';
-
 function getApiHost(): string {
   // Access the environment variable from window
   if (typeof window !== 'undefined' && (window as any).__ENV__?.API_HOST) {
@@ -48,12 +46,19 @@ async function setServerSession(user: AuthUser, token: string) {
     formData.append('ageRange', user.ageRange || '');
     formData.append('memberSince', user.memberSince || '');
 
-    await fetch('/api/auth/set-session', {
+    const response = await fetch('/api/auth/set-session', {
       method: 'POST',
       body: formData,
+      credentials: 'same-origin', // Important: ensure cookies are sent/received
     });
+    
+    if (!response.ok) {
+      console.error('[AuthContext] Failed to set server session:', response.status);
+    } else {
+      console.log('[AuthContext] Server session set successfully');
+    }
   } catch (error) {
-    console.error('Failed to set server session:', error);
+    console.error('[AuthContext] Failed to set server session:', error);
     // Don't throw - session cookie is optional, localStorage is primary
   }
 }
@@ -63,24 +68,10 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [token, setToken] = useState<string | null>(null);
   const [isHydrated, setIsHydrated] = useState(false);
 
+  // On mount, just mark as hydrated - server session will handle auth
   useEffect(() => {
-    try {
-      const raw = localStorage.getItem(STORAGE_KEY);
-      if (raw) {
-        const parsed = JSON.parse(raw);
-        setUser(parsed.user ?? null);
-        setToken(parsed.token ?? null);
-      }
-    } catch {}
     setIsHydrated(true);
   }, []);
-
-  useEffect(() => {
-    if (!isHydrated) return;
-    try {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify({ user, token }));
-    } catch {}
-  }, [user, token, isHydrated]);
 
   const login = useCallback(async (email: string, password: string) => {
     const host = getApiHost();
@@ -94,12 +85,13 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       const message = data?.error || data?.message || 'Login failed';
       throw new Error(message);
     }
-    setToken(data.token);
-    setUser(data.user);
-    try { localStorage.setItem(STORAGE_KEY, JSON.stringify({ user: data.user, token: data.token })); } catch {}
     
     // Set server-side session cookie
     await setServerSession(data.user, data.token);
+    
+    // Update local state only after server session is set
+    setToken(data.token);
+    setUser(data.user);
   }, []);
 
   const signup = useCallback(async (params: { email: string; password: string; phoneNumber?: string; ageRange?: string; accountType?: AccountType; fullName?: string; memberSince?: string }) => {
@@ -123,25 +115,29 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       const message = data?.error || data?.message || 'Signup failed';
       throw new Error(message);
     }
-    setToken(data.token);
-    setUser(data.user);
-    try { localStorage.setItem(STORAGE_KEY, JSON.stringify({ user: data.user, token: data.token })); } catch {}
     
     // Set server-side session cookie
     await setServerSession(data.user, data.token);
+    
+    // Update local state only after server session is set
+    setToken(data.token);
+    setUser(data.user);
   }, []);
 
   const logout = useCallback(async () => {
-    setToken(null);
-    setUser(null);
-    try { localStorage.removeItem(STORAGE_KEY); } catch {}
-    
-    // Clear server-side session cookie
+    // Clear server-side session cookie first
     try {
-      await fetch('/api/auth/logout', { method: 'POST' });
+      await fetch('/api/auth/logout', { 
+        method: 'POST',
+        credentials: 'same-origin'
+      });
     } catch (error) {
       console.error('Failed to clear server session:', error);
     }
+    
+    // Then clear local state
+    setToken(null);
+    setUser(null);
   }, []);
 
   const value = useMemo<AuthContextValue>(() => ({
