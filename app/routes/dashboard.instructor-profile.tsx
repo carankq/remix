@@ -9,25 +9,44 @@ import InstructorCreateForm from "../components/InstructorCreateForm";
 
 interface InstructorProfile {
   _id: string;
-  userId: string;
+  brandName: string;
+  ownerId: string;
   name: string;
   description?: string;
-  hourlyRate?: number;
-  yearsExperience?: number;
-  qualifications?: string[];
-  verified?: boolean;
-  location?: {
-    postcode?: string;
-    city?: string;
-    county?: string;
-  };
-  availability?: string;
+  pricePerHour?: number;
+  outcodes?: string[];
+  vehicles?: Array<{ type: string; licensePlateNumber?: string }>;
+  deals?: string[];
+  yearsOfExperience?: number;
+  company?: string;
+  phone?: string;
+  email?: string;
   languages?: string[];
   image?: string;
-  company?: string;
-  areas?: string[];
-  vehicles?: Array<{ type: 'Manual' | 'Automatic' | 'Electric' }>;
-  deals?: string[];
+  availability?: {
+    working?: Array<{
+      day: string;
+      startTime: string;
+      endTime: string;
+    }>;
+    exceptions?: Array<{
+      startTime: number;
+      endTime: number;
+    }>;
+  };
+  permissions?: {
+    publicAvailability?: string;
+    publicAvailabilityWhitelist?: string[];
+    publicAvailabilityBlacklist?: string[];
+    numberVisibility?: string;
+    numberVisibilityWhitelist?: string[];
+    numberVisibilityBlacklist?: string[];
+  };
+  adminDisabled?: boolean;
+  adminDisabledReason?: string;
+  enabled?: boolean;
+  createdAt?: string;
+  updatedAt?: string;
 }
 
 interface LoaderData {
@@ -87,7 +106,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
     
     const data = await response.json();
     const profile = data?.instructor || data;
-    
+    console.log(JSON.stringify(data));
     return json<LoaderData>({ 
       profile,
       profileError: null,
@@ -122,14 +141,14 @@ export default function DashboardInstructorProfileRoute() {
     
     if (profile.name) completed++;
     if (profile.description && profile.description.length > 50) completed++;
-    if (profile.hourlyRate) completed++;
-    if (profile.yearsExperience) completed++;
-    if (profile.qualifications && profile.qualifications.length > 0) completed++;
-    if (profile.location?.postcode) completed++;
-    if (profile.availability) completed++;
+    if (profile.pricePerHour) completed++;
+    if (profile.yearsOfExperience) completed++;
+    if (profile.vehicles && profile.vehicles.length > 0) completed++;
+    if (profile.outcodes && profile.outcodes.length > 0) completed++;
+    if (profile.availability?.working && profile.availability.working.length > 0) completed++;
     if (profile.languages && profile.languages.length > 0) completed++;
     if (profile.image) completed++;
-    if (profile.verified) completed++;
+    if (profile.deals && profile.deals.length > 0) completed++;
     
     return Math.round((completed / total) * 100);
   };
@@ -137,13 +156,24 @@ export default function DashboardInstructorProfileRoute() {
   const profileComplete = calculateCompletion(profile);
   
   // Extract display data from profile
-  const hourlyRate = profile?.hourlyRate ? `£${profile.hourlyRate}` : 'Not set';
-  const experience = profile?.yearsExperience ? `${profile.yearsExperience} years` : 'Not set';
-  const areas = profile?.areas || (profile?.location?.city ? [profile.location.city] : []);
+  const hourlyRate = profile?.pricePerHour ? `£${profile.pricePerHour}` : 'Not set';
+  const experience = profile?.yearsOfExperience ? `${profile.yearsOfExperience} years` : 'Not set';
+  const outcodes = profile?.outcodes || [];
   const languages = profile?.languages || ['English'];
-  const availability = profile?.availability || 'Not set';
+  const vehicles = profile?.vehicles || [];
+  const deals = profile?.deals || [];
+  
+  // Format availability for display
+  const formatAvailability = () => {
+    if (!profile?.availability?.working || profile.availability.working.length === 0) {
+      return 'Not set';
+    }
+    return profile.availability.working.map(slot => 
+      `${slot.day}: ${slot.startTime} - ${slot.endTime}`
+    ).join(', ');
+  };
+  const availability = formatAvailability();
   const bio = profile?.description || 'No bio provided yet.';
-  const verified = profile?.verified || false;
 
   // If not an instructor, show error
   if (!isInstructor) {
@@ -298,6 +328,10 @@ export default function DashboardInstructorProfileRoute() {
                           <div style={{ fontSize: '1rem', fontWeight: '600', color: '#111827' }}>{profile.name || 'Not set'}</div>
                         </div>
                         <div>
+                          <div style={{ fontSize: '0.75rem', color: '#6b7280', marginBottom: '0.25rem' }}>Brand Name</div>
+                          <div style={{ fontSize: '1rem', fontWeight: '600', color: '#111827' }}>{profile.brandName || 'Not set'}</div>
+                        </div>
+                        <div>
                           <div style={{ fontSize: '0.75rem', color: '#6b7280', marginBottom: '0.25rem' }}>Hourly Rate</div>
                           <div style={{ fontSize: '1rem', fontWeight: '600', color: '#111827' }}>{hourlyRate}</div>
                         </div>
@@ -305,11 +339,11 @@ export default function DashboardInstructorProfileRoute() {
                           <div style={{ fontSize: '0.75rem', color: '#6b7280', marginBottom: '0.25rem' }}>Experience</div>
                           <div style={{ fontSize: '1rem', fontWeight: '600', color: '#111827' }}>{experience}</div>
                         </div>
-                        {areas.length > 0 && (
+                        {outcodes.length > 0 && (
                           <div>
-                            <div style={{ fontSize: '0.75rem', color: '#6b7280', marginBottom: '0.25rem' }}>Teaching Areas</div>
+                            <div style={{ fontSize: '0.75rem', color: '#6b7280', marginBottom: '0.25rem' }}>Coverage Outcodes</div>
                             <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
-                              {areas.map((area, i) => (
+                              {outcodes.map((outcode, i) => (
                                 <span key={i} style={{
                                   padding: '0.25rem 0.75rem',
                                   background: '#dbeafe',
@@ -318,7 +352,26 @@ export default function DashboardInstructorProfileRoute() {
                                   fontWeight: '500',
                                   borderRadius: '0'
                                 }}>
-                                  {area}
+                                  {outcode}
+                                </span>
+                              ))}
+                            </div>
+                          </div>
+                        )}
+                        {vehicles.length > 0 && (
+                          <div>
+                            <div style={{ fontSize: '0.75rem', color: '#6b7280', marginBottom: '0.25rem' }}>Vehicles</div>
+                            <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
+                              {vehicles.map((vehicle, i) => (
+                                <span key={i} style={{
+                                  padding: '0.25rem 0.75rem',
+                                  background: '#f3f4f6',
+                                  color: '#111827',
+                                  fontSize: '0.875rem',
+                                  fontWeight: '500',
+                                  borderRadius: '0'
+                                }}>
+                                  {vehicle.type}
                                 </span>
                               ))}
                             </div>
@@ -383,59 +436,64 @@ export default function DashboardInstructorProfileRoute() {
                       }}>
                         Availability
                       </h2>
-                      <p style={{ color: '#374151', lineHeight: '1.6' }}>
+                      <p style={{ color: '#374151', lineHeight: '1.6', fontSize: '0.875rem' }}>
                         {availability}
                       </p>
                     </div>
 
-                    {/* Verification Status */}
-                    {verified ? (
+                    {/* Deals & Offers */}
+                    {deals.length > 0 && (
                       <div style={{
                         background: 'white',
                         border: '2px solid #10b981',
                         borderRadius: '0',
                         padding: '1.5rem'
                       }}>
-                        <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
-                          <div style={{
-                            width: '40px',
-                            height: '40px',
-                            borderRadius: '0',
-                            background: '#10b981',
-                            display: 'flex',
-                            alignItems: 'center',
-                            justifyContent: 'center'
-                          }}>
-                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                              <polyline points="20 6 9 17 4 12"/>
-                            </svg>
-                          </div>
-                          <div>
-                            <div style={{ fontSize: '1rem', fontWeight: '600', color: '#111827', marginBottom: '0.25rem' }}>
-                              Verified Instructor
+                        <h2 style={{
+                          fontSize: '1.25rem',
+                          fontWeight: '600',
+                          color: '#111827',
+                          marginBottom: '1.5rem'
+                        }}>
+                          Deals & Offers
+                        </h2>
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+                          {deals.map((deal, i) => (
+                            <div key={i} style={{
+                              display: 'flex',
+                              alignItems: 'center',
+                              gap: '0.5rem'
+                            }}>
+                              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#10b981" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                                <polyline points="20 6 9 17 4 12"/>
+                              </svg>
+                              <span style={{ fontSize: '0.875rem', color: '#374151', fontWeight: '500' }}>
+                                {deal}
+                              </span>
                             </div>
-                            <div style={{ fontSize: '0.875rem', color: '#6b7280' }}>
-                              Identity & credentials verified
-                            </div>
-                          </div>
+                          ))}
                         </div>
                       </div>
-                    ) : (
+                    )}
+
+                    {/* Admin Status Warning */}
+                    {profile.adminDisabled && (
                       <div style={{
                         background: 'white',
-                        border: '2px solid #f59e0b',
+                        border: '2px solid #ef4444',
                         borderRadius: '0',
                         padding: '1.5rem'
                       }}>
-                        <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+                        <div style={{ display: 'flex', alignItems: 'flex-start', gap: '1rem' }}>
                           <div style={{
                             width: '40px',
                             height: '40px',
                             borderRadius: '0',
-                            background: '#f59e0b',
+                            background: '#ef4444',
                             display: 'flex',
                             alignItems: 'center',
-                            justifyContent: 'center'
+                            justifyContent: 'center',
+                            flexShrink: 0
                           }}>
                             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
                               <circle cx="12" cy="12" r="10"/>
@@ -444,11 +502,11 @@ export default function DashboardInstructorProfileRoute() {
                             </svg>
                           </div>
                           <div>
-                            <div style={{ fontSize: '1rem', fontWeight: '600', color: '#111827', marginBottom: '0.25rem' }}>
-                              Verification Pending
+                            <div style={{ fontSize: '1rem', fontWeight: '600', color: '#111827', marginBottom: '0.5rem' }}>
+                              Profile Disabled
                             </div>
-                            <div style={{ fontSize: '0.875rem', color: '#6b7280' }}>
-                              Complete verification to build trust
+                            <div style={{ fontSize: '0.875rem', color: '#6b7280', lineHeight: '1.5' }}>
+                              {profile.adminDisabledReason || 'Your profile has been disabled by an administrator.'}
                             </div>
                           </div>
                         </div>
