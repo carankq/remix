@@ -913,7 +913,7 @@ const InstructorCreateForm: React.FC<InstructorCreateFormProps> = ({ onCreated }
                 <option value="">Select vehicle type</option>
                 <option value="Manual">Manual</option>
                 <option value="Automatic">Automatic</option>
-                <option value="Both">Both Manual & Automatic</option>
+                <option value="Electric">Electric</option>
               </select>
             </div>
             <div>

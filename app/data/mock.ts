@@ -5,7 +5,7 @@ export type DrivingInstructor = {
   pricePerHour: number;
   postcode: string[];
   gender: 'Male' | 'Female';
-  vehicleType: 'Manual' | 'Automatic' | 'Both';
+  vehicleType: 'Manual' | 'Automatic' | 'Electric';
   yearsOfExperience: number;
   rating: number;
   totalReviews: number;

@@ -84,11 +84,9 @@ export async function loader({ request }: LoaderFunctionArgs) {
       image: r.image || r.profileImage || r.avatar,
     })).filter(i => i.id);
 
-    console.log('v2 I see these guys: list', list);
-
     return json({ instructors: list }, {
       headers: {
-        // "Cache-Control": "public, max-age=300, s-maxage=600", // Cache for 5 min client, 10 min CDN
+        "Cache-Control": "public, max-age=300, s-maxage=600", // Cache for 5 min client, 10 min CDN
       }
     });
   } catch (e) {
@@ -183,7 +181,8 @@ export default function ResultsRoute() {
       }
     };
     
-    refetchWithAuth();
+    // won't be used until booking system is implemented properly
+    // refetchWithAuth();
     
     return () => {
       cancelled = true;
@@ -339,7 +338,7 @@ export default function ResultsRoute() {
                       <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/>
                       <circle cx="12" cy="10" r="3"/>
                     </svg>
-                    {pc}
+                    Around {pc}
                   </span>
                 );
               });

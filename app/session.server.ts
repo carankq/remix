@@ -27,6 +27,7 @@ export async function getUserFromSession(request: Request) {
   const fullName = session.get("fullName");
   const phoneNumber = session.get("phoneNumber");
   const ageRange = session.get("ageRange");
+  const memberSince = session.get("memberSince");
   
   if (!userId || !token) {
     return null;
@@ -40,6 +41,7 @@ export async function getUserFromSession(request: Request) {
     fullName,
     phoneNumber,
     ageRange,
+    memberSince,
   };
 }
 
@@ -52,6 +54,7 @@ export async function createUserSession({
   fullName,
   phoneNumber,
   ageRange,
+  memberSince,
   redirectTo,
 }: {
   request: Request;
@@ -62,6 +65,7 @@ export async function createUserSession({
   fullName?: string;
   phoneNumber?: string;
   ageRange?: string;
+  memberSince?: string;
   redirectTo: string;
 }) {
   const session = await getSession(request);
@@ -72,6 +76,7 @@ export async function createUserSession({
   session.set("fullName", fullName);
   session.set("phoneNumber", phoneNumber);
   session.set("ageRange", ageRange);
+  session.set("memberSince", memberSince);
   
   return sessionStorage.commitSession(session);
 }

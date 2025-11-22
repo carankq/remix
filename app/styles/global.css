@@ -794,6 +794,25 @@ select {
   .auth-form-content p {
     padding: 0 !important;
   }
+  
+  /* Instructor profile mobile responsiveness */
+  .instructor-profile-stats {
+    grid-template-columns: 1fr !important;
+    gap: 0.75rem !important;
+  }
+  
+  .instructor-profile-grid {
+    grid-template-columns: 1fr !important;
+    gap: 1.5rem !important;
+  }
+  
+  .instructor-profile-actions {
+    flex-direction: column !important;
+  }
+  
+  .instructor-profile-actions button {
+    width: 100% !important;
+  }
 }
 
 /* Desktop and larger */

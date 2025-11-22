@@ -311,7 +311,7 @@ export function SearchSection({
                     <option value="">Any Type</option>
                     <option value="Manual">Manual</option>
                     <option value="Automatic">Automatic</option>
-                    <option value="Both">Both</option>
+                    <option value="Electric">Electric</option>
                   </select>
                   <svg 
                     width="20" 

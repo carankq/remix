@@ -132,7 +132,7 @@ export function Header() {
                       right: 0,
                       background: 'white',
                       border: '1px solid #e5e7eb',
-                      borderRadius: '0.75rem',
+                      borderRadius: '0',
                       boxShadow: '0 10px 25px rgba(0,0,0,0.1)',
                       minWidth: '220px',
                       overflow: 'hidden',
@@ -177,14 +177,14 @@ export function Header() {
                       {/* Menu Items */}
                       <div style={{ padding: '0.5rem' }}>
                         <Link
-                          to="/portal"
+                          to="/dashboard/enquiries"
                           onClick={() => setShowUserMenu(false)}
                           style={{
                             display: 'flex',
                             alignItems: 'center',
                             gap: '0.75rem',
                             padding: '0.75rem 1rem',
-                            borderRadius: '0.5rem',
+                            borderRadius: '0',
                             textDecoration: 'none',
                             color: '#374151',
                             fontSize: '0.95rem',
@@ -201,10 +201,72 @@ export function Header() {
                           }}
                         >
                           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                            <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>
-                            <polyline points="9 22 9 12 15 12 15 22"/>
+                            <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
                           </svg>
-                          Portal
+                          Enquiries
+                        </Link>
+
+                        <Link
+                          to="/dashboard/account-info"
+                          onClick={() => setShowUserMenu(false)}
+                          style={{
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: '0.75rem',
+                            padding: '0.75rem 1rem',
+                            borderRadius: '0',
+                            textDecoration: 'none',
+                            color: '#374151',
+                            fontSize: '0.95rem',
+                            fontWeight: '500',
+                            transition: 'all 0.2s ease'
+                          }}
+                          onMouseEnter={(e) => {
+                            e.currentTarget.style.background = '#f3f4f6';
+                            e.currentTarget.style.color = '#111827';
+                          }}
+                          onMouseLeave={(e) => {
+                            e.currentTarget.style.background = 'transparent';
+                            e.currentTarget.style.color = '#374151';
+                          }}
+                        >
+                          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+                            <circle cx="12" cy="7" r="4"/>
+                          </svg>
+                          Account Info
+                        </Link>
+
+                        <Link
+                          to="/dashboard/instructor-profile"
+                          onClick={() => setShowUserMenu(false)}
+                          style={{
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: '0.75rem',
+                            padding: '0.75rem 1rem',
+                            borderRadius: '0',
+                            textDecoration: 'none',
+                            color: '#374151',
+                            fontSize: '0.95rem',
+                            fontWeight: '500',
+                            transition: 'all 0.2s ease'
+                          }}
+                          onMouseEnter={(e) => {
+                            e.currentTarget.style.background = '#f3f4f6';
+                            e.currentTarget.style.color = '#111827';
+                          }}
+                          onMouseLeave={(e) => {
+                            e.currentTarget.style.background = 'transparent';
+                            e.currentTarget.style.color = '#374151';
+                          }}
+                        >
+                          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                            <path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
+                            <circle cx="8.5" cy="7" r="4"/>
+                            <polyline points="17 11 19 13 23 9"/>
+                          </svg>
+                          Instructor Profile
                         </Link>
 
                         <button
@@ -215,7 +277,7 @@ export function Header() {
                             alignItems: 'center',
                             gap: '0.75rem',
                             padding: '0.75rem 1rem',
-                            borderRadius: '0.5rem',
+                            borderRadius: '0',
                             border: 'none',
                             background: 'transparent',
                             color: '#dc2626',

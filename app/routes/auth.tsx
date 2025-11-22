@@ -6,7 +6,7 @@ import { useAuth } from "../context/AuthContext";
 
 export default function AuthRoute() {
   const [mode, setMode] = useState<'login' | 'signup'>('login');
-  const [role, setRole] = useState<'student' | 'instructor' | 'account_type'>('account_type');
+  const [role, setRole] = useState<'student' | 'instructor' | 'account_type'>('instructor');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [phoneNumber, setPhoneNumber] = useState('');
@@ -51,10 +51,6 @@ export default function AuthRoute() {
       return;
     }
     if (mode === 'signup') {
-      if (role === 'account_type') {
-        setError('Please choose an account type.');
-        return;
-      }
       if (!fullName.trim()) {
         setError('Please enter your full name.');
         return;
@@ -210,57 +206,23 @@ export default function AuthRoute() {
                             <circle cx="12" cy="7" r="4"/>
                           </svg>
                         </span>
-                        <select
-                          value={role}
-                          onChange={(e) => setRole(e.target.value as 'student' | 'instructor' | 'account_type')}
-                          disabled={isSubmitting}
+                        <input
+                          type="text"
+                          value="Instructor"
+                          disabled
                           style={{
                             width: '100%',
-                            padding: '0.75rem 3rem 0.75rem 3rem',
+                            padding: '0.75rem 1rem 0.75rem 3rem',
                             fontSize: '1rem',
-                            color: role === 'account_type' ? '#9ca3af' : '#111827',
+                            color: '#111827',
                             border: '1px solid #e5e7eb',
                             borderRadius: '0',
                             outline: 'none',
                             transition: 'all 0.2s ease',
                             background: '#f9fafb',
-                            cursor: 'pointer',
-                            appearance: 'none'
+                            cursor: 'not-allowed'
                           }}
-                          onFocus={(e) => {
-                            e.currentTarget.style.borderColor = '#93c5fd';
-                            e.currentTarget.style.background = '#ffffff';
-                            e.currentTarget.style.boxShadow = '0 0 0 3px rgba(147, 197, 253, 0.1)';
-                          }}
-                          onBlur={(e) => {
-                            e.currentTarget.style.borderColor = '#e5e7eb';
-                            e.currentTarget.style.background = '#f9fafb';
-                            e.currentTarget.style.boxShadow = 'none';
-                          }}
-                        >
-                          <option value="account_type">Select account type</option>
-                          <option value="student">Student</option>
-                          <option value="instructor">Instructor</option>
-                        </select>
-                        <svg 
-                          width="18" 
-                          height="18" 
-                          viewBox="0 0 24 24" 
-                          fill="none" 
-                          stroke="#9ca3af" 
-                          strokeWidth="2.5" 
-                          strokeLinecap="round" 
-                          strokeLinejoin="round"
-                          style={{
-                            position: 'absolute',
-                            right: '1rem',
-                            top: '50%',
-                            transform: 'translateY(-50%)',
-                            pointerEvents: 'none'
-                          }}
-                        >
-                          <polyline points="6 9 12 15 18 9"/>
-                        </svg>
+                        />
                       </div>
                     </div>
                   )}

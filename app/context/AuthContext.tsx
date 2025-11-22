@@ -9,6 +9,7 @@ export interface AuthUser {
   phoneNumber?: string;
   ageRange?: string;
   fullName?: string;
+  memberSince?: string;
 }
 
 interface AuthContextValue {
@@ -16,7 +17,7 @@ interface AuthContextValue {
   token: string | null;
   isAuthenticated: boolean;
   login: (email: string, password: string) => Promise<void>;
-  signup: (params: { email: string; password: string; phoneNumber?: string; ageRange?: string; accountType?: AccountType; fullName?: string }) => Promise<void>;
+  signup: (params: { email: string; password: string; phoneNumber?: string; ageRange?: string; accountType?: AccountType; fullName?: string; memberSince?: string }) => Promise<void>;
   logout: () => void;
 }
 
@@ -28,9 +29,10 @@ function getApiHost(): string {
   // Access the environment variable from window
   if (typeof window !== 'undefined' && (window as any).__ENV__?.API_HOST) {
     const host = String((window as any).__ENV__.API_HOST).trim();
-    return host.replace(/\/$/, '') || window.location.origin;
+    return host.replace(/\/$/, '') || 'http://localhost:3001';
   }
-  return typeof window !== 'undefined' ? window.location.origin : '';
+  // Fallback to localhost for development
+  return 'http://localhost:3001';
 }
 
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
@@ -74,7 +76,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     try { localStorage.setItem(STORAGE_KEY, JSON.stringify({ user: data.user, token: data.token })); } catch {}
   }, []);
 
-  const signup = useCallback(async (params: { email: string; password: string; phoneNumber?: string; ageRange?: string; accountType?: AccountType; fullName?: string }) => {
+  const signup = useCallback(async (params: { email: string; password: string; phoneNumber?: string; ageRange?: string; accountType?: AccountType; fullName?: string; memberSince?: string }) => {
     const host = getApiHost();
     const payload = {
       accountType: params.accountType ?? 'student',
@@ -82,7 +84,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       password: params.password,
       phoneNumber: params.phoneNumber ?? '',
       ageRange: params.ageRange ?? '',
-      fullName: params.fullName ?? ''
+      fullName: params.fullName ?? '',
+      memberSince: params.memberSince
     };
     const res = await fetch(`${host}/signup`, {
       method: 'POST',
