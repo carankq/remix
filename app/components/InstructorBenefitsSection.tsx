@@ -96,7 +96,7 @@ export function InstructorBenefitsSection() {
                 Join as an Instructor
               </a>
               <p style={{ fontSize: '0.875rem', color: '#6b7280', marginTop: '1rem' }}>
-                Already registered? <a href="/portal" style={{ color: '#2563eb', fontWeight: '600', textDecoration: 'none' }}>Sign in to your dashboard</a>
+                Already registered? <a href="/auth" style={{ color: '#2563eb', fontWeight: '600', textDecoration: 'none' }}>Sign in to your dashboard</a>
               </p>
             </div>
           </div>

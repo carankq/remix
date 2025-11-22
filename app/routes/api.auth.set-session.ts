@@ -1,0 +1,45 @@
+import type { ActionFunctionArgs } from "@remix-run/node";
+import { json } from "@remix-run/node";
+import { createUserSession } from "../session.server";
+
+export async function action({ request }: ActionFunctionArgs) {
+  if (request.method !== "POST") {
+    return new Response("Method not allowed", { status: 405 });
+  }
+
+  const formData = await request.formData();
+  const userId = formData.get("userId") as string;
+  const token = formData.get("token") as string;
+  const accountType = formData.get("accountType") as string;
+  const email = formData.get("email") as string;
+  const fullName = formData.get("fullName") as string;
+  const phoneNumber = formData.get("phoneNumber") as string;
+  const ageRange = formData.get("ageRange") as string;
+  const memberSince = formData.get("memberSince") as string;
+
+  if (!userId || !token) {
+    return new Response("Missing required fields", { status: 400 });
+  }
+
+  // Create session cookie
+  const cookie = await createUserSession({
+    request,
+    userId,
+    token,
+    accountType,
+    email,
+    fullName,
+    phoneNumber,
+    ageRange,
+    memberSince,
+    redirectTo: '/', // Not used since we're not redirecting
+  });
+
+  // Return success with Set-Cookie header
+  return json({ success: true }, {
+    headers: {
+      "Set-Cookie": cookie,
+    },
+  });
+}
+

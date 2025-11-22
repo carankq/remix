@@ -1,21 +1,50 @@
 import type { LoaderFunctionArgs } from "@remix-run/node";
 import { json, redirect } from "@remix-run/node";
+import { useNavigate } from "@remix-run/react";
 import { Header } from "../components/Header";
 import { Footer } from "../components/Footer";
 import { getUserFromSession } from "../session.server";
+import { useAuth } from "../context/AuthContext";
+import { useEffect } from "react";
 
 export async function loader({ request }: LoaderFunctionArgs) {
   const userSession = await getUserFromSession(request);
   
-  // // Redirect to login if not authenticated
-  // if (!userSession) {
-  //   return redirect('/auth');
-  // }
+  // Redirect to auth if not authenticated
+  // The session cookie will be set by the AuthContext after login
+  if (!userSession) {
+    return redirect('/auth');
+  }
   
   return json({});
 }
 
 export default function DashboardEnquiriesRoute() {
+  const { isAuthenticated } = useAuth();
+  const navigate = useNavigate();
+  
+  // Client-side auth check - redirect if not authenticated
+  useEffect(() => {
+    if (!isAuthenticated) {
+      navigate('/auth', { replace: true });
+    }
+  }, [isAuthenticated, navigate]);
+  
+  // Show loading state while auth is initializing
+  if (!isAuthenticated) {
+    return (
+      <div style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
+        <Header />
+        <main style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+          <div style={{ textAlign: 'center', color: '#6b7280' }}>
+            Loading...
+          </div>
+        </main>
+        <Footer />
+      </div>
+    );
+  }
+  
   // Mock enquiries data
   const enquiries = [
     {

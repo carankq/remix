@@ -30,11 +30,10 @@ export default function AuthRoute() {
     }, 150); // Half of the transition duration
   };
 
-  // Redirect to portal if already authenticated
   useEffect(() => {
-    if (isAuthenticated) {
-      navigate('/portal');
-    }
+    // if (isAuthenticated) {
+    //   navigate('/');
+    // }
   }, [isAuthenticated, navigate]);
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -75,8 +74,7 @@ export default function AuthRoute() {
           fullName
         });
       }
-      // Navigate to portal after successful auth
-      navigate('/portal');
+      // navigate('/');
     } catch (err: any) {
       setError(err?.message || 'Something went wrong. Please try again.');
     } finally {

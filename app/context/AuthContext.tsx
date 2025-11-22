@@ -18,7 +18,7 @@ interface AuthContextValue {
   isAuthenticated: boolean;
   login: (email: string, password: string) => Promise<void>;
   signup: (params: { email: string; password: string; phoneNumber?: string; ageRange?: string; accountType?: AccountType; fullName?: string; memberSince?: string }) => Promise<void>;
-  logout: () => void;
+  logout: () => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextValue | undefined>(undefined);
@@ -33,6 +33,29 @@ function getApiHost(): string {
   }
   // Fallback to localhost for development
   return 'http://localhost:3001';
+}
+
+// Helper to set server-side session cookie
+async function setServerSession(user: AuthUser, token: string) {
+  try {
+    const formData = new FormData();
+    formData.append('userId', user.id);
+    formData.append('token', token);
+    formData.append('accountType', user.accountType || '');
+    formData.append('email', user.email || '');
+    formData.append('fullName', user.fullName || '');
+    formData.append('phoneNumber', user.phoneNumber || '');
+    formData.append('ageRange', user.ageRange || '');
+    formData.append('memberSince', user.memberSince || '');
+
+    await fetch('/api/auth/set-session', {
+      method: 'POST',
+      body: formData,
+    });
+  } catch (error) {
+    console.error('Failed to set server session:', error);
+    // Don't throw - session cookie is optional, localStorage is primary
+  }
 }
 
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
@@ -74,6 +97,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     setToken(data.token);
     setUser(data.user);
     try { localStorage.setItem(STORAGE_KEY, JSON.stringify({ user: data.user, token: data.token })); } catch {}
+    
+    // Set server-side session cookie
+    await setServerSession(data.user, data.token);
   }, []);
 
   const signup = useCallback(async (params: { email: string; password: string; phoneNumber?: string; ageRange?: string; accountType?: AccountType; fullName?: string; memberSince?: string }) => {
@@ -100,12 +126,22 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     setToken(data.token);
     setUser(data.user);
     try { localStorage.setItem(STORAGE_KEY, JSON.stringify({ user: data.user, token: data.token })); } catch {}
+    
+    // Set server-side session cookie
+    await setServerSession(data.user, data.token);
   }, []);
 
-  const logout = useCallback(() => {
+  const logout = useCallback(async () => {
     setToken(null);
     setUser(null);
     try { localStorage.removeItem(STORAGE_KEY); } catch {}
+    
+    // Clear server-side session cookie
+    try {
+      await fetch('/api/auth/logout', { method: 'POST' });
+    } catch (error) {
+      console.error('Failed to clear server session:', error);
+    }
   }, []);
 
   const value = useMemo<AuthContextValue>(() => ({

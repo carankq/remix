@@ -86,8 +86,6 @@ export async function loader({ request }: LoaderFunctionArgs) {
       ? `${apiHost}/instructor/${encodeURIComponent(userSession.id)}/bookings?page=${page}&limit=${limit}&filter=${encodeURIComponent(filter)}&order=${encodeURIComponent(order)}&orderBy=${encodeURIComponent(orderBy)}`
       : `${apiHost}/students/${encodeURIComponent(userSession.id)}/bookings?page=${page}&limit=${limit}&filter=${encodeURIComponent(filter)}&order=${encodeURIComponent(order)}&orderBy=${encodeURIComponent(orderBy)}`;
     
-    console.log('making request to:', bookingsUrl);
-    
     const bookingsRes = await fetch(bookingsUrl, {
       headers: {
         'Accept-Encoding': 'gzip, deflate, br',
@@ -358,11 +356,6 @@ export default function PortalRoute() {
   
   // Sync loader data with state when page changes
   useEffect(() => {
-    console.log('Loader data updated:', {
-      useClientAuth: loaderData.useClientAuth,
-      bookingsCount: loaderData.serverBookings?.length,
-      pagination: loaderData.pagination
-    });
     if (!loaderData.useClientAuth) {
       setBookings(loaderData.serverBookings || []);
       setInstructorsById(loaderData.serverInstructors || {});
@@ -681,8 +674,6 @@ export default function PortalRoute() {
           ? `${host}/instructor/${encodeURIComponent(user.id)}/bookings?page=${page}&limit=${limit}&filter=${encodeURIComponent(filter)}&order=${encodeURIComponent(order)}&orderBy=${encodeURIComponent(orderBy)}`
           : `${host}/students/${encodeURIComponent(user.id)}/bookings?page=${page}&limit=${limit}&filter=${encodeURIComponent(filter)}&order=${encodeURIComponent(order)}&orderBy=${encodeURIComponent(orderBy)}`;
         
-        console.log('Client-side fetch to:', url);
-        
         const res = await fetch(url, {
           headers: {
             'Authorization': `Bearer ${token}`
@@ -867,13 +858,6 @@ export default function PortalRoute() {
 
   // No client-side filtering needed - the API returns filtered results based on the filter param
   const displayedBookings = bookings;
-  
-  console.log('Displaying bookings:', {
-    count: displayedBookings.length,
-    currentPage: pagination.page,
-    filter: bookingFilter,
-    ids: displayedBookings.map(b => b._id || b.id).slice(0, 3)
-  });
 
   const goToPage = (nextPage: number) => {
     const params = new URLSearchParams(searchParams);

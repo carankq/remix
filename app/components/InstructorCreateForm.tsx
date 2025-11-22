@@ -350,8 +350,6 @@ const InstructorCreateForm: React.FC<InstructorCreateFormProps> = ({ onCreated }
         return d.getTime();
       };
 
-      console.log('sending jumber vis:', numberVisibility)
-
       const payload: any = {
         ownerId: user.id,
         name: instForm.name.trim(),

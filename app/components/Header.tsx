@@ -10,8 +10,8 @@ export function Header() {
   
   const isHomePage = location.pathname === '/';
 
-  const handleLogout = () => {
-    logout();
+  const handleLogout = async () => {
+    await logout();
     setShowUserMenu(false);
     navigate('/');
   };
