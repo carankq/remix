@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { InstructorCard } from './InstructorCard';
+import { Alert } from './Alert';
 
 interface InstructorCreateFormProps {
   onCreated?: (instructor: any) => void;
@@ -40,6 +41,12 @@ const InstructorCreateForm: React.FC<InstructorCreateFormProps> = ({
   const [instSubmitting, setInstSubmitting] = useState(false);
   const [instError, setInstError] = useState<string | null>(null);
   const [instSuccess, setInstSuccess] = useState<string | null>(null);
+  const [showAlert, setShowAlert] = useState(false);
+  const [alertConfig, setAlertConfig] = useState<{ title: string; message: string; type: 'error' | 'success' | 'warning' | 'info' }>({
+    title: '',
+    message: '',
+    type: 'error'
+  });
   const [instForm, setInstForm] = useState({
     name: '',
     brandName: '',
@@ -89,6 +96,12 @@ const InstructorCreateForm: React.FC<InstructorCreateFormProps> = ({
       .trim()
       .replace(/[^a-z0-9]+/g, '-')
       .replace(/^-+|-+$/g, '');
+  };
+
+  // Helper to show alert popup
+  const showAlertPopup = (title: string, message: string, type: 'error' | 'success' | 'warning' | 'info' = 'error') => {
+    setAlertConfig({ title, message, type });
+    setShowAlert(true);
   };
 
   // Owner listing summary state
@@ -410,7 +423,11 @@ const InstructorCreateForm: React.FC<InstructorCreateFormProps> = ({
         }
       };
       if (!payload.name || !payload.brandName || postcodes.length === 0 || !payload.vehicleType) {
-        setInstError('Please complete the required fields: name, brand name, coverage postcode(s), vehicle type.');
+        showAlertPopup(
+          'Missing Required Fields',
+          'Please complete the required fields: name, brand name, coverage postcode(s), and vehicle type.',
+          'warning'
+        );
         setInstSubmitting(false);
         return;
       }
@@ -449,22 +466,47 @@ const InstructorCreateForm: React.FC<InstructorCreateFormProps> = ({
         setAvailStart('');
         setAvailEnd('');
         setSpecSelect('');
+        showAlertPopup(
+          'Success!',
+          'Instructor listing created successfully.',
+          'success'
+        );
         onCreated && onCreated(data);
         await refreshOwner();
         setMode('summary');
       } else if (isUpdate && response.status === 200) {
-        setInstSuccess('Instructor listing updated successfully.');
+        showAlertPopup(
+          'Success!',
+          'Instructor listing updated successfully.',
+          'success'
+        );
         await refreshOwner();
         setMode('summary');
       } else if (response.status === 400) {
-        setInstError(data?.error || 'Validation error. Please check your details.');
+        showAlertPopup(
+          'Validation Error',
+          data?.error || 'Please check your details and try again.',
+          'error'
+        );
       } else if (response.status === 404) {
-        setInstError(data?.error || 'Instructor not found.');
+        showAlertPopup(
+          'Not Found',
+          data?.error || 'Instructor not found.',
+          'error'
+        );
       } else {
-        setInstError(data?.error || (isUpdate ? 'Something went wrong while updating the listing.' : 'Something went wrong while creating the listing.'));
+        showAlertPopup(
+          'Error',
+          data?.error || (isUpdate ? 'Something went wrong while updating the listing.' : 'Something went wrong while creating the listing.'),
+          'error'
+        );
       }
     } catch {
-      setInstError('Network error while saving the listing.');
+      showAlertPopup(
+        'Network Error',
+        'Unable to save the listing. Please check your connection and try again.',
+        'error'
+      );
     } finally {
       setInstSubmitting(false);
     }
@@ -495,37 +537,6 @@ const InstructorCreateForm: React.FC<InstructorCreateFormProps> = ({
     paddingBottom: '0.75rem',
     borderBottom: '2px solid #e5e7eb'
   };
-
-  // Initial loading view to avoid jerky UI
-  if (mode === 'loading' || ownerLoading) {
-    return (
-      <div style={{
-        background: '#ffffff',
-        borderRadius: '0',
-        border: '2px solid #e5e7eb',
-        padding: '3rem 2rem',
-        textAlign: 'center'
-      }}>
-        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '1rem' }}>
-          <svg className="animate-spin" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-            <path d="M21 12a9 9 0 11-6.219-8.56"/>
-          </svg>
-          <div>
-            <h2 style={{ 
-              fontSize: '1.25rem', 
-              fontWeight: '600', 
-              color: '#111827',
-              marginBottom: '0.5rem',
-              fontFamily: "'Space Grotesk', sans-serif"
-            }}>
-              Loading your instructor profile
-            </h2>
-            <p style={{ fontSize: '0.875rem', color: '#6b7280' }}>Please wait a moment...</p>
-          </div>
-        </div>
-      </div>
-    );
-  }
 
   // Summary view - show listing card like results page
   if (mode === 'summary' && ownerInst) {
@@ -1630,6 +1641,15 @@ const InstructorCreateForm: React.FC<InstructorCreateFormProps> = ({
         </button>
       </div>
       </form>
+      
+      {/* Alert Popup */}
+      <Alert
+        isOpen={showAlert}
+        onClose={() => setShowAlert(false)}
+        title={alertConfig.title}
+        message={alertConfig.message}
+        type={alertConfig.type}
+      />
     </div>
   );
 };
