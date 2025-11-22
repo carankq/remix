@@ -133,6 +133,11 @@ export default function DashboardInstructorProfileRoute() {
     window.location.reload();
   };
   
+  // Callback to handle cancel - go back to view mode
+  const handleCancel = () => {
+    setShowForm(false);
+  };
+  
   // Calculate profile completion percentage
   const calculateCompletion = (profile: InstructorProfile | null) => {
     if (!profile) return 0;
@@ -541,6 +546,7 @@ export default function DashboardInstructorProfileRoute() {
             ) : (
               <InstructorCreateForm 
                 onCreated={handleProfileCreated}
+                onCancel={handleCancel}
                 initialProfile={profile}
                 skipFetch={true}
                 initialMode="edit"

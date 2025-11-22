@@ -5,6 +5,7 @@ import { Alert } from './Alert';
 
 interface InstructorCreateFormProps {
   onCreated?: (instructor: any) => void;
+  onCancel?: () => void; // Callback when user cancels editing
   initialProfile?: any | null; // Profile data from server
   skipFetch?: boolean; // Skip client-side fetching
   initialMode?: 'summary' | 'edit'; // Control initial mode (default: auto-detect)
@@ -40,6 +41,7 @@ const DAYS_OF_WEEK = [
 
 const InstructorCreateForm: React.FC<InstructorCreateFormProps> = ({ 
   onCreated,
+  onCancel,
   initialProfile = null,
   skipFetch = false,
   initialMode = undefined
@@ -67,6 +69,7 @@ const InstructorCreateForm: React.FC<InstructorCreateFormProps> = ({
     image: '',
   });
   const [vehicles, setVehicles] = useState<Array<{ type: string; licensePlateNumber: string }>>([]);
+  const [vehiclesModified, setVehiclesModified] = useState(false); // Track if vehicles were changed
   const [deals, setDeals] = useState<string[]>([]);
   const [languages, setLanguages] = useState<string[]>([]);
   // Working availability (day + HH:MM inputs rendered as strings)
@@ -223,10 +226,10 @@ const InstructorCreateForm: React.FC<InstructorCreateFormProps> = ({
       email: ownerInst.email || prev.email,
       image: ownerInst.image || ''
     }));
-    setPostcodes(Array.isArray(ownerInst.postcode) ? ownerInst.postcode : (ownerInst.postcode ? [ownerInst.postcode] : []));
+    setPostcodes(Array.isArray(ownerInst.outcodes) ? ownerInst.outcodes : (ownerInst.outcodes ? [ownerInst.outcodes] : []));
     setVehicles(Array.isArray(ownerInst.vehicles) ? ownerInst.vehicles.map((v: any) => ({ 
       type: v.type || 'Manual', 
-      licensePlateNumber: v.licensePlateNumber || '' 
+      licensePlateNumber: v.licensePlateNumber || ''
     })) : []);
     setDeals(Array.isArray(ownerInst.deals) ? ownerInst.deals : []);
     setLanguages(Array.isArray(ownerInst.languages) ? ownerInst.languages : []);
@@ -396,7 +399,6 @@ const InstructorCreateForm: React.FC<InstructorCreateFormProps> = ({
         pricePerHour: instForm.pricePerHour.trim() !== '' ? Math.min(60, parseFloat(instForm.pricePerHour)) : undefined,
         outcodes: postcodes, // array of outcodes (first part of postcodes)
         gender: instForm.gender || undefined,
-        vehicles: vehicles.filter(v => v.type && v.licensePlateNumber), // Only include complete vehicles
         deals: deals,
         yearsOfExperience: instForm.yearsOfExperience ? Number(instForm.yearsOfExperience) : undefined,
         company: instForm.company.trim() || undefined,
@@ -426,17 +428,28 @@ const InstructorCreateForm: React.FC<InstructorCreateFormProps> = ({
           numberVisibilityBlacklist: numberBlacklist
         }
       };
-      if (!payload.name || !payload.brandName || postcodes.length === 0 || vehicles.length === 0) {
+      
+      // Only include vehicles if: 
+      // 1. Creating new profile (no ownerInst), OR
+      // 2. Updating existing profile AND vehiclesModified is true
+      const isUpdate = Boolean(ownerInst && (ownerInst._id || ownerInst.id));
+      if (!isUpdate || vehiclesModified) {
+        payload.vehicles = vehicles.filter(v => v.type && v.licensePlateNumber); // Only include complete vehicles
+      }
+      
+      // Validation: vehicles required only if creating new profile OR updating vehicles
+      const vehiclesRequired = !isUpdate || vehiclesModified;
+      if (!payload.name || !payload.brandName || postcodes.length === 0 || (vehiclesRequired && vehicles.length === 0)) {
         showAlertPopup(
           'Missing Required Fields',
-          'Please complete the required fields: name, brand name, coverage outcode(s), and at least one vehicle.',
+          vehiclesRequired 
+            ? 'Please complete the required fields: name, brand name, coverage outcode(s), and at least one vehicle.'
+            : 'Please complete the required fields: name, brand name, and coverage outcode(s).',
           'warning'
         );
         setInstSubmitting(false);
         return;
       }
-
-      const isUpdate = Boolean(ownerInst && (ownerInst._id || ownerInst.id));
       const targetId = ownerInst?._id || ownerInst?.id;
       const url = isUpdate ? `${window.__ENV__?.API_HOST || 'http://localhost:3001'}/instructors/${encodeURIComponent(targetId)}` : `${window.__ENV__?.API_HOST || 'http://localhost:3001'}/instructors`;
       const method = isUpdate ? 'PUT' : 'POST';
@@ -848,9 +861,29 @@ const InstructorCreateForm: React.FC<InstructorCreateFormProps> = ({
           
           {/* Vehicles */}
           <div style={{ marginBottom: '1.5rem' }}>
-            <label style={{ display: 'block', fontSize: '0.875rem', fontWeight: '600', color: '#374151', marginBottom: '0.75rem' }}>
-              Vehicles <span style={{ color: '#dc2626' }}>*</span>
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '0.75rem' }}>
+              <label style={{ display: 'block', fontSize: '0.875rem', fontWeight: '600', color: '#374151' }}>
+                Vehicles <span style={{ color: '#dc2626' }}>*</span>
               </label>
+              {ownerInst && (
+                <label style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', cursor: 'pointer' }}>
+                  <input
+                    type="checkbox"
+                    checked={vehiclesModified}
+                    onChange={(e) => setVehiclesModified(e.target.checked)}
+                    style={{ 
+                      width: '16px', 
+                      height: '16px', 
+                      cursor: 'pointer',
+                      accentColor: '#2563eb'
+                    }}
+                  />
+                  <span style={{ fontSize: '0.8125rem', color: '#6b7280', fontWeight: '500' }}>
+                    Update vehicles
+                  </span>
+                </label>
+              )}
+            </div>
             <p style={{ fontSize: '0.8125rem', color: '#64748b', marginBottom: '0.5rem' }}>
               Add the vehicles you use for instruction
             </p>
@@ -858,17 +891,48 @@ const InstructorCreateForm: React.FC<InstructorCreateFormProps> = ({
               🔒 License plate numbers are kept private and not shown publicly
             </p>
             
+            {/* Warning when vehicles update is enabled */}
+            {ownerInst && vehiclesModified && (
+              <div style={{
+                background: '#fef3c7',
+                border: '2px solid #f59e0b',
+                borderRadius: '0',
+                padding: '0.875rem',
+                marginBottom: '1rem',
+                display: 'flex',
+                alignItems: 'flex-start',
+                gap: '0.75rem'
+              }}>
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#f59e0b" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0, marginTop: '0.125rem' }}>
+                  <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/>
+                  <line x1="12" y1="9" x2="12" y2="13"/>
+                  <line x1="12" y1="17" x2="12.01" y2="17"/>
+                </svg>
+                <div>
+                  <p style={{ fontSize: '0.8125rem', color: '#92400e', fontWeight: '600', marginBottom: '0.25rem' }}>
+                    Important: This will override all existing vehicle information
+                  </p>
+                  <p style={{ fontSize: '0.75rem', color: '#78350f', lineHeight: '1.4' }}>
+                    Make sure to add all vehicles you want to keep. Any vehicles not listed below will be removed when you save.
+                  </p>
+                </div>
+              </div>
+            )}
+            
             {vehicles.map((vehicle, idx) => (
               <div key={idx} style={{ 
                 display: 'grid', 
                 gridTemplateColumns: '1fr 2fr auto', 
                 gap: '0.5rem', 
                 marginBottom: '0.75rem',
-                alignItems: 'start'
+                alignItems: 'start',
+                opacity: (ownerInst && !vehiclesModified) ? 0.5 : 1,
+                pointerEvents: (ownerInst && !vehiclesModified) ? 'none' : 'auto'
               }}>
                 <select 
                   className="instructor-form-select"
                   value={vehicle.type}
+                  disabled={ownerInst && !vehiclesModified}
                   onChange={(e) => {
                     const updated = [...vehicles];
                     updated[idx].type = e.target.value;
@@ -884,6 +948,7 @@ const InstructorCreateForm: React.FC<InstructorCreateFormProps> = ({
                   className="instructor-form-input"
                   placeholder="License Plate (e.g., ABC 123)"
                   value={vehicle.licensePlateNumber}
+                  disabled={ownerInst && !vehiclesModified}
                   onChange={(e) => {
                     const updated = [...vehicles];
                     updated[idx].licensePlateNumber = e.target.value;
@@ -892,6 +957,7 @@ const InstructorCreateForm: React.FC<InstructorCreateFormProps> = ({
                 />
                 <button
                   type="button"
+                  disabled={ownerInst && !vehiclesModified}
                   onClick={() => setVehicles(vehicles.filter((_, i) => i !== idx))}
                   style={{
                     padding: '0.75rem',
@@ -899,7 +965,7 @@ const InstructorCreateForm: React.FC<InstructorCreateFormProps> = ({
                     border: '2px solid #ef4444',
                     borderRadius: '0',
                     color: '#dc2626',
-                    cursor: 'pointer',
+                    cursor: (ownerInst && !vehiclesModified) ? 'not-allowed' : 'pointer',
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center'
@@ -915,9 +981,18 @@ const InstructorCreateForm: React.FC<InstructorCreateFormProps> = ({
             
             <button
               type="button"
+              disabled={ownerInst && !vehiclesModified}
               onClick={() => setVehicles([...vehicles, { type: '', licensePlateNumber: '' }])}
               className="btn btn-secondary"
-              style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', fontSize: '0.875rem', marginTop: '0.5rem' }}
+              style={{ 
+                display: 'flex', 
+                alignItems: 'center', 
+                gap: '0.5rem', 
+                fontSize: '0.875rem', 
+                marginTop: '0.5rem',
+                opacity: (ownerInst && !vehiclesModified) ? 0.5 : 1,
+                cursor: (ownerInst && !vehiclesModified) ? 'not-allowed' : 'pointer'
+              }}
             >
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                 <line x1="12" y1="5" x2="12" y2="19"/>
@@ -1637,7 +1712,14 @@ const InstructorCreateForm: React.FC<InstructorCreateFormProps> = ({
           <button
             type="button"
             className="btn btn-secondary"
-            onClick={() => setMode('summary')}
+            onClick={() => {
+              // If onCancel callback is provided, use it; otherwise fall back to summary mode
+              if (onCancel) {
+                onCancel();
+              } else {
+                setMode('summary');
+              }
+            }}
             style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', fontSize: '0.875rem' }}
           >
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
