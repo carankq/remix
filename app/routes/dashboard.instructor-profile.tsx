@@ -543,6 +543,7 @@ export default function DashboardInstructorProfileRoute() {
                 onCreated={handleProfileCreated}
                 initialProfile={profile}
                 skipFetch={true}
+                initialMode="edit"
               />
             )}
           </>

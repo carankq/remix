@@ -7,6 +7,7 @@ interface InstructorCreateFormProps {
   onCreated?: (instructor: any) => void;
   initialProfile?: any | null; // Profile data from server
   skipFetch?: boolean; // Skip client-side fetching
+  initialMode?: 'summary' | 'edit'; // Control initial mode (default: auto-detect)
 }
 
 const PRESET_LANGUAGES = [
@@ -40,7 +41,8 @@ const DAYS_OF_WEEK = [
 const InstructorCreateForm: React.FC<InstructorCreateFormProps> = ({ 
   onCreated,
   initialProfile = null,
-  skipFetch = false 
+  skipFetch = false,
+  initialMode = undefined
 }) => {
   const { user, token } = useAuth();
   const [instSubmitting, setInstSubmitting] = useState(false);
@@ -169,22 +171,24 @@ const InstructorCreateForm: React.FC<InstructorCreateFormProps> = ({
     }
   };
 
-  useEffect(() => { 
+  useEffect(() => {
     // If skipFetch is true, use initialProfile instead of fetching
     if (skipFetch) {
       if (initialProfile) {
         setOwnerInst(initialProfile);
-        setMode('summary');
+        // Use initialMode prop if provided, otherwise default to 'summary' for existing profile
+        setMode(initialMode !== undefined ? initialMode : 'summary');
       } else {
         setOwnerInst(null);
-        setMode('edit');
+        // Use initialMode prop if provided, otherwise default to 'edit' for new profile
+        setMode(initialMode !== undefined ? initialMode : 'edit');
       }
       return;
     }
     
     // Otherwise, fetch from API (legacy behavior)
     if (user?.accountType === 'instructor') refreshOwner(); 
-  }, [user?.accountType, user?.id, skipFetch, initialProfile]);
+  }, [user?.accountType, user?.id, skipFetch, initialProfile, initialMode]);
 
   // When entering edit mode with an existing ownerInst, prefill the form
   useEffect(() => {
@@ -401,7 +405,7 @@ const InstructorCreateForm: React.FC<InstructorCreateFormProps> = ({
         image: instForm.image.trim() || undefined,
         availability: {
           working: availability.map(a => ({
-            day: a.day,
+          day: a.day,
             // working times are plain strings like 10:30am per new schema
             startTime: toAmPm(a.start),
             endTime: toAmPm(a.end)
@@ -602,16 +606,16 @@ const InstructorCreateForm: React.FC<InstructorCreateFormProps> = ({
         padding: '1.5rem',
         marginBottom: '1.5rem'
       }}>
-        <h2 style={{ 
+      <h2 style={{ 
           fontSize: '1.5rem', 
-          fontWeight: '700', 
+        fontWeight: '700', 
           color: '#111827',
-          marginBottom: '0.5rem',
+        marginBottom: '0.5rem',
           fontFamily: "'Space Grotesk', sans-serif"
-        }}>
+      }}>
           {ownerInst ? 'Edit Your Instructor Profile' : 'Create Your Instructor Profile'}
-        </h2>
-        <p style={{
+      </h2>
+      <p style={{
           fontSize: '0.875rem',
           color: '#6b7280',
           margin: 0
@@ -846,7 +850,7 @@ const InstructorCreateForm: React.FC<InstructorCreateFormProps> = ({
           <div style={{ marginBottom: '1.5rem' }}>
             <label style={{ display: 'block', fontSize: '0.875rem', fontWeight: '600', color: '#374151', marginBottom: '0.75rem' }}>
               Vehicles <span style={{ color: '#dc2626' }}>*</span>
-            </label>
+              </label>
             <p style={{ fontSize: '0.8125rem', color: '#64748b', marginBottom: '0.5rem' }}>
               Add the vehicles you use for instruction
             </p>
@@ -875,7 +879,7 @@ const InstructorCreateForm: React.FC<InstructorCreateFormProps> = ({
                   {VEHICLE_TYPES.map(type => (
                     <option key={type} value={type}>{type}</option>
                   ))}
-                </select>
+              </select>
                 <input
                   className="instructor-form-input"
                   placeholder="License Plate (e.g., ABC 123)"
@@ -906,7 +910,7 @@ const InstructorCreateForm: React.FC<InstructorCreateFormProps> = ({
                     <line x1="6" y1="6" x2="18" y2="18"/>
                   </svg>
                 </button>
-              </div>
+            </div>
             ))}
             
             <button
@@ -946,8 +950,8 @@ const InstructorCreateForm: React.FC<InstructorCreateFormProps> = ({
                   className="instructor-form-input" 
                   type="text"
                   inputMode="decimal"
-                  placeholder="25"
-                  value={instForm.pricePerHour}
+                  placeholder="25" 
+                  value={instForm.pricePerHour} 
                   onChange={onPriceChange}
                   style={{ paddingLeft: '2.25rem' }} 
                 />
