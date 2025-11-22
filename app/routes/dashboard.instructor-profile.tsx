@@ -223,7 +223,11 @@ export default function DashboardInstructorProfileRoute() {
 
             {/* No Profile State - Show Form Immediately */}
             {!profile && !profileError && (
-              <InstructorCreateForm onCreated={handleProfileCreated} />
+              <InstructorCreateForm 
+                onCreated={handleProfileCreated}
+                initialProfile={null}
+                skipFetch={true}
+              />
             )}
 
             {/* Profile Content */}
@@ -475,7 +479,11 @@ export default function DashboardInstructorProfileRoute() {
                 </div>
               </>
             ) : (
-              <InstructorCreateForm onCreated={handleProfileCreated} />
+              <InstructorCreateForm 
+                onCreated={handleProfileCreated}
+                initialProfile={profile}
+                skipFetch={true}
+              />
             )}
           </>
         )}

@@ -4,6 +4,8 @@ import { InstructorCard } from './InstructorCard';
 
 interface InstructorCreateFormProps {
   onCreated?: (instructor: any) => void;
+  initialProfile?: any | null; // Profile data from server
+  skipFetch?: boolean; // Skip client-side fetching
 }
 
 const PRESET_LANGUAGES = [
@@ -29,7 +31,11 @@ const DAYS_OF_WEEK = [
   'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'
 ];
 
-const InstructorCreateForm: React.FC<InstructorCreateFormProps> = ({ onCreated }) => {
+const InstructorCreateForm: React.FC<InstructorCreateFormProps> = ({ 
+  onCreated,
+  initialProfile = null,
+  skipFetch = false 
+}) => {
   const { user, token } = useAuth();
   const [instSubmitting, setInstSubmitting] = useState(false);
   const [instError, setInstError] = useState<string | null>(null);
@@ -145,7 +151,22 @@ const InstructorCreateForm: React.FC<InstructorCreateFormProps> = ({ onCreated }
     }
   };
 
-  useEffect(() => { if (user?.accountType === 'instructor') refreshOwner(); }, [user?.accountType, user?.id]);
+  useEffect(() => { 
+    // If skipFetch is true, use initialProfile instead of fetching
+    if (skipFetch) {
+      if (initialProfile) {
+        setOwnerInst(initialProfile);
+        setMode('summary');
+      } else {
+        setOwnerInst(null);
+        setMode('edit');
+      }
+      return;
+    }
+    
+    // Otherwise, fetch from API (legacy behavior)
+    if (user?.accountType === 'instructor') refreshOwner(); 
+  }, [user?.accountType, user?.id, skipFetch, initialProfile]);
 
   // When entering edit mode with an existing ownerInst, prefill the form
   useEffect(() => {
