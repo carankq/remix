@@ -75,6 +75,7 @@ export function InstructorCard({ instructor, showActions = true }: InstructorCar
   
   return (
     <article 
+      className="instructor-card"
       style={{
         background: '#ffffff',
         borderRadius: '0',
@@ -94,10 +95,10 @@ export function InstructorCard({ instructor, showActions = true }: InstructorCar
       }}>
       
       {/* Hero Section */}
-      <div style={{ padding: '2rem', background: '#f8fafc' }}>
-        <div style={{ display: 'flex', alignItems: 'start', gap: '1.5rem', flexWrap: 'wrap' }}>
+      <div className="instructor-card-hero" style={{ padding: '2rem', background: '#f8fafc' }}>
+        <div className="instructor-card-header" style={{ display: 'flex', alignItems: 'start', gap: '1.5rem', flexWrap: 'wrap' }}>
           {/* Profile Image */}
-          <div style={{ position: 'relative', flexShrink: 0 }}>
+          <div className="instructor-card-image" style={{ position: 'relative', flexShrink: 0 }}>
             <img
               src={imgSrc}
               onError={(e) => { const img = e.currentTarget as HTMLImageElement; if (img.src !== placeholder) { img.src = placeholder; } }}
@@ -114,8 +115,8 @@ export function InstructorCard({ instructor, showActions = true }: InstructorCar
           </div>
           
           {/* Name & Info */}
-          <div style={{ flex: 1, minWidth: 0 }}>
-            <h4 style={{ 
+          <div className="instructor-card-info" style={{ flex: 1, minWidth: 0 }}>
+            <h4 className="instructor-card-name" style={{ 
               fontSize: '1.5rem', 
               fontWeight: '700', 
               color: '#0f172a', 
@@ -299,7 +300,7 @@ export function InstructorCard({ instructor, showActions = true }: InstructorCar
           
           {/* Price Card */}
           {instructor.pricePerHour && (
-            <div style={{ 
+            <div className="instructor-card-price" style={{ 
               padding: '1.25rem 1.5rem',
               background: '#1e40af',
               border: '2px solid #1e3a8a',

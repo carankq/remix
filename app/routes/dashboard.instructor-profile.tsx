@@ -107,7 +107,6 @@ export async function loader({ request }: LoaderFunctionArgs) {
     
     const data = await response.json();
     const profile = data?.instructor || data;
-    console.log(JSON.stringify(data));
     return json<LoaderData>({ 
       profile,
       profileError: null,

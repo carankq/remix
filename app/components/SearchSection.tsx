@@ -137,7 +137,7 @@ export function SearchSection({
                     type="text" 
                     value={outcode} 
                     onChange={(e) => handleOutcodeInputChange(e.target.value)} 
-                    placeholder="Enter outcode (e.g., SW1)" 
+                    placeholder="Enter postcode (e.g., SW1)" 
                     style={{
                       width: '100%',
                       padding: '1rem 1rem 1rem 3rem',
@@ -576,7 +576,7 @@ export function SearchSection({
                 color: '#111827',
                 margin: 0 
               }}>
-                Outcode Required
+                Postcode or Outcode Required
               </h3>
             </div>
             <p style={{ 

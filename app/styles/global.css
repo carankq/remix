@@ -957,5 +957,50 @@ select {
   .instructor-form-section .grid {
     grid-template-columns: 1fr !important;
   }
+
+  /* Instructor Card Mobile Styles */
+  .instructor-card {
+    margin-left: -1rem !important;
+    margin-right: -1rem !important;
+    border-left: none !important;
+    border-right: none !important;
+    border-radius: 0 !important;
+  }
+
+  .instructor-card-hero {
+    padding: 1.25rem !important;
+  }
+
+  .instructor-card-header {
+    flex-direction: column !important;
+    align-items: center !important;
+    text-align: center !important;
+  }
+
+  .instructor-card-image {
+    margin-bottom: 0.75rem;
+  }
+
+  .instructor-card-image img {
+    width: 100px !important;
+    height: 100px !important;
+  }
+
+  .instructor-card-info {
+    width: 100%;
+  }
+
+  .instructor-card-name {
+    font-size: 1.25rem !important;
+  }
+
+  .instructor-card-price {
+    width: 100% !important;
+    min-width: unset !important;
+  }
+
+  .instructor-card-price > div:first-child {
+    font-size: 1.75rem !important;
+  }
 }
 
