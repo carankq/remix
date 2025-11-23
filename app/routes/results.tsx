@@ -10,23 +10,25 @@ import { getUserFromSession } from "../session.server";
 
 type Instructor = {
   id: string;
+  brandName?: string;
   name: string;
   description?: string;
   pricePerHour?: number;
-  vehicles?: Array<{ type: 'Manual' | 'Automatic' | 'Electric' }>;
-  yearsOfExperience?: number;
-  rating?: number;
-  totalReviews?: number;
   outcodes?: string[];
   gender?: string;
+  vehicles?: Array<{ type: string; licensePlateNumber?: string }>;
+  yearsOfExperience?: number;
+  deals?: string[];
+  instructorType?: 'ADI' | 'PDI';
+  languages?: string[];
+  rating?: number;
+  totalReviews?: number;
   company?: string;
   phone?: string;
   email?: string;
-  deals?: string[];
   availability?:
     | Array<{ day: string; start?: string; end?: string; startTime?: string; endTime?: string }>
     | { working?: Array<{ day: string; startTime: string; endTime: string }>; exceptions?: Array<any> };
-  languages?: string[];
   enabled?: boolean;
   image?: string;
 };
@@ -62,20 +64,25 @@ export async function loader({ request }: LoaderFunctionArgs) {
     // Only include necessary fields to reduce payload size
     const list: Instructor[] = rawList.map((r) => ({
       id: String(r.id ?? r._id ?? ""),
+      brandName: String(r.brandName) || undefined,
       name: String(r.name ?? r.fullName ?? "Unknown"),
       description: typeof r.description === 'string' ? r.description?.substring(0, 200) : '', // Limit description length
       pricePerHour: Number(r.pricePerHour ?? r.hourlyRate ?? r.price ?? 0) || undefined,
-      brandName: String(r.brandName) || undefined,
-      vehicles: Array.isArray(r.vehicles) ? r.vehicles.map((v: any) => ({ type: v.type })) : undefined,
-      yearsOfExperience: Number(r.yearsOfExperience ?? r.experienceYears ?? 0) || undefined,
-      rating: Number(r.rating ?? r.averageRating ?? 0) || undefined,
-      totalReviews: Number(r.totalReviews ?? r.reviewCount ?? 0) || undefined,
       outcodes: Array.isArray(r.outcodes) ? r.outcodes : (r.outcodes ? [String(r.outcodes)] : undefined),
       gender: r.gender,
+      vehicles: Array.isArray(r.vehicles) ? r.vehicles.map((v: any) => ({ 
+        type: v.type,
+        licensePlateNumber: v.licensePlateNumber 
+      })) : undefined,
+      yearsOfExperience: Number(r.yearsOfExperience ?? r.experienceYears ?? 0) || undefined,
+      deals: Array.isArray(r.deals) ? r.deals : undefined,
+      instructorType: r.instructorType,
+      languages: Array.isArray(r.languages) ? r.languages.slice(0, 3) : undefined, // Limit languages shown
+      rating: Number(r.rating ?? r.averageRating ?? 0) || undefined,
+      totalReviews: Number(r.totalReviews ?? r.reviewCount ?? 0) || undefined,
       company: r.company,
       phone: r.phone,
       email: r.email,
-      deals: Array.isArray(r.deals) ? r.deals : undefined,
       availability: (() => {
         // Handle both old array format and new object format
         if (Array.isArray(r.availability)) {
@@ -86,7 +93,6 @@ export async function loader({ request }: LoaderFunctionArgs) {
         }
         return undefined;
       })(),
-      languages: Array.isArray(r.languages) ? r.languages.slice(0, 3) : undefined, // Limit languages shown
       enabled: r.enabled,
       image: r.image || r.profileImage || r.avatar,
     })).filter(i => i.id);

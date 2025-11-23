@@ -996,7 +996,9 @@ const InstructorCreateForm: React.FC<InstructorCreateFormProps> = ({
               </label>
               <input className="instructor-form-input" placeholder="e.g., ABC Driving Academy" value={instForm.company} onChange={onInstChange('company')} />
             </div>
-            <div>
+            {
+              mode !== 'edit' ?
+              <div>
               <label className="instructor-form-label">
                 Gender
               </label>
@@ -1009,7 +1011,11 @@ const InstructorCreateForm: React.FC<InstructorCreateFormProps> = ({
                 <option value="Male">Male</option>
                 <option value="Female">Female</option>
               </select>
-            </div>
+            </div>              
+              
+              : null
+            }
+
             <div>
               <label className="instructor-form-label">
                 Profile Image URL

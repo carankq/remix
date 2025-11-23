@@ -3,24 +3,25 @@ import { useEffect, useState } from "react";
 
 type Instructor = {
   id: string;
-  name: string;
   brandName?: string;
+  name: string;
   description?: string;
   pricePerHour?: number;
-  vehicleType?: string;
+  outcodes?: string[];
+  gender?: string;
+  vehicles?: Array<{ type: string; licensePlateNumber?: string }>;
   yearsOfExperience?: number;
+  deals?: string[];
+  instructorType?: 'ADI' | 'PDI';
+  languages?: string[];
   rating?: number;
   totalReviews?: number;
-  postcode?: string[];
   company?: string;
   phone?: string;
   email?: string;
-  specializations?: string[];
-  instructorType?: 'ADI' | 'PDI';
   availability?:
     | Array<{ day: string; start?: string; end?: string; startTime?: string; endTime?: string }>
     | { working?: Array<{ day: string; startTime: string; endTime: string }>; exceptions?: Array<any> };
-  languages?: string[];
   enabled?: boolean;
   image?: string;
 };
@@ -76,25 +77,24 @@ export function InstructorCard({ instructor, showActions = true }: InstructorCar
     <article 
       style={{
         background: '#ffffff',
-        borderRadius: '1rem',
-        border: '1px solid #e2e8f0',
+        borderRadius: '0',
+        border: '2px solid #e2e8f0',
         overflow: 'hidden',
-        boxShadow: '0 1px 3px rgba(0,0,0,0.05)',
         transition: 'all 0.2s ease',
         cursor: instructor.brandName ? 'pointer' : 'default'
       }}
       onClick={handleCardClick}
       onMouseEnter={(e) => {
-        e.currentTarget.style.boxShadow = '0 8px 24px rgba(0,0,0,0.1)';
+        e.currentTarget.style.borderColor = '#cbd5e1';
         e.currentTarget.style.transform = 'translateY(-2px)';
       }}
       onMouseLeave={(e) => {
-        e.currentTarget.style.boxShadow = '0 1px 3px rgba(0,0,0,0.05)';
+        e.currentTarget.style.borderColor = '#e2e8f0';
         e.currentTarget.style.transform = 'translateY(0)';
       }}>
       
-      {/* Hero Section with Gradient Background */}
-      <div style={{ padding: '2rem', background: 'linear-gradient(to bottom, #f8fafc 0%, #ffffff 100%)' }}>
+      {/* Hero Section */}
+      <div style={{ padding: '2rem', background: '#f8fafc' }}>
         <div style={{ display: 'flex', alignItems: 'start', gap: '1.5rem', flexWrap: 'wrap' }}>
           {/* Profile Image */}
           <div style={{ position: 'relative', flexShrink: 0 }}>
@@ -301,16 +301,16 @@ export function InstructorCard({ instructor, showActions = true }: InstructorCar
           {instructor.pricePerHour && (
             <div style={{ 
               padding: '1.25rem 1.5rem',
-              background: 'linear-gradient(135deg, #3b82f6 0%, #2563eb 100%)',
-              borderRadius: '1rem',
+              background: '#1e40af',
+              border: '2px solid #1e3a8a',
+              borderRadius: '0',
               textAlign: 'center',
-              boxShadow: '0 4px 12px rgba(59, 130, 246, 0.3)',
               minWidth: '140px'
             }}>
               <div style={{ fontSize: '2rem', fontWeight: '700', color: '#ffffff', marginBottom: '0.25rem' }}>
                 £{instructor.pricePerHour}
               </div>
-              <div style={{ fontSize: '0.75rem', color: '#dbeafe', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+              <div style={{ fontSize: '0.75rem', color: '#dbeafe', textTransform: 'uppercase', letterSpacing: '0.05em', fontWeight: '600' }}>
                 per hour
               </div>
             </div>
@@ -320,30 +320,31 @@ export function InstructorCard({ instructor, showActions = true }: InstructorCar
 
       {/* Content Section */}
       <div style={{ padding: '0 2rem 2rem 2rem' }}>
-        {/* Location & Vehicle Bar */}
-        {(instructor.postcode || instructor.vehicleType) && (
+        {/* Info Bar - Outcodes, Vehicles, Gender */}
+        {((instructor.outcodes && instructor.outcodes.length > 0) || (instructor.vehicles && instructor.vehicles.length > 0) || instructor.gender) && (
           <div style={{ 
             display: 'flex', 
             alignItems: 'center', 
             gap: '1.5rem', 
             padding: '1.25rem',
             background: '#f8fafc',
-            borderRadius: '0.75rem',
+            border: '2px solid #e5e7eb',
+            borderRadius: '0',
             marginBottom: '1.5rem',
             flexWrap: 'wrap'
           }}>
-            {instructor.postcode && instructor.postcode.length > 0 && (
+            {instructor.outcodes && instructor.outcodes.length > 0 && (
               <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#3b82f6" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                   <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/>
                   <circle cx="12" cy="10" r="3"/>
                 </svg>
                 <span style={{ fontSize: '0.875rem', fontWeight: '500', color: '#334155' }}>
-                  {instructor.postcode.join(', ')}
+                  {instructor.outcodes.join(', ')}
                 </span>
               </div>
             )}
-            {instructor.vehicleType && (
+            {instructor.vehicles && instructor.vehicles.length > 0 && (
               <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#3b82f6" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                   <rect x="1" y="6" width="22" height="11" rx="2" ry="2"/>
@@ -351,7 +352,18 @@ export function InstructorCard({ instructor, showActions = true }: InstructorCar
                   <line x1="11" y1="11" x2="17" y2="11"/>
                 </svg>
                 <span style={{ fontSize: '0.875rem', fontWeight: '500', color: '#334155' }}>
-                  {instructor.vehicleType}
+                  {instructor.vehicles.map(v => v.type).join(', ')}
+                </span>
+              </div>
+            )}
+            {instructor.gender && (
+              <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#3b82f6" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+                  <circle cx="12" cy="7" r="4"/>
+                </svg>
+                <span style={{ fontSize: '0.875rem', fontWeight: '500', color: '#334155' }}>
+                  {instructor.gender}
                 </span>
               </div>
             )}
@@ -382,8 +394,8 @@ export function InstructorCard({ instructor, showActions = true }: InstructorCar
           </div>
         )}
 
-        {/* Specializations */}
-        {instructor.specializations && instructor.specializations.length > 0 && (
+        {/* Deals & Offers */}
+        {instructor.deals && instructor.deals.length > 0 && (
           <div style={{ marginBottom: '1.5rem' }}>
             <h5 style={{ 
               fontSize: '0.75rem', 
@@ -393,19 +405,20 @@ export function InstructorCard({ instructor, showActions = true }: InstructorCar
               letterSpacing: '0.05em',
               marginBottom: '0.75rem'
             }}>
-              Specializations
+              Deals & Offers
             </h5>
             <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.5rem' }}>
-              {instructor.specializations.map((spec, i) => (
+              {instructor.deals.map((deal, i) => (
                 <span key={i} style={{
                   padding: '0.5rem 0.875rem',
-                  background: '#dbeafe',
-                  color: '#1e40af',
-                  borderRadius: '0.5rem',
+                  background: '#ecfdf5',
+                  color: '#065f46',
+                  border: '2px solid #10b981',
+                  borderRadius: '0',
                   fontSize: '0.8125rem',
-                  fontWeight: '500'
+                  fontWeight: '600'
                 }}>
-                  {spec}
+                  {deal}
                 </span>
               ))}
             </div>
@@ -431,9 +444,10 @@ export function InstructorCard({ instructor, showActions = true }: InstructorCar
                   padding: '0.5rem 0.875rem',
                   background: '#f3e8ff',
                   color: '#7c3aed',
-                  borderRadius: '0.5rem',
+                  border: '2px solid #a78bfa',
+                  borderRadius: '0',
                   fontSize: '0.8125rem',
-                  fontWeight: '500'
+                  fontWeight: '600'
                 }}>
                   {lang}
                 </span>
@@ -461,9 +475,10 @@ export function InstructorCard({ instructor, showActions = true }: InstructorCar
                   padding: '0.5rem 0.875rem',
                   background: '#fef3c7',
                   color: '#78350f',
-                  borderRadius: '0.5rem',
+                  border: '2px solid #fbbf24',
+                  borderRadius: '0',
                   fontSize: '0.8125rem',
-                  fontWeight: '500'
+                  fontWeight: '600'
                 }}>
                   {a.day.slice(0, 3)} {a.startTime}–{a.endTime}
                 </span>
@@ -473,9 +488,10 @@ export function InstructorCard({ instructor, showActions = true }: InstructorCar
                   padding: '0.5rem 0.875rem',
                   background: '#f1f5f9',
                   color: '#64748b',
-                  borderRadius: '0.5rem',
+                  border: '2px solid #cbd5e1',
+                  borderRadius: '0',
                   fontSize: '0.8125rem',
-                  fontWeight: '500'
+                  fontWeight: '600'
                 }}>
                   +{workingSlots.length - 6} more
                 </span>
