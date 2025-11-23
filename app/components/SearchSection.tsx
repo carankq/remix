@@ -4,7 +4,7 @@ import { Search, RotateCcw } from './Icons';
 
 type FilterCriteria = {
   priceRange: [number, number];
-  postcode: string;
+  outcode: string;
   gender: string;
   vehicleType: string;
   minExperience: number;
@@ -12,7 +12,7 @@ type FilterCriteria = {
 };
 
 type InitialFilters = {
-  postcode?: string;
+  outcode?: string;
   gender?: string;
   vehicleType?: string;
   language?: string;
@@ -30,44 +30,44 @@ export function SearchSection({
   // Initialize filters with provided values or defaults
   const [filters, setFilters] = useState<FilterCriteria>({
     priceRange: [20, 60],
-    postcode: initialFilters?.postcode || '',
+    outcode: initialFilters?.outcode || '',
     gender: initialFilters?.gender || '',
     vehicleType: initialFilters?.vehicleType || '',
     minExperience: 0,
     language: initialFilters?.language || ''
   });
   
-  // Single postcode only
-  const [postcode, setPostcode] = useState<string>(
-    initialFilters?.postcode ? initialFilters.postcode.split(',')[0]?.trim() || '' : ''
+  // Single outcode only
+  const [outcode, setOutcode] = useState<string>(
+    initialFilters?.outcode ? initialFilters.outcode.split(',')[0]?.trim() || '' : ''
   );
   
   const [showAlert, setShowAlert] = useState(false);
 
   const handleFilterChange = (key: keyof FilterCriteria, value: any) => {
-    const normalizedValue = key === 'postcode' && typeof value === 'string' ? value.toUpperCase() : value;
+    const normalizedValue = key === 'outcode' && typeof value === 'string' ? value.toUpperCase() : value;
     setFilters({ ...filters, [key]: normalizedValue });
   };
 
   const handleSearch = () => {
-    // Check if postcode is empty or only whitespace
-    if (!postcode || postcode.trim() === '') {
+    // Check if outcode is empty or only whitespace
+    if (!outcode || outcode.trim() === '') {
       setShowAlert(true);
       return;
     }
-    onSearch('', { ...filters, postcode });
+    onSearch('', { ...filters, outcode });
   };
   const clearFilters = () => { 
-    const d: FilterCriteria = { priceRange: [20, 60], postcode: '', gender: '', vehicleType: '', minExperience: 0, language: '' }; 
+    const d: FilterCriteria = { priceRange: [20, 60], outcode: '', gender: '', vehicleType: '', minExperience: 0, language: '' }; 
     setFilters(d); 
-    setPostcode(''); 
+    setOutcode(''); 
     if (autoSearch) onSearch('', d); 
   };
 
-  useEffect(() => { if (autoSearch) { onSearch('', { ...filters, postcode }); } }, []);
+  useEffect(() => { if (autoSearch) { onSearch('', { ...filters, outcode }); } }, []);
 
-  const handlePostcodeInputChange = (value: string) => {
-    setPostcode(value.toUpperCase());
+  const handleOutcodeInputChange = (value: string) => {
+    setOutcode(value.toUpperCase());
   };
 
   return (
@@ -119,7 +119,7 @@ export function SearchSection({
               gap: '1.5rem',
               marginBottom: '2rem'
             }}>
-              {/* Postcode */}
+              {/* Outcode */}
               <div>
                 <label style={{
                   display: 'block',
@@ -135,9 +135,9 @@ export function SearchSection({
                 <div style={{ position: 'relative' }}>
                   <input 
                     type="text" 
-                    value={postcode} 
-                    onChange={(e) => handlePostcodeInputChange(e.target.value)} 
-                    placeholder="Enter postcode" 
+                    value={outcode} 
+                    onChange={(e) => handleOutcodeInputChange(e.target.value)} 
+                    placeholder="Enter outcode (e.g., SW1)" 
                     style={{
                       width: '100%',
                       padding: '1rem 1rem 1rem 3rem',
@@ -576,7 +576,7 @@ export function SearchSection({
                 color: '#111827',
                 margin: 0 
               }}>
-                Postcode Required
+                Outcode Required
               </h3>
             </div>
             <p style={{ 
@@ -585,7 +585,7 @@ export function SearchSection({
               lineHeight: '1.5',
               marginBottom: '1.5rem' 
             }}>
-              Please enter a postcode to search for instructors in your area.
+              Please enter an outcode to search for instructors in your area.
             </p>
             <button
               onClick={() => setShowAlert(false)}

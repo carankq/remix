@@ -1,6 +1,6 @@
 import type { LoaderFunctionArgs } from "@remix-run/node";
 import { json, redirect } from "@remix-run/node";
-import { useLoaderData } from "@remix-run/react";
+import { useLoaderData, useNavigate } from "@remix-run/react";
 import { Header } from "../components/Header";
 import { Footer } from "../components/Footer";
 import { getUserFromSession } from "../session.server";
@@ -126,6 +126,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
 
 export default function DashboardInstructorProfileRoute() {
   const { profile, profileError, isInstructor } = useLoaderData<typeof loader>();
+  const navigate = useNavigate();
   const [showForm, setShowForm] = useState(false);
   
   // Callback to handle profile creation/update - reload the page to get fresh data
@@ -551,19 +552,32 @@ export default function DashboardInstructorProfileRoute() {
                   >
                     Edit Profile
                   </button>
-                  <button style={{
-                    padding: '0.75rem 1.5rem',
-                    border: '2px solid #e5e7eb',
-                    background: 'white',
-                    color: '#6b7280',
-                    borderRadius: '0',
-                    cursor: 'pointer',
-                    fontWeight: '600',
-                    fontSize: '1rem',
-                    transition: 'all 0.2s ease'
-                  }}>
-                    Preview Public Profile
-                  </button>
+                  {profile.brandName && (
+                    <button 
+                      onClick={() => navigate(`/instructors/${encodeURIComponent(profile.brandName)}`)}
+                      style={{
+                        padding: '0.75rem 1.5rem',
+                        border: '2px solid #e5e7eb',
+                        background: 'white',
+                        color: '#6b7280',
+                        borderRadius: '0',
+                        cursor: 'pointer',
+                        fontWeight: '600',
+                        fontSize: '1rem',
+                        transition: 'all 0.2s ease'
+                      }}
+                      onMouseEnter={(e) => {
+                        e.currentTarget.style.background = '#f9fafb';
+                        e.currentTarget.style.borderColor = '#d1d5db';
+                      }}
+                      onMouseLeave={(e) => {
+                        e.currentTarget.style.background = 'white';
+                        e.currentTarget.style.borderColor = '#e5e7eb';
+                      }}
+                    >
+                      Preview Public Profile
+                    </button>
+                  )}
                 </div>
               </>
             ) : (

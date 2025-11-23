@@ -17,7 +17,7 @@ type Instructor = {
   yearsOfExperience?: number;
   rating?: number;
   totalReviews?: number;
-  postcode?: string[];
+  outcodes?: string[];
   gender?: string;
   company?: string;
   phone?: string;
@@ -70,7 +70,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
       yearsOfExperience: Number(r.yearsOfExperience ?? r.experienceYears ?? 0) || undefined,
       rating: Number(r.rating ?? r.averageRating ?? 0) || undefined,
       totalReviews: Number(r.totalReviews ?? r.reviewCount ?? 0) || undefined,
-      postcode: Array.isArray(r.postcode) ? r.postcode : (r.postcode ? [String(r.postcode)] : undefined),
+      outcodes: Array.isArray(r.outcodes) ? r.outcodes : (r.outcodes ? [String(r.outcodes)] : undefined),
       gender: r.gender,
       company: r.company,
       phone: r.phone,
@@ -111,10 +111,10 @@ export function headers({ loaderHeaders }: { loaderHeaders: Headers }) {
 export async function action({ request }: ActionFunctionArgs) {
   const form = await request.formData();
   const q = String(form.get("q") || "");
-  const postcode = String(form.get("postcode") || "");
+  const outcode = String(form.get("outcode") || "");
   const params = new URLSearchParams();
   if (q) params.set("q", q);
-  if (postcode) postcode.split(',').map(s => s.trim()).filter(Boolean).forEach(pc => params.append('postcode', pc));
+  if (outcode) outcode.split(',').map(s => s.trim()).filter(Boolean).forEach(oc => params.append('outcode', oc));
   return redirect("/results?" + params.toString());
 }
 
@@ -253,18 +253,18 @@ export default function ResultsRoute() {
             
             {/* Second Row: Active Filters */}
             {(() => {
-              const postcodes = searchParams.getAll('postcode');
+              const outcodes = searchParams.getAll('outcode');
               const gender = searchParams.get('gender');
               const vehicleType = searchParams.get('vehicleType');
               const language = searchParams.get('language');
-              const hasFilters = postcodes.length > 0 || gender || vehicleType || language;
+              const hasFilters = outcodes.length > 0 || gender || vehicleType || language;
               
               if (!hasFilters) return null;
               
               const filters = [];
-              postcodes.forEach((pc) => {
+              outcodes.forEach((oc) => {
                 filters.push(
-                  <span key={`pc-${pc}`} style={{
+                  <span key={`oc-${oc}`} style={{
                     display: 'inline-flex',
                     alignItems: 'center',
                     gap: '0.4rem',
@@ -276,7 +276,7 @@ export default function ResultsRoute() {
                       <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/>
                       <circle cx="12" cy="10" r="3"/>
                     </svg>
-                    Around {pc}
+                    Around {oc}
                   </span>
                 );
               });

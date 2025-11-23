@@ -434,7 +434,7 @@ const InstructorCreateForm: React.FC<InstructorCreateFormProps> = ({
         description: instForm.description.trim() || undefined,
         pricePerHour: instForm.pricePerHour.trim() !== '' ? Math.min(60, parseFloat(instForm.pricePerHour)) : undefined,
         outcodes: postcodes, // array of outcodes (first part of postcodes)
-        gender: instForm.gender || undefined,
+        gender: (instForm.gender === 'Male' || instForm.gender === 'Female') ? instForm.gender : undefined,
         deals: deals,
         yearsOfExperience: instForm.yearsOfExperience ? Number(instForm.yearsOfExperience) : undefined,
         company: instForm.company.trim() || undefined,
@@ -995,6 +995,20 @@ const InstructorCreateForm: React.FC<InstructorCreateFormProps> = ({
                 Company Name
               </label>
               <input className="instructor-form-input" placeholder="e.g., ABC Driving Academy" value={instForm.company} onChange={onInstChange('company')} />
+            </div>
+            <div>
+              <label className="instructor-form-label">
+                Gender
+              </label>
+              <select 
+                className="instructor-form-select"
+                value={instForm.gender}
+                onChange={onInstChange('gender')}
+              >
+                <option value="">Choose below</option>
+                <option value="Male">Male</option>
+                <option value="Female">Female</option>
+              </select>
             </div>
             <div>
               <label className="instructor-form-label">

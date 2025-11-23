@@ -16,7 +16,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
   
   // Extract search params to pass back to client
   const searchParams = {
-    postcode: url.searchParams.getAll('postcode'),
+    outcode: url.searchParams.getAll('outcode'),
     gender: url.searchParams.get('gender') || '',
     vehicleType: url.searchParams.get('vehicleType') || '',
     language: url.searchParams.get('language') || '',
@@ -58,10 +58,10 @@ export function headers({ loaderHeaders }: { loaderHeaders: Headers }) {
 export async function action({ request }: ActionFunctionArgs) {
   const formData = await request.formData();
   const q = String(formData.get("q") || "").trim();
-  const postcode = String(formData.get("postcode") || "").trim();
+  const outcode = String(formData.get("outcode") || "").trim();
   const params = new URLSearchParams();
   if (q) params.set("q", q);
-  if (postcode) params.append("postcode", postcode);
+  if (outcode) params.append("outcode", outcode);
   return new Response(null, {
     status: 302,
     headers: { Location: "/results?" + params.toString() }
@@ -77,14 +77,14 @@ export default function Index() {
       <Header />
         <SearchSection 
           initialFilters={{
-            postcode: searchParams.postcode.join(','),
+            outcode: searchParams.outcode?.join(',') || '',
             gender: searchParams.gender,
             vehicleType: searchParams.vehicleType,
             language: searchParams.language,
           }}
           onSearch={(q, filters) => {
             const params = new URLSearchParams();
-            if (filters.postcode) filters.postcode.split(',').map(p => p.trim()).filter(Boolean).forEach(pc => params.append('postcode', pc));
+            if (filters.outcode) filters.outcode.split(',').map(p => p.trim()).filter(Boolean).forEach(oc => params.append('outcode', oc));
             if (filters.gender) params.set('gender', filters.gender);
             if (filters.vehicleType) params.set('vehicleType', filters.vehicleType);
             if (filters.language) params.set('language', filters.language);
