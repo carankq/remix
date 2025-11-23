@@ -1,5 +1,5 @@
 import { Link, useNavigate } from "@remix-run/react";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 
 type Instructor = {
   id: string;
@@ -16,6 +16,7 @@ type Instructor = {
   phone?: string;
   email?: string;
   specializations?: string[];
+  instructorType?: 'ADI' | 'PDI';
   availability?:
     | Array<{ day: string; start?: string; end?: string; startTime?: string; endTime?: string }>
     | { working?: Array<{ day: string; startTime: string; endTime: string }>; exceptions?: Array<any> };
@@ -31,6 +32,7 @@ type InstructorCardProps = {
 
 export function InstructorCard({ instructor, showActions = true }: InstructorCardProps) {
   const navigate = useNavigate();
+  const [showTypeInfo, setShowTypeInfo] = useState(false);
   const hasRating = instructor.rating && instructor.rating > 0;
   const hasImage = instructor.image && instructor.image.trim() !== '';
   const placeholder = 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><rect width="100" height="100" rx="50" fill="%23e5e7eb"/><circle cx="50" cy="38" r="18" fill="%239ca3af"/><path d="M20 86c4-18 18-28 30-28s26 10 30 28" fill="%239ca3af"/></svg>';
@@ -131,6 +133,142 @@ export function InstructorCard({ instructor, showActions = true }: InstructorCar
                 <span style={{ fontSize: '0.875rem', color: '#64748b' }}>{instructor.company}</span>
               </div>
             )}
+            
+            {/* Instructor Type Badge */}
+            {instructor.instructorType && (
+              <div style={{ marginBottom: '0.75rem', position: 'relative' }}>
+                <div 
+                  style={{ 
+                    display: 'inline-flex', 
+                    alignItems: 'center', 
+                    gap: '0.5rem',
+                    padding: '0.375rem 0.875rem',
+                    background: instructor.instructorType === 'ADI' ? '#ecfdf5' : '#fdf2f8',
+                    border: `2px solid ${instructor.instructorType === 'ADI' ? '#10b981' : '#ec4899'}`,
+                    borderRadius: '0',
+                    cursor: 'pointer'
+                  }}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setShowTypeInfo(!showTypeInfo);
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.transform = 'scale(1.02)';
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.transform = 'scale(1)';
+                  }}
+                >
+                  <span style={{
+                    fontSize: '0.8125rem',
+                    fontWeight: '700',
+                    color: instructor.instructorType === 'ADI' ? '#065f46' : '#831843',
+                    letterSpacing: '0.025em'
+                  }}>
+                    {instructor.instructorType}
+                  </span>
+                  <svg 
+                    width="14" 
+                    height="14" 
+                    viewBox="0 0 24 24" 
+                    fill="none" 
+                    stroke={instructor.instructorType === 'ADI' ? '#10b981' : '#ec4899'} 
+                    strokeWidth="2.5" 
+                    strokeLinecap="round" 
+                    strokeLinejoin="round"
+                  >
+                    <circle cx="12" cy="12" r="10"/>
+                    <line x1="12" y1="16" x2="12" y2="12"/>
+                    <line x1="12" y1="8" x2="12.01" y2="8"/>
+                  </svg>
+                </div>
+                
+                {/* Popup Info Box */}
+                {showTypeInfo && (
+                  <div 
+                    style={{
+                      position: 'absolute',
+                      top: '100%',
+                      left: '0',
+                      marginTop: '0.5rem',
+                      padding: '1rem',
+                      background: '#ffffff',
+                      border: `2px solid ${instructor.instructorType === 'ADI' ? '#10b981' : '#ec4899'}`,
+                      borderRadius: '0',
+                      boxShadow: '0 8px 24px rgba(0,0,0,0.15)',
+                      zIndex: 1000,
+                      minWidth: '280px',
+                      maxWidth: '320px'
+                    }}
+                    onClick={(e) => e.stopPropagation()}
+                  >
+                    <div style={{ display: 'flex', alignItems: 'flex-start', gap: '0.75rem' }}>
+                      <div style={{
+                        padding: '0.5rem',
+                        background: instructor.instructorType === 'ADI' ? '#ecfdf5' : '#fdf2f8',
+                        borderRadius: '0'
+                      }}>
+                        <svg 
+                          width="20" 
+                          height="20" 
+                          viewBox="0 0 24 24" 
+                          fill="none" 
+                          stroke={instructor.instructorType === 'ADI' ? '#10b981' : '#ec4899'} 
+                          strokeWidth="2" 
+                          strokeLinecap="round" 
+                          strokeLinejoin="round"
+                        >
+                          <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+                          <polyline points="14 2 14 8 20 8"/>
+                          <line x1="16" y1="13" x2="8" y2="13"/>
+                          <line x1="16" y1="17" x2="8" y2="17"/>
+                        </svg>
+                      </div>
+                      <div style={{ flex: 1 }}>
+                        <h5 style={{ 
+                          fontSize: '0.875rem', 
+                          fontWeight: '700', 
+                          color: '#111827',
+                          marginBottom: '0.5rem'
+                        }}>
+                          {instructor.instructorType === 'ADI' ? 'Approved Driving Instructor' : 'Potential Driving Instructor'}
+                        </h5>
+                        <p style={{ 
+                          fontSize: '0.75rem', 
+                          color: '#6b7280',
+                          lineHeight: '1.5',
+                          marginBottom: '0.5rem'
+                        }}>
+                          {instructor.instructorType === 'ADI' 
+                            ? 'A fully qualified and DVSA-approved instructor licensed to teach learner drivers independently.'
+                            : 'A trainee instructor learning to teach under supervision, working towards becoming a fully qualified ADI.'}
+                        </p>
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setShowTypeInfo(false);
+                          }}
+                          style={{
+                            padding: '0.375rem 0.75rem',
+                            background: instructor.instructorType === 'ADI' ? '#10b981' : '#ec4899',
+                            color: '#ffffff',
+                            border: 'none',
+                            borderRadius: '0',
+                            fontSize: '0.75rem',
+                            fontWeight: '600',
+                            cursor: 'pointer',
+                            width: '100%'
+                          }}
+                        >
+                          Got it
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                )}
+              </div>
+            )}
+            
             <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', flexWrap: 'wrap' }}>
               {hasRating && (
                 <div style={{ display: 'flex', alignItems: 'center', gap: '0.375rem' }}>

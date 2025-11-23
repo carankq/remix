@@ -72,6 +72,13 @@ const InstructorCreateForm: React.FC<InstructorCreateFormProps> = ({
   const [vehiclesModified, setVehiclesModified] = useState(false); // Track if vehicles were changed
   const [deals, setDeals] = useState<string[]>([]);
   const [languages, setLanguages] = useState<string[]>([]);
+  
+  // Credential References state
+  const [credentialType, setCredentialType] = useState<'ADI' | 'PDI' | ''>('');
+  const [credentialExpiry, setCredentialExpiry] = useState(''); // YYYY-MM-DD format
+  const [credentialReferenceCode, setCredentialReferenceCode] = useState('');
+  const [credentialsModified, setCredentialsModified] = useState(false); // Track if credentials were changed
+  
   // Working availability (day + HH:MM inputs rendered as strings)
   const [availability, setAvailability] = useState<{ day: string; start: string; end: string }[]>([]);
   // Exceptions (date ranges for holidays, etc.)
@@ -233,6 +240,35 @@ const InstructorCreateForm: React.FC<InstructorCreateFormProps> = ({
     })) : []);
     setDeals(Array.isArray(ownerInst.deals) ? ownerInst.deals : []);
     setLanguages(Array.isArray(ownerInst.languages) ? ownerInst.languages : []);
+    
+    // Prefill credential references
+    if (ownerInst.credentialReferences && typeof ownerInst.credentialReferences === 'object') {
+      setCredentialType(ownerInst.credentialReferences.type || '');
+      setCredentialReferenceCode(ownerInst.credentialReferences.referenceCode || '');
+      
+      // Handle expiry - can be date-time string or Unix timestamp
+      if (ownerInst.credentialReferences.expiry) {
+        const expiry = ownerInst.credentialReferences.expiry;
+        let expiryDate: Date;
+        
+        if (typeof expiry === 'number') {
+          // Unix timestamp (handle both ms and seconds)
+          expiryDate = new Date(expiry > 10000000000 ? expiry : expiry * 1000);
+        } else {
+          // ISO date-time string
+          expiryDate = new Date(expiry);
+        }
+        
+        setCredentialExpiry(expiryDate.toISOString().slice(0, 10)); // YYYY-MM-DD
+      } else {
+        setCredentialExpiry('');
+      }
+    } else {
+      setCredentialType('');
+      setCredentialExpiry('');
+      setCredentialReferenceCode('');
+    }
+    
     // Prefill availability (support both legacy array and new object with .working/.exceptions)
     if (Array.isArray(ownerInst.availability)) {
       setAvailability(ownerInst.availability.map((a: any) => ({ day: a.day, start: toHHMM(a.startTime), end: toHHMM(a.endTime) })));
@@ -429,22 +465,63 @@ const InstructorCreateForm: React.FC<InstructorCreateFormProps> = ({
         }
       };
       
+      // Determine if this is an update
+      const isUpdate = Boolean(ownerInst && (ownerInst._id || ownerInst.id));
+      
+      // Add credential references if:
+      // 1. Creating new profile (no ownerInst), OR
+      // 2. Updating existing profile AND credentialsModified is true
+      if (!isUpdate || credentialsModified) {
+        if (credentialType && credentialReferenceCode) {
+          payload.credentialReferences = {
+            type: credentialType,
+            referenceCode: credentialReferenceCode.trim()
+          };
+          
+          // Add expiry if provided (convert to Unix timestamp in ms)
+          if (credentialExpiry) {
+            const expiryDate = new Date(credentialExpiry);
+            payload.credentialReferences.expiry = expiryDate.getTime();
+          }
+        }
+      }
+      
       // Only include vehicles if: 
       // 1. Creating new profile (no ownerInst), OR
       // 2. Updating existing profile AND vehiclesModified is true
-      const isUpdate = Boolean(ownerInst && (ownerInst._id || ownerInst.id));
       if (!isUpdate || vehiclesModified) {
         payload.vehicles = vehicles.filter(v => v.type && v.licensePlateNumber); // Only include complete vehicles
       }
       
+      // Validation: credentials required for new profiles OR when updating credentials
+      const credentialsRequired = !isUpdate || credentialsModified;
       // Validation: vehicles required only if creating new profile OR updating vehicles
       const vehiclesRequired = !isUpdate || vehiclesModified;
-      if (!payload.name || !payload.brandName || postcodes.length === 0 || (vehiclesRequired && vehicles.length === 0)) {
+      
+      if (!payload.name || !payload.brandName || postcodes.length === 0) {
         showAlertPopup(
           'Missing Required Fields',
-          vehiclesRequired 
-            ? 'Please complete the required fields: name, brand name, coverage outcode(s), and at least one vehicle.'
-            : 'Please complete the required fields: name, brand name, and coverage outcode(s).',
+          'Please complete the required fields: name, brand name, and coverage outcode(s).',
+          'warning'
+        );
+        setInstSubmitting(false);
+        return;
+      }
+
+      if (credentialsRequired && (!credentialType || !credentialReferenceCode)) {
+        showAlertPopup(
+          'Missing Credentials',
+          'Driving instructor credentials (type and reference code) are required. Your profile will not appear in search results without valid credentials.',
+          'warning'
+        );
+        setInstSubmitting(false);
+        return;
+      }
+      
+      if (vehiclesRequired && vehicles.length === 0) {
+        showAlertPopup(
+          'Missing Vehicles',
+          'Please add at least one vehicle.',
           'warning'
         );
         setInstSubmitting(false);
@@ -491,8 +568,8 @@ const InstructorCreateForm: React.FC<InstructorCreateFormProps> = ({
         if (onCreated) {
           onCreated(data);
         } else {
-          await refreshOwner();
-          setMode('summary');
+        await refreshOwner();
+        setMode('summary');
         }
       } else if (isUpdate && response.status === 200) {
         showAlertPopup(
@@ -503,8 +580,8 @@ const InstructorCreateForm: React.FC<InstructorCreateFormProps> = ({
         if (onCreated) {
           onCreated(data);
         } else {
-          await refreshOwner();
-          setMode('summary');
+        await refreshOwner();
+        setMode('summary');
         }
       } else if (response.status === 400) {
         showAlertPopup(
@@ -688,6 +765,182 @@ const InstructorCreateForm: React.FC<InstructorCreateFormProps> = ({
         </div>
       )}
       <form onSubmit={submitInstructor} style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
+        
+        {/* Credential References Section */}
+        <div style={sectionStyle}>
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '1rem' }}>
+            <h3 style={sectionHeaderStyle}>
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ color: '#10b981' }}>
+                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+                <polyline points="14 2 14 8 20 8"/>
+                <line x1="16" y1="13" x2="8" y2="13"/>
+                <line x1="16" y1="17" x2="8" y2="17"/>
+                <polyline points="10 9 9 9 8 9"/>
+              </svg>
+              Driving Instructor Credentials
+            </h3>
+            {ownerInst && (
+              <label style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', cursor: 'pointer' }}>
+                <input
+                  type="checkbox"
+                  checked={credentialsModified}
+                  onChange={(e) => setCredentialsModified(e.target.checked)}
+                  style={{ 
+                    width: '16px', 
+                    height: '16px', 
+                    cursor: 'pointer',
+                    accentColor: '#2563eb'
+                  }}
+                />
+                <span style={{ fontSize: '0.8125rem', color: '#6b7280', fontWeight: '500' }}>
+                  Update credentials
+                </span>
+              </label>
+            )}
+          </div>
+          
+          <div style={{
+            background: '#eff6ff',
+            border: '2px solid #3b82f6',
+            borderRadius: '0',
+            padding: '0.875rem',
+            marginBottom: '1rem',
+            display: 'flex',
+            alignItems: 'flex-start',
+            gap: '0.75rem'
+          }}>
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#3b82f6" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0, marginTop: '0.125rem' }}>
+              <circle cx="12" cy="12" r="10"/>
+              <line x1="12" y1="16" x2="12" y2="12"/>
+              <line x1="12" y1="8" x2="12.01" y2="8"/>
+            </svg>
+            <div>
+              <p style={{ fontSize: '0.8125rem', color: '#1e40af', fontWeight: '600', marginBottom: '0.25rem' }}>
+                Keep Your Credentials Up to Date
+              </p>
+              <p style={{ fontSize: '0.75rem', color: '#1e3a8a', lineHeight: '1.5' }}>
+                🔒 <strong>Security:</strong> This information is never shared publicly and is used only for verification.<br/>
+                ⚠️ <strong>Important:</strong> Your profile will not appear in search results if your credentials are missing or expired. Please ensure they are current.
+              </p>
+            </div>
+          </div>
+          
+          {/* Warning when credentials update is enabled */}
+          {ownerInst && credentialsModified && (
+            <div style={{
+              background: '#fef3c7',
+              border: '2px solid #f59e0b',
+              borderRadius: '0',
+              padding: '0.875rem',
+              marginBottom: '1rem',
+              display: 'flex',
+              alignItems: 'flex-start',
+              gap: '0.75rem'
+            }}>
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#f59e0b" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0, marginTop: '0.125rem' }}>
+                <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/>
+                <line x1="12" y1="9" x2="12" y2="13"/>
+                <line x1="12" y1="17" x2="12.01" y2="17"/>
+              </svg>
+              <div>
+                <p style={{ fontSize: '0.8125rem', color: '#92400e', fontWeight: '600', marginBottom: '0.25rem' }}>
+                  Important: This will update your credential information
+                </p>
+                <p style={{ fontSize: '0.75rem', color: '#78350f', lineHeight: '1.4' }}>
+                  Ensure all credential details are accurate. Your profile visibility depends on having valid, up-to-date credentials.
+                </p>
+              </div>
+            </div>
+          )}
+          
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4" style={{
+            opacity: (ownerInst && !credentialsModified) ? 0.5 : 1,
+            pointerEvents: (ownerInst && !credentialsModified) ? 'none' : 'auto'
+          }}>
+            <div>
+              <label className="instructor-form-label">
+                Credential Type
+              </label>
+              <select 
+                className="instructor-form-select"
+                value={credentialType}
+                disabled={ownerInst && !credentialsModified}
+                onChange={(e) => setCredentialType(e.target.value as 'ADI' | 'PDI' | '')}
+              >
+                <option value="">Select type</option>
+                <option value="ADI">ADI (Approved Driving Instructor)</option>
+                <option value="PDI">PDI (Potential Driving Instructor)</option>
+              </select>
+              <p className="instructor-form-helper">
+                Your instructor qualification
+              </p>
+            </div>
+            
+            <div>
+              <label className="instructor-form-label">
+                Reference Code
+              </label>
+              <input 
+                className="instructor-form-input"
+                type="text"
+                placeholder="6 digits (e.g., 123456)"
+                maxLength={6}
+                value={credentialReferenceCode}
+                disabled={ownerInst && !credentialsModified}
+                onChange={(e) => {
+                  // Only allow numbers
+                  const value = e.target.value.replace(/[^0-9]/g, '');
+                  setCredentialReferenceCode(value);
+                }}
+              />
+              <p className="instructor-form-helper">
+                Unique 6-digit reference code
+              </p>
+            </div>
+            
+            <div>
+              <label className="instructor-form-label">
+                Expiry Date
+              </label>
+              <input 
+                className="instructor-form-input"
+                type="date"
+                value={credentialExpiry}
+                disabled={ownerInst && !credentialsModified}
+                onChange={(e) => setCredentialExpiry(e.target.value)}
+              />
+              <p className="instructor-form-helper">
+                When your credential expires
+              </p>
+            </div>
+          </div>
+          
+          {credentialType && credentialReferenceCode && (
+            <div style={{
+              marginTop: '1rem',
+              padding: '0.875rem',
+              background: credentialType === 'ADI' ? '#ecfdf5' : '#fdf2f8',
+              border: `2px solid ${credentialType === 'ADI' ? '#10b981' : '#ec4899'}`,
+              borderRadius: '0',
+              display: 'flex',
+              alignItems: 'flex-start',
+              gap: '0.75rem'
+            }}>
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke={credentialType === 'ADI' ? '#10b981' : '#ec4899'} strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0, marginTop: '0.125rem' }}>
+                <polyline points="20 6 9 17 4 12"/>
+              </svg>
+              <div>
+                <p style={{ fontSize: '0.8125rem', color: credentialType === 'ADI' ? '#065f46' : '#831843', fontWeight: '600', marginBottom: '0.25rem' }}>
+                  Credentials Added
+                </p>
+                <p style={{ fontSize: '0.75rem', color: credentialType === 'ADI' ? '#047857' : '#9f1239', lineHeight: '1.4' }}>
+                  {credentialType} credential #{credentialReferenceCode}
+                  {credentialExpiry && ` expires on ${new Date(credentialExpiry).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })}`}
+                </p>
+              </div>
+            </div>
+          )}
+        </div>
         
         {/* Personal Information Section */}
         <div style={sectionStyle}>

@@ -23,6 +23,7 @@ interface InstructorProfile {
   email?: string;
   languages?: string[];
   image?: string;
+  instructorType?: 'ADI' | 'PDI';
   availability?: {
     working?: Array<{
       day: string;
@@ -336,6 +337,28 @@ export default function DashboardInstructorProfileRoute() {
                           <div style={{ fontSize: '0.75rem', color: '#6b7280', marginBottom: '0.25rem' }}>Brand Name</div>
                           <div style={{ fontSize: '1rem', fontWeight: '600', color: '#111827' }}>{profile.brandName || 'Not set'}</div>
                         </div>
+                        {profile.instructorType && (
+                          <div>
+                            <div style={{ fontSize: '0.75rem', color: '#6b7280', marginBottom: '0.25rem' }}>Instructor Type</div>
+                            <div style={{ display: 'inline-flex', alignItems: 'center', gap: '0.5rem' }}>
+                              <span style={{
+                                padding: '0.375rem 0.875rem',
+                                background: profile.instructorType === 'ADI' ? '#ecfdf5' : '#fdf2f8',
+                                border: `2px solid ${profile.instructorType === 'ADI' ? '#10b981' : '#ec4899'}`,
+                                color: profile.instructorType === 'ADI' ? '#065f46' : '#831843',
+                                fontSize: '0.875rem',
+                                fontWeight: '700',
+                                borderRadius: '0',
+                                letterSpacing: '0.025em'
+                              }}>
+                                {profile.instructorType}
+                              </span>
+                              <span style={{ fontSize: '0.875rem', color: '#6b7280' }}>
+                                {profile.instructorType === 'ADI' ? 'Approved Driving Instructor' : 'Potential Driving Instructor'}
+                              </span>
+                            </div>
+                          </div>
+                        )}
                         <div>
                           <div style={{ fontSize: '0.75rem', color: '#6b7280', marginBottom: '0.25rem' }}>Hourly Rate</div>
                           <div style={{ fontSize: '1rem', fontWeight: '600', color: '#111827' }}>{hourlyRate}</div>
