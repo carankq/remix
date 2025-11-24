@@ -846,6 +846,12 @@ select {
     grid-template-columns: 1fr 1fr !important;
   }
   
+  /* Hover effect for how it works cards on desktop */
+  .how-it-works-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+  }
+  
   /* Results header layout - desktop: space-between */
   .results-header-layout {
     display: flex !important;

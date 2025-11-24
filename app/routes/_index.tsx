@@ -91,8 +91,8 @@ export default function Index() {
             navigate(`/results?${params.toString()}`);
           }} 
         />
-        <InstructorBenefitsSection />
         <HowItWorksSection />
+        <InstructorBenefitsSection />
         {/* <TrustTechnologySection /> */}
         <FAQSection blogs={blogsTop3} />
       <Footer />
