@@ -1,8 +1,10 @@
-import type { LoaderFunctionArgs } from "@remix-run/node";
+import type { LoaderFunctionArgs, ActionFunctionArgs } from "@remix-run/node";
 import { json, redirect } from "@remix-run/node";
-import { useLoaderData } from "@remix-run/react";
+import { useLoaderData, useFetcher } from "@remix-run/react";
+import { useState } from "react";
 import { Header } from "../components/Header";
 import { Footer } from "../components/Footer";
+import { Alert } from "../components/Alert";
 import { getUserFromSession } from "../session.server";
 
 type Enquiry = {
@@ -28,6 +30,66 @@ type LoaderData = {
   archivedEnquiries: number;
 };
 
+export async function action({ request }: ActionFunctionArgs) {
+  const userSession = await getUserFromSession(request);
+  console.log('came here to do someting.......')
+  if (!userSession) {
+    return redirect('/auth');
+  }
+  
+  const formData = await request.formData();
+  const action = formData.get('_action');
+  const enquiryId = formData.get('enquiryId');
+  
+  if (!enquiryId || typeof enquiryId !== 'string') {
+    return json({ error: 'Invalid enquiry ID', success: false }, { status: 400 });
+  }
+  
+  try {
+    console.log('started doing somthing...')
+    const apiHost = process.env.API_HOST || 'http://localhost:3001';
+    const endpoint = action === 'archive' 
+      ? `/enquiries/${enquiryId}/archive`
+      : `/enquiries/${enquiryId}/unarchive`;
+    
+    console.log(`[Enquiry Action] ${action} - Calling: ${apiHost}${endpoint}`);
+    
+    const response = await fetch(`${apiHost}${endpoint}`, {
+      method: 'PATCH',
+      headers: {
+        'Authorization': `Bearer ${userSession.token}`,
+        'Content-Type': 'application/json'
+      }
+    });
+    
+    console.log(`[Enquiry Action] Response status: ${response.status}`);
+    
+    if (!response.ok) {
+      const errorData = await response.json().catch(() => ({ message: 'Operation failed' }));
+      console.error(`[Enquiry Action] Error:`, errorData);
+      return json({ 
+        error: errorData.message || 'Failed to update enquiry',
+        success: false 
+      }, { status: response.status });
+    }
+    
+    console.log(`[Enquiry Action] Success - Enquiry ${action}d`);
+    
+    return json({ 
+      success: true, 
+      error: null,
+      message: action === 'archive' ? 'Enquiry archived successfully' : 'Enquiry unarchived successfully'
+    });
+    
+  } catch (error) {
+    console.error('Error updating enquiry:', error);
+    return json({ 
+      error: 'Failed to update enquiry. Please try again.',
+      success: false 
+    }, { status: 500 });
+  }
+}
+
 export async function loader({ request }: LoaderFunctionArgs) {
   const userSession = await getUserFromSession(request);
   
@@ -38,11 +100,10 @@ export async function loader({ request }: LoaderFunctionArgs) {
   
   try {
     const apiHost = process.env.API_HOST || 'http://localhost:3001';
-    const url = new URL(request.url);
-    const includeArchived = url.searchParams.get('includeArchived') === 'true';
     
+    // Always fetch both active and archived enquiries
     const response = await fetch(
-      `${apiHost}/enquiries/mine?includeArchived=${includeArchived}`,
+      `${apiHost}/enquiries/mine?includeArchived=true`,
       {
         headers: {
           'Authorization': `Bearer ${userSession.token}`,
@@ -84,6 +145,41 @@ export async function loader({ request }: LoaderFunctionArgs) {
 
 export default function DashboardEnquiriesRoute() {
   const { enquiries, totalEnquiries, newEnquiries, archivedEnquiries } = useLoaderData<typeof loader>();
+  const fetcher = useFetcher<{ success?: boolean; error?: string | null; message?: string }>();
+  const [showSuccessAlert, setShowSuccessAlert] = useState(false);
+  const [showErrorAlert, setShowErrorAlert] = useState(false);
+  const [alertMessage, setAlertMessage] = useState('');
+  const [showArchived, setShowArchived] = useState(false);
+  
+  // Handle fetcher state
+  const isUpdating = fetcher.state !== 'idle';
+  
+  // Filter enquiries based on view mode
+  const displayedEnquiries = showArchived 
+    ? enquiries.filter(e => e.archived)
+    : enquiries.filter(e => !e.archived);
+  
+  // Show alerts based on fetcher data
+  if (fetcher.data && !showSuccessAlert && !showErrorAlert) {
+    if (fetcher.data.success) {
+      setAlertMessage(fetcher.data.message || 'Operation successful');
+      setShowSuccessAlert(true);
+    } else if (fetcher.data.error) {
+      setAlertMessage(fetcher.data.error);
+      setShowErrorAlert(true);
+    }
+  }
+  
+  const handleArchive = (enquiryId: string, isArchived: boolean) => {
+    const formData = new FormData();
+    formData.append('_action', isArchived ? 'unarchive' : 'archive');
+    formData.append('enquiryId', enquiryId);
+    console.log('submitting form data', formData, isArchived, enquiryId);
+    fetcher.submit(formData, { 
+      method: 'post',
+      action: '/dashboard/enquiries'
+    });
+  };
 
   return (
     <div>
@@ -98,18 +194,64 @@ export default function DashboardEnquiriesRoute() {
             
             {/* Header */}
             <div style={{ marginBottom: '2rem' }}>
-              <h1 style={{
-                fontSize: '2rem',
-                fontWeight: '700',
-                color: '#111827',
-                marginBottom: '0.5rem',
-                fontFamily: "'Space Grotesk', sans-serif"
-              }}>
-                Enquiries
-              </h1>
-              <p style={{ color: '#6b7280', fontSize: '1rem' }}>
-                Manage your student enquiries and respond to messages
-              </p>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '1rem' }}>
+                <div>
+                  <h1 style={{
+                    fontSize: '2rem',
+                    fontWeight: '700',
+                    color: '#111827',
+                    marginBottom: '0.5rem',
+                    fontFamily: "'Space Grotesk', sans-serif"
+                  }}>
+                    Enquiries
+                  </h1>
+                  <p style={{ color: '#6b7280', fontSize: '1rem' }}>
+                    Manage your student enquiries and respond to messages
+                  </p>
+                </div>
+                
+                {/* Toggle View */}
+                <div style={{
+                  display: 'flex',
+                  gap: '0.5rem',
+                  background: '#f3f4f6',
+                  padding: '0.25rem',
+                  borderRadius: '0'
+                }}>
+                  <button
+                    onClick={() => setShowArchived(false)}
+                    style={{
+                      padding: '0.625rem 1.5rem',
+                      fontSize: '0.875rem',
+                      fontWeight: '600',
+                      border: 'none',
+                      borderRadius: '0',
+                      background: !showArchived ? '#1e40af' : 'transparent',
+                      color: !showArchived ? '#ffffff' : '#6b7280',
+                      cursor: 'pointer',
+                      transition: 'all 0.2s ease'
+                    }}
+                  >
+                    Active ({newEnquiries})
+                  </button>
+                  <button
+                    onClick={() => setShowArchived(true)}
+                    style={{
+                      padding: '0.625rem 1.5rem',
+                      fontSize: '0.875rem',
+                      fontWeight: '600',
+                      border: 'none',
+                      borderRadius: '0',
+                      background: showArchived ? '#6b7280' : 'transparent',
+                      color: showArchived ? '#ffffff' : '#6b7280',
+                      cursor: 'pointer',
+                      transition: 'all 0.2s ease'
+                    }}
+                  >
+                    Archived ({archivedEnquiries})
+                  </button>
+                </div>
+              </div>
             </div>
 
             {/* Stats */}
@@ -149,7 +291,7 @@ export default function DashboardEnquiriesRoute() {
             </div>
 
             {/* Enquiries List */}
-            {enquiries.length === 0 ? (
+            {displayedEnquiries.length === 0 ? (
               <div style={{
                 background: 'linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%)',
                 border: '3px solid #3b82f6',
@@ -169,15 +311,17 @@ export default function DashboardEnquiriesRoute() {
                   color: '#111827',
                   marginBottom: '0.75rem'
                 }}>
-                  No Enquiries Yet
+                  {showArchived ? 'No Archived Enquiries' : 'No Active Enquiries'}
                 </h3>
                 <p style={{ color: '#6b7280', fontSize: '1rem' }}>
-                  When students make enquiries, they'll appear here.
+                  {showArchived 
+                    ? 'Archived enquiries will appear here.'
+                    : 'When students make enquiries, they\'ll appear here.'}
                 </p>
               </div>
             ) : (
               <div style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
-                {enquiries.map((enquiry, index) => (
+                {displayedEnquiries.map((enquiry, index) => (
                   <div 
                     key={enquiry._id}
                     style={{
@@ -196,24 +340,36 @@ export default function DashboardEnquiriesRoute() {
                       if (!enquiry.archived) {
                         e.currentTarget.style.transform = 'translateY(-2px)';
                         e.currentTarget.style.boxShadow = '0 10px 30px rgba(59, 130, 246, 0.15)';
+                        const accentBar = e.currentTarget.querySelector('.accent-bar') as HTMLElement;
+                        if (accentBar) {
+                          accentBar.style.width = '6px';
+                        }
                       }
                     }}
                     onMouseLeave={(e) => {
                       e.currentTarget.style.transform = 'translateY(0)';
                       e.currentTarget.style.boxShadow = '0 2px 8px rgba(0, 0, 0, 0.1)';
+                      const accentBar = e.currentTarget.querySelector('.accent-bar') as HTMLElement;
+                      if (accentBar) {
+                        accentBar.style.width = '0px';
+                      }
                     }}
                   >
                     {/* Accent bar */}
-                    <div style={{
-                      position: 'absolute',
-                      left: 0,
-                      top: 0,
-                      bottom: 0,
-                      width: '6px',
-                      background: enquiry.archived 
-                        ? 'linear-gradient(180deg, #9ca3af 0%, #6b7280 100%)'
-                        : 'linear-gradient(180deg, #3b82f6 0%, #1e40af 100%)'
-                    }} />
+                    <div 
+                      className="accent-bar"
+                      style={{
+                        position: 'absolute',
+                        left: 0,
+                        top: 0,
+                        bottom: 0,
+                        width: '0px',
+                        background: enquiry.archived 
+                          ? 'linear-gradient(180deg, #9ca3af 0%, #6b7280 100%)'
+                          : 'linear-gradient(180deg, #3b82f6 0%, #1e40af 100%)',
+                        transition: 'width 0.3s ease'
+                      }} 
+                    />
                     
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'start', marginBottom: '1.5rem', flexWrap: 'wrap', gap: '1rem' }}>
                       <div style={{ flex: 1, minWidth: '250px' }}>
@@ -393,29 +549,34 @@ export default function DashboardEnquiriesRoute() {
                         >
                           💌 Respond via Email
                         </a>
-                        {!enquiry.archived && (
-                          <button style={{
+                        <button 
+                          onClick={() => handleArchive(enquiry._id, enquiry.archived)}
+                          disabled={isUpdating}
+                          style={{
                             padding: '0.625rem 1.5rem',
                             fontSize: '0.875rem',
-                            border: '2px solid #cbd5e1',
+                            border: enquiry.archived ? '2px solid #10b981' : '2px solid #cbd5e1',
                             background: 'white',
-                            color: '#475569',
+                            color: enquiry.archived ? '#059669' : '#475569',
                             borderRadius: '0',
-                            cursor: 'pointer',
+                            cursor: isUpdating ? 'not-allowed' : 'pointer',
                             fontWeight: '600',
-                            transition: 'all 0.2s ease'
+                            transition: 'all 0.2s ease',
+                            opacity: isUpdating ? 0.6 : 1
                           }}
                           onMouseEnter={(e) => {
-                            e.currentTarget.style.background = '#f1f5f9';
-                            e.currentTarget.style.borderColor = '#94a3b8';
+                            if (!isUpdating) {
+                              e.currentTarget.style.background = enquiry.archived ? '#f0fdf4' : '#f1f5f9';
+                              e.currentTarget.style.borderColor = enquiry.archived ? '#059669' : '#94a3b8';
+                            }
                           }}
                           onMouseLeave={(e) => {
                             e.currentTarget.style.background = 'white';
-                            e.currentTarget.style.borderColor = '#cbd5e1';
-                          }}>
-                            📦 Archive
-                          </button>
-                        )}
+                            e.currentTarget.style.borderColor = enquiry.archived ? '#10b981' : '#cbd5e1';
+                          }}
+                        >
+                          {isUpdating ? '...' : enquiry.archived ? '📤 Unarchive' : '📦 Archive'}
+                        </button>
                       </div>
                     </div>
                   </div>
@@ -428,6 +589,30 @@ export default function DashboardEnquiriesRoute() {
         </div>
       </main>
       <Footer />
+      
+      {/* Success Alert */}
+      <Alert
+        isOpen={showSuccessAlert}
+        onClose={() => {
+          setShowSuccessAlert(false);
+          window.location.reload();
+        }}
+        title="Success"
+        message={alertMessage}
+        type="success"
+      />
+      
+      {/* Error Alert */}
+      <Alert
+        isOpen={showErrorAlert}
+        onClose={() => {
+          setShowErrorAlert(false);
+          setAlertMessage('');
+        }}
+        title="Error"
+        message={alertMessage}
+        type="error"
+      />
     </div>
   );
 }

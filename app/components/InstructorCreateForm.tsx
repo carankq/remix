@@ -1058,7 +1058,7 @@ const InstructorCreateForm: React.FC<InstructorCreateFormProps> = ({
             <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '1.25rem' }}>
               <input 
                 className="instructor-form-input" 
-                placeholder="Enter outcode (e.g., SW1, NW3, M1)" 
+                placeholder="Enter postcode (e.g., SW1, NW3, M1)" 
                 value={postcodeInput} 
                 onChange={(e)=>setPostcodeInput(e.target.value.toUpperCase())} 
                 onKeyDown={(e)=>{ if(e.key==='Enter'){ e.preventDefault(); addPostcode(); } }} 
