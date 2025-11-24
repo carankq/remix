@@ -48,7 +48,8 @@ export function InstructorCard({ instructor, showActions = true }: InstructorCar
     const params = new URLSearchParams({
       instructorId: instructor.id,
       instructorName: instructor.name,
-      postcode: currentOutcode || ''
+      postcode: currentOutcode || '',
+      returnUrl: window.location.pathname + window.location.search
     });
     navigate(`/enquiry?${params.toString()}`);
   };
