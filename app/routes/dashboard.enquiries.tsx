@@ -184,14 +184,13 @@ export default function DashboardEnquiriesRoute() {
                       background: enquiry.archived 
                         ? 'linear-gradient(135deg, #f9fafb 0%, #f3f4f6 100%)'
                         : 'linear-gradient(135deg, #ffffff 0%, #f8fafc 100%)',
-                      border: enquiry.archived 
-                        ? '3px solid #d1d5db'
-                        : '3px solid #3b82f6',
+                      border: 'none',
                       borderRadius: '0',
                       padding: '2rem',
                       transition: 'all 0.3s ease',
                       position: 'relative',
-                      overflow: 'hidden'
+                      overflow: 'hidden',
+                      boxShadow: '0 2px 8px rgba(0, 0, 0, 0.1)'
                     }}
                     onMouseEnter={(e) => {
                       if (!enquiry.archived) {
@@ -201,7 +200,7 @@ export default function DashboardEnquiriesRoute() {
                     }}
                     onMouseLeave={(e) => {
                       e.currentTarget.style.transform = 'translateY(0)';
-                      e.currentTarget.style.boxShadow = 'none';
+                      e.currentTarget.style.boxShadow = '0 2px 8px rgba(0, 0, 0, 0.1)';
                     }}
                   >
                     {/* Accent bar */}
@@ -218,7 +217,7 @@ export default function DashboardEnquiriesRoute() {
                     
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'start', marginBottom: '1.5rem', flexWrap: 'wrap', gap: '1rem' }}>
                       <div style={{ flex: 1, minWidth: '250px' }}>
-                        <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginBottom: '1rem' }}>
+                        <div style={{ marginBottom: '1rem' }}>
                           <h3 style={{ 
                             fontSize: '1.5rem', 
                             fontWeight: '700', 
@@ -226,22 +225,16 @@ export default function DashboardEnquiriesRoute() {
                             margin: 0
                           }}>
                             {enquiry.studentName}
+                            {enquiry.enquiryAsParent && (
+                              <span style={{ 
+                                color: '#78350f',
+                                fontSize: '1rem',
+                                marginLeft: '0.5rem'
+                              }}>
+                                (Parent)
+                              </span>
+                            )}
                           </h3>
-                          {enquiry.enquiryAsParent && (
-                            <span style={{
-                              padding: '0.375rem 0.75rem',
-                              background: 'linear-gradient(135deg, #fef3c7 0%, #fde68a 100%)',
-                              color: '#78350f',
-                              fontSize: '0.75rem',
-                              fontWeight: '700',
-                              borderRadius: '0',
-                              border: '2px solid #fbbf24',
-                              textTransform: 'uppercase',
-                              letterSpacing: '0.5px'
-                            }}>
-                              Parent Enquiry
-                            </span>
-                          )}
                         </div>
                         
                         <div style={{ 
@@ -315,23 +308,6 @@ export default function DashboardEnquiriesRoute() {
                             </div>
                           </div>
                         </div>
-                      </div>
-                      
-                      <div style={{
-                        padding: '0.625rem 1rem',
-                        background: enquiry.archived 
-                          ? 'linear-gradient(135deg, #f3f4f6 0%, #e5e7eb 100%)'
-                          : 'linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%)',
-                        color: enquiry.archived ? '#374151' : '#1e40af',
-                        fontSize: '0.75rem',
-                        fontWeight: '700',
-                        borderRadius: '0',
-                        border: enquiry.archived ? '2px solid #9ca3af' : '2px solid #3b82f6',
-                        textTransform: 'uppercase',
-                        letterSpacing: '1px',
-                        alignSelf: 'flex-start'
-                      }}>
-                        {enquiry.archived ? '📦 Archived' : '✨ Active'}
                       </div>
                     </div>
                     
