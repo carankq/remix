@@ -55,28 +55,43 @@ export function InstructorBenefitsSection() {
 
             {/* Stats - Horizontal */}
             <div className="instructor-stats-grid">
-              <div className="flex items-center gap-3 bg-white" style={{ padding: '1.5rem 2rem', borderRadius: '0', flex: 1, maxWidth: '360px', border: '2px solid #e5e7eb' }}>
-                <p className="text-3xl font-bold text-blue-600">✓ DVLA</p>
-                <div style={{ textAlign: 'left' }}>
-                  <p className="text-sm font-semibold text-gray-900">Vehicle Verification</p>
-                  <p className="text-xs text-gray-500">Instant credibility</p>
-                </div>
+              <div style={{ 
+                background: '#eff6ff',
+                padding: '1.5rem',
+                borderRadius: '0',
+                flex: 1,
+                maxWidth: '360px'
+              }}>
+                <p className="font-bold text-gray-900 mb-2" style={{ fontSize: '1.125rem' }}>DVLA Verification</p>
+                <p className="text-gray-600" style={{ lineHeight: '1.6' }}>
+                  Build instant trust with verified credentials
+                </p>
               </div>
               
-              <div className="flex items-center gap-3 bg-white" style={{ padding: '1.5rem 2rem', borderRadius: '0', flex: 1, maxWidth: '360px', border: '2px solid #e5e7eb' }}>
-                <p className="text-3xl font-bold text-purple-600">📍</p>
-                <div style={{ textAlign: 'left' }}>
-                  <p className="text-sm font-semibold text-gray-900">Area-Based Search</p>
-                  <p className="text-xs text-gray-500">Students find you locally</p>
-                </div>
+              <div style={{ 
+                background: '#eff6ff',
+                padding: '1.5rem',
+                borderRadius: '0',
+                flex: 1,
+                maxWidth: '360px'
+              }}>
+                <p className="font-bold text-gray-900 mb-2" style={{ fontSize: '1.125rem' }}>Local Matching</p>
+                <p className="text-gray-600" style={{ lineHeight: '1.6' }}>
+                  Students find you by area — no more long drives
+                </p>
               </div>
               
-              <div className="flex items-center gap-3 bg-white" style={{ padding: '1.5rem 2rem', borderRadius: '0', flex: 1, maxWidth: '360px', border: '2px solid #e5e7eb' }}>
-                <p className="text-3xl font-bold text-green-600">📧</p>
-                <div style={{ textAlign: 'left' }}>
-                  <p className="text-sm font-semibold text-gray-900">Direct Enquiries</p>
-                  <p className="text-xs text-gray-500">Connect with learners</p>
-                </div>
+              <div style={{ 
+                background: '#eff6ff',
+                padding: '1.5rem',
+                borderRadius: '0',
+                flex: 1,
+                maxWidth: '360px'
+              }}>
+                <p className="font-bold text-gray-900 mb-2" style={{ fontSize: '1.125rem' }}>Direct Enquiries</p>
+                <p className="text-gray-600" style={{ lineHeight: '1.6' }}>
+                  Connect directly with interested learners
+                </p>
               </div>
             </div>
             
