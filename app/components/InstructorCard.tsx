@@ -1,5 +1,6 @@
-import { Link, useNavigate } from "@remix-run/react";
+import { Link, useNavigate, useSearchParams } from "@remix-run/react";
 import { useEffect, useState } from "react";
+import { EnquiryForm } from "./EnquiryForm";
 
 type Instructor = {
   id: string;
@@ -33,11 +34,16 @@ type InstructorCardProps = {
 
 export function InstructorCard({ instructor, showActions = true }: InstructorCardProps) {
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
   const [showTypeInfo, setShowTypeInfo] = useState(false);
+  const [showEnquiryForm, setShowEnquiryForm] = useState(false);
   const hasRating = instructor.rating && instructor.rating > 0;
   const hasImage = instructor.image && instructor.image.trim() !== '';
   const placeholder = 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><rect width="100" height="100" rx="50" fill="%23e5e7eb"/><circle cx="50" cy="38" r="18" fill="%239ca3af"/><path d="M20 86c4-18 18-28 30-28s26 10 30 28" fill="%239ca3af"/></svg>';
   const imgSrc = hasImage ? instructor.image : placeholder;
+  
+  // Get outcode from URL params for default postcode
+  const currentOutcode = searchParams.getAll('outcode').join(', ');
 
   // Normalize availability to a simple array of slots we can render
   const workingSlots: Array<{ day: string; startTime: string; endTime: string }> = (() => {
@@ -504,8 +510,11 @@ export function InstructorCard({ instructor, showActions = true }: InstructorCar
         {/* Action Buttons */}
         {showActions && (
           <div style={{ display: 'flex', gap: '1rem', paddingTop: '0.5rem', flexWrap: 'wrap' }}>
-            <Link 
-              to={`/book?instructor=${instructor.id}`}
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                setShowEnquiryForm(true);
+              }}
               className="btn btn-primary"
               style={{
                 flex: '1',
@@ -514,17 +523,18 @@ export function InstructorCard({ instructor, showActions = true }: InstructorCar
                 display: 'inline-flex',
                 alignItems: 'center',
                 justifyContent: 'center',
-                gap: '0.5rem'
+                gap: '0.5rem',
+                border: 'none',
+                cursor: 'pointer',
+                borderRadius: '0'
               }}
             >
               <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/>
-                <line x1="16" y1="2" x2="16" y2="6"/>
-                <line x1="8" y1="2" x2="8" y2="6"/>
-                <line x1="3" y1="10" x2="21" y2="10"/>
+                <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/>
+                <polyline points="22,6 12,13 2,6"/>
               </svg>
-              Book Lesson
-            </Link>
+              Make Enquiry
+            </button>
             
             {instructor.phone && (
               <a 
@@ -538,7 +548,8 @@ export function InstructorCard({ instructor, showActions = true }: InstructorCar
                   alignItems: 'center',
                   justifyContent: 'center',
                   gap: '0.5rem',
-                  textDecoration: 'none'
+                  textDecoration: 'none',
+                  borderRadius: '0'
                 }}
               >
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -550,6 +561,16 @@ export function InstructorCard({ instructor, showActions = true }: InstructorCar
           </div>
         )}
       </div>
+      
+      {/* Enquiry Form Modal */}
+      {showEnquiryForm && (
+        <EnquiryForm
+          instructorId={instructor.id}
+          instructorName={instructor.name}
+          defaultPostcode={currentOutcode}
+          onClose={() => setShowEnquiryForm(false)}
+        />
+      )}
     </article>
   );
 }

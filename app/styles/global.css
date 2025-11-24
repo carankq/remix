@@ -64,7 +64,7 @@ body {
 .scale-in { animation: scaleIn 0.4s ease-out forwards; }
 .btn-brand { background: #2563eb; color: #FFFFFF; box-shadow: 0 8px 24px rgba(37, 99, 235, 0.25); }
 .btn-brand:hover { background: #1d4ed8; transform: translateY(-2px); box-shadow: 0 12px 30px rgba(29, 78, 216, 0.35); }
-.btn-secondary { background: #2A5F4F; color: #FFFFFF; border: 1px solid #2A5F4F; box-shadow: 0 1px 3px 0 rgba(0,0,0,0.1); }
+.btn-secondary { background: #2A5F4F; color: #FFFFFF; border: 1px solid #2A5F4F; box-shadow: 0 1px 3px 0 rgba(0,0,0,0.1); border-radius: 0; }
 .btn-secondary:hover { background: #1F4A3C; border-color: #1F4A3C; transform: translateY(-1px); }
 .btn-outline { background: transparent; color: #0F3A2E; border: 1px solid #0F3A2E; }
 .btn-outline:hover { background: #0F3A2E; color: #FFFFFF; transform: translateY(-1px); }
