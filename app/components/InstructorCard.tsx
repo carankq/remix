@@ -1,6 +1,5 @@
 import { Link, useNavigate, useSearchParams } from "@remix-run/react";
 import { useEffect, useState } from "react";
-import { EnquiryForm } from "./EnquiryForm";
 
 type Instructor = {
   id: string;
@@ -36,7 +35,6 @@ export function InstructorCard({ instructor, showActions = true }: InstructorCar
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const [showTypeInfo, setShowTypeInfo] = useState(false);
-  const [showEnquiryForm, setShowEnquiryForm] = useState(false);
   const hasRating = instructor.rating && instructor.rating > 0;
   const hasImage = instructor.image && instructor.image.trim() !== '';
   const placeholder = 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><rect width="100" height="100" rx="50" fill="%23e5e7eb"/><circle cx="50" cy="38" r="18" fill="%239ca3af"/><path d="M20 86c4-18 18-28 30-28s26 10 30 28" fill="%239ca3af"/></svg>';
@@ -44,6 +42,16 @@ export function InstructorCard({ instructor, showActions = true }: InstructorCar
   
   // Get outcode from URL params for default postcode
   const currentOutcode = searchParams.getAll('outcode').join(', ');
+  
+  const handleEnquiryClick = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    const params = new URLSearchParams({
+      instructorId: instructor.id,
+      instructorName: instructor.name,
+      postcode: currentOutcode || ''
+    });
+    navigate(`/enquiry?${params.toString()}`);
+  };
 
   // Normalize availability to a simple array of slots we can render
   const workingSlots: Array<{ day: string; startTime: string; endTime: string }> = (() => {
@@ -511,10 +519,7 @@ export function InstructorCard({ instructor, showActions = true }: InstructorCar
         {showActions && (
           <div style={{ display: 'flex', gap: '1rem', paddingTop: '0.5rem', flexWrap: 'wrap' }}>
             <button
-              onClick={(e) => {
-                e.stopPropagation();
-                setShowEnquiryForm(true);
-              }}
+              onClick={handleEnquiryClick}
               className="btn btn-primary"
               style={{
                 flex: '1',
@@ -561,16 +566,6 @@ export function InstructorCard({ instructor, showActions = true }: InstructorCar
           </div>
         )}
       </div>
-      
-      {/* Enquiry Form Modal */}
-      {showEnquiryForm && (
-        <EnquiryForm
-          instructorId={instructor.id}
-          instructorName={instructor.name}
-          defaultPostcode={currentOutcode}
-          onClose={() => setShowEnquiryForm(false)}
-        />
-      )}
     </article>
   );
 }
