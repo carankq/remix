@@ -1,6 +1,8 @@
 import { json, redirect, type LoaderFunctionArgs, type ActionFunctionArgs } from "@remix-run/node";
 import { useLoaderData, useNavigate, Form } from "@remix-run/react";
 import { useState } from "react";
+import { Header } from "../components/Header";
+import { Footer } from "../components/Footer";
 
 type LoaderData = {
   instructorId: string;
@@ -33,7 +35,7 @@ export async function action({ request }: ActionFunctionArgs) {
   const studentEmailAddress = formData.get('studentEmailAddress')?.toString();
   const studentPhoneNumber = formData.get('studentPhoneNumber')?.toString();
   const postcode = formData.get('postcode')?.toString();
-  const description = formData.get('description')?.toString();
+  const message = formData.get('message')?.toString();
   const enquiryAsParent = formData.get('enquiryAsParent') === 'true';
 
   // Validation
@@ -53,7 +55,7 @@ export async function action({ request }: ActionFunctionArgs) {
       studentPhoneNumber: studentPhoneNumber.trim(),
       studentEmailAddress: studentEmailAddress.trim().toLowerCase(),
       postcode: postcode.toUpperCase(),
-      description: description?.trim() || undefined,
+      message: message?.trim() || undefined,
       enquiryAsParent
     };
 
@@ -95,7 +97,7 @@ export default function EnquiryPage() {
     studentPhoneNumber: '',
     studentEmailAddress: '',
     postcode: postcode,
-    description: '',
+    message: '',
     enquiryAsParent: false
   });
 
@@ -151,16 +153,16 @@ export default function EnquiryPage() {
     
     try {
       const apiHost = typeof window !== 'undefined' 
-        ? (window as any).ENV?.API_HOST || 'http://localhost:3001'
-        : 'http://localhost:3001';
-      
+        ? (window as any).__ENV__?.API_HOST || 'http://localhost:9000'
+        : 'http://localhost:9000';
+
       const payload = {
         instructorId,
         studentName: formData.studentName.trim(),
         studentPhoneNumber: formatPhoneForSubmit(formData.studentPhoneNumber),
         studentEmailAddress: formData.studentEmailAddress.trim().toLowerCase(),
         postcode: formData.postcode.toUpperCase(),
-        description: formData.description.trim() || undefined,
+        message: formData.message.trim() || undefined,
         enquiryAsParent: formData.enquiryAsParent
       };
 
@@ -188,85 +190,91 @@ export default function EnquiryPage() {
 
   if (success) {
     return (
-      <div style={{
-        minHeight: '100vh',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        background: '#f8fafc',
-        padding: '2rem 1rem'
-      }}>
+      <>
+        <Header />
         <div style={{
-          background: '#ffffff',
-          maxWidth: '600px',
-          width: '100%',
-          borderRadius: '0',
-          border: '3px solid #10b981',
-          padding: '3rem 2rem',
-          textAlign: 'center'
+          minHeight: 'calc(100vh - 400px)',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          background: '#f8fafc',
+          padding: '4rem 1rem'
         }}>
           <div style={{
-            width: '5rem',
-            height: '5rem',
-            background: '#10b981',
-            color: '#ffffff',
+            background: '#ffffff',
+            maxWidth: '600px',
+            width: '100%',
             borderRadius: '0',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            margin: '0 auto 2rem',
-            fontSize: '3rem',
-            fontWeight: 'bold'
+            border: '3px solid #10b981',
+            padding: '3rem 2rem',
+            textAlign: 'center'
           }}>
-            ✓
-          </div>
-          <h1 style={{ fontSize: '2rem', fontWeight: 'bold', marginBottom: '1rem', color: '#111827' }}>
-            Enquiry Sent Successfully!
-          </h1>
-          <p style={{ color: '#6b7280', lineHeight: '1.6', marginBottom: '2rem', fontSize: '1.125rem' }}>
-            Your enquiry has been sent to <strong style={{ color: '#111827' }}>{instructorName}</strong>. They'll get back to you soon!
-          </p>
-          <div style={{ display: 'flex', gap: '1rem', justifyContent: 'center', flexWrap: 'wrap' }}>
-            <button
-              onClick={() => navigate('/results')}
-              className="btn btn-primary"
-              style={{
-                padding: '0.875rem 2rem',
-                fontSize: '1rem',
-                fontWeight: '600',
-                borderRadius: '0'
-              }}
-            >
-              Back to Results
-            </button>
-            <button
-              onClick={() => navigate('/')}
-              className="btn btn-secondary"
-              style={{
-                padding: '0.875rem 2rem',
-                fontSize: '1rem',
-                fontWeight: '600',
-                borderRadius: '0'
-              }}
-            >
-              Go to Homepage
-            </button>
+            <div style={{
+              width: '5rem',
+              height: '5rem',
+              background: '#10b981',
+              color: '#ffffff',
+              borderRadius: '0',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              margin: '0 auto 2rem',
+              fontSize: '3rem',
+              fontWeight: 'bold'
+            }}>
+              ✓
+            </div>
+            <h1 style={{ fontSize: '2rem', fontWeight: 'bold', marginBottom: '1rem', color: '#111827' }}>
+              Enquiry Sent Successfully!
+            </h1>
+            <p style={{ color: '#6b7280', lineHeight: '1.6', marginBottom: '2rem', fontSize: '1.125rem' }}>
+              Your enquiry has been sent to <strong style={{ color: '#111827' }}>{instructorName}</strong>. They'll get back to you soon!
+            </p>
+            <div style={{ display: 'flex', gap: '1rem', justifyContent: 'center', flexWrap: 'wrap' }}>
+              <button
+                onClick={() => navigate('/results')}
+                className="btn btn-primary"
+                style={{
+                  padding: '0.875rem 2rem',
+                  fontSize: '1rem',
+                  fontWeight: '600',
+                  borderRadius: '0'
+                }}
+              >
+                Back to Results
+              </button>
+              <button
+                onClick={() => navigate('/')}
+                className="btn btn-secondary"
+                style={{
+                  padding: '0.875rem 2rem',
+                  fontSize: '1rem',
+                  fontWeight: '600',
+                  borderRadius: '0'
+                }}
+              >
+                Go to Homepage
+              </button>
+            </div>
           </div>
         </div>
-      </div>
+        <Footer />
+      </>
     );
   }
 
   return (
-    <div style={{
-      minHeight: '100vh',
-      background: '#f8fafc',
-      padding: '2rem 1rem'
-    }}>
+    <>
+      <Header />
       <div style={{
-        maxWidth: '700px',
-        margin: '0 auto'
+        minHeight: 'calc(100vh - 400px)',
+        background: '#f8fafc',
+        padding: '2rem 1rem'
       }}>
+        <div style={{
+          maxWidth: '700px',
+          margin: '0 auto'
+        }}>
         {/* Header */}
         <div style={{
           background: '#ffffff',
@@ -454,7 +462,7 @@ export default function EnquiryPage() {
               />
             </div>
 
-            {/* Description (Optional) */}
+            {/* message (Optional) */}
             <div style={{ marginBottom: '1.5rem' }}>
               <label style={{ 
                 display: 'block', 
@@ -466,8 +474,8 @@ export default function EnquiryPage() {
                 Message (Optional)
               </label>
               <textarea
-                value={formData.description}
-                onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+                value={formData.message}
+                onChange={(e) => setFormData({ ...formData, message: e.target.value })}
                 placeholder="Any additional information or questions..."
                 rows={5}
                 style={{
@@ -547,8 +555,10 @@ export default function EnquiryPage() {
             </div>
           </form>
         </div>
+        </div>
       </div>
-    </div>
+      <Footer />
+    </>
   );
 }
 
