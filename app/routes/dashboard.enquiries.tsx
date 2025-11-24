@@ -1,7 +1,7 @@
 import type { LoaderFunctionArgs, ActionFunctionArgs } from "@remix-run/node";
 import { json, redirect } from "@remix-run/node";
 import { useLoaderData, useFetcher } from "@remix-run/react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Header } from "../components/Header";
 import { Footer } from "../components/Footer";
 import { Alert } from "../components/Alert";
@@ -28,6 +28,7 @@ type LoaderData = {
   totalEnquiries: number;
   newEnquiries: number;
   archivedEnquiries: number;
+  error?: string;
 };
 
 export async function action({ request }: ActionFunctionArgs) {
@@ -138,18 +139,20 @@ export async function loader({ request }: LoaderFunctionArgs) {
       enquiries: [],
       totalEnquiries: 0,
       newEnquiries: 0,
-      archivedEnquiries: 0
+      archivedEnquiries: 0,
+      error: 'Failed to load enquiries. Please try refreshing the page.'
     });
   }
 }
 
 export default function DashboardEnquiriesRoute() {
-  const { enquiries, totalEnquiries, newEnquiries, archivedEnquiries } = useLoaderData<typeof loader>();
+  const { enquiries, totalEnquiries, newEnquiries, archivedEnquiries, error: loaderError } = useLoaderData<typeof loader>();
   const fetcher = useFetcher<{ success?: boolean; error?: string | null; message?: string }>();
   const [showSuccessAlert, setShowSuccessAlert] = useState(false);
   const [showErrorAlert, setShowErrorAlert] = useState(false);
   const [alertMessage, setAlertMessage] = useState('');
   const [showArchived, setShowArchived] = useState(false);
+  const [processedFetcherData, setProcessedFetcherData] = useState(false);
   
   // Handle fetcher state
   const isUpdating = fetcher.state !== 'idle';
@@ -159,16 +162,25 @@ export default function DashboardEnquiriesRoute() {
     ? enquiries.filter(e => e.archived)
     : enquiries.filter(e => !e.archived);
   
-  // Show alerts based on fetcher data
-  if (fetcher.data && !showSuccessAlert && !showErrorAlert) {
-    if (fetcher.data.success) {
-      setAlertMessage(fetcher.data.message || 'Operation successful');
-      setShowSuccessAlert(true);
-    } else if (fetcher.data.error) {
-      setAlertMessage(fetcher.data.error);
-      setShowErrorAlert(true);
+  // Show alerts based on fetcher data using useEffect
+  useEffect(() => {
+    if (fetcher.data && !processedFetcherData) {
+      if (fetcher.data.success) {
+        setAlertMessage(fetcher.data.message || 'Operation successful');
+        setShowSuccessAlert(true);
+        setProcessedFetcherData(true);
+      } else if (fetcher.data.error) {
+        setAlertMessage(fetcher.data.error);
+        setShowErrorAlert(true);
+        setProcessedFetcherData(true);
+      }
     }
-  }
+    
+    // Reset processed flag when fetcher is idle and has no data
+    if (fetcher.state === 'idle' && !fetcher.data) {
+      setProcessedFetcherData(false);
+    }
+  }, [fetcher.data, fetcher.state, processedFetcherData]);
   
   const handleArchive = (enquiryId: string, isArchived: boolean) => {
     const formData = new FormData();
@@ -253,6 +265,39 @@ export default function DashboardEnquiriesRoute() {
                 </div>
               </div>
             </div>
+
+            {/* Error Message */}
+            {loaderError && (
+              <div style={{
+                background: 'linear-gradient(135deg, #fef2f2 0%, #fee2e2 100%)',
+                border: '3px solid #ef4444',
+                borderRadius: '0',
+                padding: '1.5rem',
+                marginBottom: '2rem',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '1rem'
+              }}>
+                <div style={{
+                  fontSize: '2rem'
+                }}>
+                  ⚠️
+                </div>
+                <div>
+                  <h3 style={{ 
+                    fontSize: '1.125rem', 
+                    fontWeight: '700', 
+                    color: '#991b1b',
+                    marginBottom: '0.25rem'
+                  }}>
+                    Error Loading Enquiries
+                  </h3>
+                  <p style={{ color: '#7f1d1d', margin: 0 }}>
+                    {loaderError}
+                  </p>
+                </div>
+              </div>
+            )}
 
             {/* Stats */}
             <div style={{
