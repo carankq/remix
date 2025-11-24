@@ -1,52 +1,89 @@
 import type { LoaderFunctionArgs } from "@remix-run/node";
 import { json, redirect } from "@remix-run/node";
+import { useLoaderData } from "@remix-run/react";
 import { Header } from "../components/Header";
 import { Footer } from "../components/Footer";
 import { getUserFromSession } from "../session.server";
+
+type Enquiry = {
+  _id: string;
+  instructorId: string;
+  studentName: string;
+  message: string;
+  studentPhoneNumber: string;
+  studentEmailAddress: string;
+  postcode: string;
+  gender: string;
+  enquiryAsParent: boolean;
+  archived: boolean;
+  archivedAt: string | null;
+  createdAt: string;
+  updatedAt: string;
+};
+
+type LoaderData = {
+  enquiries: Enquiry[];
+  totalEnquiries: number;
+  newEnquiries: number;
+  archivedEnquiries: number;
+};
 
 export async function loader({ request }: LoaderFunctionArgs) {
   const userSession = await getUserFromSession(request);
   
   // Redirect to auth if not authenticated
-  // The session cookie will be set by the AuthContext after login
   if (!userSession) {
     return redirect('/auth');
   }
   
-  return json({});
+  try {
+    const apiHost = process.env.API_HOST || 'http://localhost:3001';
+    const url = new URL(request.url);
+    const includeArchived = url.searchParams.get('includeArchived') === 'true';
+    
+    const response = await fetch(
+      `${apiHost}/enquiries/mine?includeArchived=${includeArchived}`,
+      {
+        headers: {
+          'Authorization': `Bearer ${userSession.token}`,
+          'Content-Type': 'application/json'
+        }
+      }
+    );
+    
+    if (!response.ok) {
+      if (response.status === 403 || response.status === 401) {
+        return redirect('/auth');
+      }
+      throw new Error('Failed to fetch enquiries');
+    }
+    
+    const enquiries: Enquiry[] = await response.json();
+    
+    // Calculate stats
+    const totalEnquiries = enquiries.length;
+    const newEnquiries = enquiries.filter(e => !e.archived).length;
+    const archivedEnquiries = enquiries.filter(e => e.archived).length;
+    
+    return json<LoaderData>({
+      enquiries,
+      totalEnquiries,
+      newEnquiries,
+      archivedEnquiries
+    });
+  } catch (error) {
+    console.error('Error fetching enquiries:', error);
+    return json<LoaderData>({
+      enquiries: [],
+      totalEnquiries: 0,
+      newEnquiries: 0,
+      archivedEnquiries: 0
+    });
+  }
 }
 
 export default function DashboardEnquiriesRoute() {
-  // Mock enquiries data
-  const enquiries = [
-    {
-      id: 1,
-      studentName: "Sarah Johnson",
-      email: "sarah.j@email.com",
-      phone: "07700 900123",
-      message: "Hi, I'm interested in booking lessons in the Manchester area. I'm a complete beginner.",
-      date: "2024-01-15",
-      status: "new"
-    },
-    {
-      id: 2,
-      studentName: "James Williams",
-      email: "j.williams@email.com",
-      phone: "07700 900456",
-      message: "Looking for intensive course lessons. I have my test booked for next month.",
-      date: "2024-01-14",
-      status: "responded"
-    },
-    {
-      id: 3,
-      studentName: "Emily Brown",
-      email: "emily.brown@email.com",
-      phone: "07700 900789",
-      message: "Do you offer refresher lessons for experienced drivers?",
-      date: "2024-01-13",
-      status: "responded"
-    }
-  ];
+  const { enquiries, totalEnquiries, newEnquiries, archivedEnquiries } = useLoaderData<typeof loader>();
 
   return (
     <div>
@@ -89,7 +126,7 @@ export default function DashboardEnquiriesRoute() {
                 padding: '1.5rem'
               }}>
                 <div style={{ fontSize: '0.875rem', color: '#6b7280', marginBottom: '0.5rem' }}>Total Enquiries</div>
-                <div style={{ fontSize: '2rem', fontWeight: '700', color: '#111827' }}>3</div>
+                <div style={{ fontSize: '2rem', fontWeight: '700', color: '#111827' }}>{totalEnquiries}</div>
               </div>
               <div style={{
                 background: 'white',
@@ -97,98 +134,180 @@ export default function DashboardEnquiriesRoute() {
                 borderRadius: '0',
                 padding: '1.5rem'
               }}>
-                <div style={{ fontSize: '0.875rem', color: '#6b7280', marginBottom: '0.5rem' }}>New</div>
-                <div style={{ fontSize: '2rem', fontWeight: '700', color: '#2563eb' }}>1</div>
+                <div style={{ fontSize: '0.875rem', color: '#6b7280', marginBottom: '0.5rem' }}>Active</div>
+                <div style={{ fontSize: '2rem', fontWeight: '700', color: '#2563eb' }}>{newEnquiries}</div>
               </div>
               <div style={{
                 background: 'white',
-                border: '2px solid #10b981',
+                border: '2px solid #9ca3af',
                 borderRadius: '0',
                 padding: '1.5rem'
               }}>
-                <div style={{ fontSize: '0.875rem', color: '#6b7280', marginBottom: '0.5rem' }}>Responded</div>
-                <div style={{ fontSize: '2rem', fontWeight: '700', color: '#10b981' }}>2</div>
+                <div style={{ fontSize: '0.875rem', color: '#6b7280', marginBottom: '0.5rem' }}>Archived</div>
+                <div style={{ fontSize: '2rem', fontWeight: '700', color: '#6b7280' }}>{archivedEnquiries}</div>
               </div>
             </div>
 
             {/* Enquiries List */}
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-              {enquiries.map((enquiry) => (
-                <div 
-                  key={enquiry.id}
-                  style={{
-                    background: 'white',
-                    border: '2px solid #e5e7eb',
-                    borderRadius: '0',
-                    padding: '1.5rem'
-                  }}
-                >
-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'start', marginBottom: '1rem' }}>
-                    <div>
-                      <h3 style={{ 
-                        fontSize: '1.125rem', 
-                        fontWeight: '600', 
-                        color: '#111827',
-                        marginBottom: '0.25rem'
+            {enquiries.length === 0 ? (
+              <div style={{
+                background: 'white',
+                border: '2px solid #e5e7eb',
+                borderRadius: '0',
+                padding: '3rem 2rem',
+                textAlign: 'center'
+              }}>
+                <h3 style={{ 
+                  fontSize: '1.125rem', 
+                  fontWeight: '600', 
+                  color: '#111827',
+                  marginBottom: '0.5rem'
+                }}>
+                  No Enquiries Yet
+                </h3>
+                <p style={{ color: '#6b7280' }}>
+                  When students make enquiries, they'll appear here.
+                </p>
+              </div>
+            ) : (
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+                {enquiries.map((enquiry) => (
+                  <div 
+                    key={enquiry._id}
+                    style={{
+                      background: 'white',
+                      border: '2px solid #e5e7eb',
+                      borderRadius: '0',
+                      padding: '1.5rem',
+                      opacity: enquiry.archived ? 0.6 : 1
+                    }}
+                  >
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'start', marginBottom: '1rem', flexWrap: 'wrap', gap: '1rem' }}>
+                      <div style={{ flex: 1, minWidth: '200px' }}>
+                        <h3 style={{ 
+                          fontSize: '1.125rem', 
+                          fontWeight: '600', 
+                          color: '#111827',
+                          marginBottom: '0.5rem'
+                        }}>
+                          {enquiry.studentName}
+                          {enquiry.enquiryAsParent && (
+                            <span style={{
+                              marginLeft: '0.5rem',
+                              padding: '0.25rem 0.5rem',
+                              background: '#fef3c7',
+                              color: '#78350f',
+                              fontSize: '0.75rem',
+                              fontWeight: '600',
+                              borderRadius: '0'
+                            }}>
+                              Parent
+                            </span>
+                          )}
+                        </h3>
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: '0.25rem', fontSize: '0.875rem', color: '#6b7280' }}>
+                          <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
+                            <span>📧</span>
+                            <a href={`mailto:${enquiry.studentEmailAddress}`} style={{ color: '#2563eb', textDecoration: 'none' }}>
+                              {enquiry.studentEmailAddress}
+                            </a>
+                          </div>
+                          <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
+                            <span>📱</span>
+                            <a href={`tel:${enquiry.studentPhoneNumber}`} style={{ color: '#2563eb', textDecoration: 'none' }}>
+                              {enquiry.studentPhoneNumber}
+                            </a>
+                          </div>
+                          <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
+                            <span>📍</span>
+                            <span>{enquiry.postcode}</span>
+                          </div>
+                          <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
+                            <span>👤</span>
+                            <span>{enquiry.gender}</span>
+                          </div>
+                        </div>
+                      </div>
+                      <span style={{
+                        padding: '0.375rem 0.75rem',
+                        background: enquiry.archived ? '#f3f4f6' : '#dbeafe',
+                        color: enquiry.archived ? '#6b7280' : '#1e40af',
+                        fontSize: '0.75rem',
+                        fontWeight: '600',
+                        borderRadius: '0',
+                        textTransform: 'uppercase',
+                        alignSelf: 'flex-start'
                       }}>
-                        {enquiry.studentName}
-                      </h3>
-                      <div style={{ display: 'flex', gap: '1rem', fontSize: '0.875rem', color: '#6b7280' }}>
-                        <span>{enquiry.email}</span>
-                        <span>{enquiry.phone}</span>
+                        {enquiry.archived ? 'Archived' : 'Active'}
+                      </span>
+                    </div>
+                    
+                    {enquiry.message && (
+                      <div style={{
+                        background: '#f9fafb',
+                        border: '2px solid #e5e7eb',
+                        borderRadius: '0',
+                        padding: '1rem',
+                        marginBottom: '1rem'
+                      }}>
+                        <div style={{ fontSize: '0.75rem', fontWeight: '600', color: '#6b7280', marginBottom: '0.5rem', textTransform: 'uppercase' }}>
+                          Message
+                        </div>
+                        <p style={{ 
+                          color: '#374151',
+                          lineHeight: '1.6',
+                          margin: 0
+                        }}>
+                          {enquiry.message}
+                        </p>
+                      </div>
+                    )}
+                    
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '1rem' }}>
+                      <span style={{ fontSize: '0.875rem', color: '#9ca3af' }}>
+                        {new Date(enquiry.createdAt).toLocaleDateString('en-GB', { 
+                          year: 'numeric', 
+                          month: 'long', 
+                          day: 'numeric',
+                          hour: '2-digit',
+                          minute: '2-digit'
+                        })}
+                      </span>
+                      <div style={{ display: 'flex', gap: '0.5rem' }}>
+                        <a 
+                          href={`mailto:${enquiry.studentEmailAddress}`}
+                          className="btn btn-primary" 
+                          style={{ 
+                            padding: '0.5rem 1rem', 
+                            fontSize: '0.875rem',
+                            textDecoration: 'none',
+                            display: 'inline-block'
+                          }}
+                        >
+                          Respond
+                        </a>
+                        {!enquiry.archived && (
+                          <button style={{
+                            padding: '0.5rem 1rem',
+                            fontSize: '0.875rem',
+                            border: '2px solid #e5e7eb',
+                            background: 'white',
+                            color: '#6b7280',
+                            borderRadius: '0',
+                            cursor: 'pointer',
+                            fontWeight: '500',
+                            transition: 'all 0.2s ease'
+                          }}>
+                            Archive
+                          </button>
+                        )}
                       </div>
                     </div>
-                    <span style={{
-                      padding: '0.375rem 0.75rem',
-                      background: enquiry.status === 'new' ? '#dbeafe' : '#d1fae5',
-                      color: enquiry.status === 'new' ? '#1e40af' : '#065f46',
-                      fontSize: '0.75rem',
-                      fontWeight: '600',
-                      borderRadius: '0',
-                      textTransform: 'uppercase'
-                    }}>
-                      {enquiry.status}
-                    </span>
                   </div>
-                  
-                  <p style={{ 
-                    color: '#374151', 
-                    marginBottom: '1rem',
-                    lineHeight: '1.6'
-                  }}>
-                    {enquiry.message}
-                  </p>
-                  
-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                    <span style={{ fontSize: '0.875rem', color: '#9ca3af' }}>
-                      {new Date(enquiry.date).toLocaleDateString('en-GB', { 
-                        year: 'numeric', 
-                        month: 'long', 
-                        day: 'numeric' 
-                      })}
-                    </span>
-                    <div style={{ display: 'flex', gap: '0.5rem' }}>
-                      <button className="btn btn-primary" style={{ padding: '0.5rem 1rem', fontSize: '0.875rem' }}>
-                        Respond
-                      </button>
-                      <button style={{
-                        padding: '0.5rem 1rem',
-                        fontSize: '0.875rem',
-                        border: '2px solid #e5e7eb',
-                        background: 'white',
-                        color: '#6b7280',
-                        borderRadius: '0',
-                        cursor: 'pointer',
-                        fontWeight: '500',
-                        transition: 'all 0.2s ease'
-                      }}>
-                        Archive
-                      </button>
-                    </div>
-                  </div>
-                </div>
-              ))}
-            </div>
+                ))}
+              </div>
+            )}
+          
 
           </div>
         </div>

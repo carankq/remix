@@ -185,6 +185,18 @@ export default function EnquiryPage() {
       return;
     }
 
+    if (formData.gender != "Male" && formData.gender != "Female") {
+      setError('Please provide the gender of the student');
+      setShowErrorAlert(true);
+      return;
+    }
+
+    if (!formData.message.trim()) {
+      setError('Please provide a message');
+      setShowErrorAlert(true);
+      return;
+    }    
+
     setLoading(true);
     
     try {
@@ -494,7 +506,7 @@ export default function EnquiryPage() {
                 color: '#374151',
                 marginBottom: '0.5rem'
               }}>
-                Gender (For Safeguarding Purposes) *
+                Gender of Student (For Safeguarding Purposes) *
               </label>
               <select
                 value={formData.gender}
@@ -519,7 +531,7 @@ export default function EnquiryPage() {
               </select>
             </div>
 
-            {/* message (Optional) */}
+            {/* message */}
             <div style={{ marginBottom: '1.5rem' }}>
               <label style={{ 
                 display: 'block', 
@@ -528,7 +540,7 @@ export default function EnquiryPage() {
                 color: '#374151',
                 marginBottom: '0.5rem'
               }}>
-                Message (Optional)
+                Message *
               </label>
               <textarea
                 value={formData.message}
