@@ -976,6 +976,39 @@ select {
   .instructor-card-hero {
     padding: 1.25rem !important;
   }
+  
+  /* Instructor Profile Mobile Styles */
+  .instructor-profile-hero {
+    padding: 0 1rem !important;
+  }
+  
+  .instructor-profile-header {
+    flex-direction: column !important;
+    align-items: center !important;
+    text-align: center !important;
+  }
+  
+  .instructor-profile-image {
+    width: 120px !important;
+    height: 120px !important;
+  }
+  
+  .instructor-profile-name {
+    font-size: 1.5rem !important;
+  }
+  
+  .instructor-profile-actions {
+    flex-direction: column !important;
+  }
+  
+  .instructor-profile-actions button,
+  .instructor-profile-actions a {
+    width: 100% !important;
+  }
+  
+  .instructor-profile-grid {
+    grid-template-columns: 1fr !important;
+  }
 
   .instructor-card-header {
     flex-direction: column !important;
