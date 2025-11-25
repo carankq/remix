@@ -66,9 +66,17 @@ export async function action({ request }: ActionFunctionArgs) {
   const enquiryAsParent = formData.get('enquiryAsParent') === 'true';
 
   // Validation
-  if (!instructorId || !studentName || !studentEmailAddress || !studentPhoneNumber || !postcode) {
+  if (!instructorId || !studentName || !postcode) {
     return json({ 
       error: 'Please fill in all required fields',
+      success: false 
+    }, { status: 400 });
+  }
+  
+  // Require at least email or phone
+  if (!studentEmailAddress && !studentPhoneNumber) {
+    return json({ 
+      error: 'Please provide either an email address or phone number',
       success: false 
     }, { status: 400 });
   }
@@ -79,8 +87,8 @@ export async function action({ request }: ActionFunctionArgs) {
     const payload = {
       instructorId,
       studentName: studentName.trim(),
-      studentPhoneNumber: studentPhoneNumber.trim(),
-      studentEmailAddress: studentEmailAddress.trim().toLowerCase(),
+      studentPhoneNumber: studentPhoneNumber?.trim() || undefined,
+      studentEmailAddress: studentEmailAddress?.trim().toLowerCase() || undefined,
       postcode: postcode.toUpperCase(),
       message: message?.trim() || undefined,
       gender: gender || undefined,
@@ -414,7 +422,7 @@ export default function EnquiryPage() {
                 color: '#374151',
                 marginBottom: '0.5rem'
               }}>
-                Email Address *
+                Email Address
               </label>
               <input
                 type="email"
@@ -432,7 +440,6 @@ export default function EnquiryPage() {
                 }}
                 onFocus={(e) => e.currentTarget.style.borderColor = '#1e40af'}
                 onBlur={(e) => e.currentTarget.style.borderColor = '#e5e7eb'}
-                required
               />
             </div>
 
@@ -445,7 +452,7 @@ export default function EnquiryPage() {
                 color: '#374151',
                 marginBottom: '0.5rem'
               }}>
-                Phone Number (UK) *
+                Phone Number (UK)
               </label>
               <input
                 type="tel"
@@ -463,8 +470,15 @@ export default function EnquiryPage() {
                 }}
                 onFocus={(e) => e.currentTarget.style.borderColor = '#1e40af'}
                 onBlur={(e) => e.currentTarget.style.borderColor = '#e5e7eb'}
-                required
               />
+              <p style={{ 
+                fontSize: '0.75rem', 
+                color: '#6b7280', 
+                marginTop: '0.5rem',
+                fontStyle: 'italic'
+              }}>
+                * At least one contact method (email or phone) is required
+              </p>
             </div>
 
             {/* Postcode/Outcode */}
