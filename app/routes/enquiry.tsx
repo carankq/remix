@@ -160,29 +160,31 @@ export default function EnquiryPage() {
       setShowErrorAlert(true);
       return;
     }
-    
-    if (!formData.studentEmailAddress.trim() || !formData.studentEmailAddress.includes('@')) {
-      setError('Please enter a valid email address');
-      setShowErrorAlert(true);
-      return;
-    }
-    
-    if (!formData.studentPhoneNumber.trim()) {
-      setError('Please enter your phone number');
-      setShowErrorAlert(true);
-      return;
-    }
-    
-    if (!validateUKPhone(formData.studentPhoneNumber)) {
-      setError('Please enter a valid UK phone number');
-      setShowErrorAlert(true);
-      return;
-    }
-    
+
     if (!formData.postcode.trim()) {
-      setError('Please enter your postcode or outcode');
+      setError('Please enter your postcode or outcode, the outcode is the first part of the postcode (e.g. SW1A for SW1A 1AA)');
       setShowErrorAlert(true);
       return;
+    }    
+
+    if (!formData.studentEmailAddress.trim().length && !formData.studentPhoneNumber.trim().length) {
+      setError('Please enter either an email address or a phone number so the instructor can get back to you');
+      setShowErrorAlert(true);
+      return;      
+    }else {
+
+      if (formData.studentEmailAddress.trim() && !formData.studentEmailAddress.includes('@')) {
+        setError('Please enter a valid email address');
+        setShowErrorAlert(true);
+        return;
+      }
+
+      if (formData.studentPhoneNumber.trim() && !validateUKPhone(formData.studentPhoneNumber)) {
+        setError('Please enter your phone number');
+        setShowErrorAlert(true);
+        return;
+      }
+  
     }
 
     if (formData.gender != "Male" && formData.gender != "Female") {
@@ -195,7 +197,7 @@ export default function EnquiryPage() {
       setError('Please provide a message');
       setShowErrorAlert(true);
       return;
-    }    
+    }
 
     setLoading(true);
     
@@ -231,7 +233,7 @@ export default function EnquiryPage() {
       setSuccess(true);
       
     } catch (err: any) {
-      setError(err.message || 'Failed to submit enquiry. Please try again.');
+      setError(err.error || 'Failed to submit enquiry. Please try again.');
       setShowErrorAlert(true);
     } finally {
       setLoading(false);

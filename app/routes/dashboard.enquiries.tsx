@@ -33,7 +33,6 @@ type LoaderData = {
 
 export async function action({ request }: ActionFunctionArgs) {
   const userSession = await getUserFromSession(request);
-  console.log('came here to do someting.......')
   if (!userSession) {
     return redirect('/auth');
   }
@@ -47,13 +46,11 @@ export async function action({ request }: ActionFunctionArgs) {
   }
   
   try {
-    console.log('started doing somthing...')
     const apiHost = process.env.API_HOST || 'http://localhost:3001';
     const endpoint = action === 'archive' 
       ? `/enquiries/${enquiryId}/archive`
       : `/enquiries/${enquiryId}/unarchive`;
     
-    console.log(`[Enquiry Action] ${action} - Calling: ${apiHost}${endpoint}`);
     
     const response = await fetch(`${apiHost}${endpoint}`, {
       method: 'PATCH',
@@ -63,7 +60,6 @@ export async function action({ request }: ActionFunctionArgs) {
       }
     });
     
-    console.log(`[Enquiry Action] Response status: ${response.status}`);
     
     if (!response.ok) {
       const errorData = await response.json().catch(() => ({ message: 'Operation failed' }));
@@ -73,8 +69,6 @@ export async function action({ request }: ActionFunctionArgs) {
         success: false 
       }, { status: response.status });
     }
-    
-    console.log(`[Enquiry Action] Success - Enquiry ${action}d`);
     
     return json({ 
       success: true, 
