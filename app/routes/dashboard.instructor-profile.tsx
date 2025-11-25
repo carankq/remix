@@ -6,6 +6,16 @@ import { Footer } from "../components/Footer";
 import { getUserFromSession } from "../session.server";
 import { useState } from "react";
 import InstructorCreateForm from "../components/InstructorCreateForm";
+import { useAuth } from "../context/AuthContext";
+
+// Helper to get API host in browser
+function getApiHost(): string {
+  if (typeof window !== 'undefined' && (window as any).__ENV__?.API_HOST) {
+    const host = String((window as any).__ENV__.API_HOST).trim();
+    return host.replace(/\/$/, '') || 'http://localhost:3001';
+  }
+  return 'http://localhost:3001';
+}
 
 interface InstructorProfile {
   _id: string;
@@ -21,6 +31,8 @@ interface InstructorProfile {
   company?: string;
   phone?: string;
   email?: string;
+  emailVerifiedDate?: string | null;
+  phoneNumberVerifiedDate?: string | null;
   languages?: string[];
   image?: string;
   instructorType?: 'ADI' | 'PDI';
@@ -126,7 +138,18 @@ export async function loader({ request }: LoaderFunctionArgs) {
 export default function DashboardInstructorProfileRoute() {
   const { profile, profileError, isInstructor } = useLoaderData<typeof loader>();
   const navigate = useNavigate();
+  const { token, logout } = useAuth();
   const [showForm, setShowForm] = useState(false);
+  
+  // Contact verification states
+  const [emailVerifying, setEmailVerifying] = useState(false);
+  const [phoneVerifying, setPhoneVerifying] = useState(false);
+  const [emailCodeSent, setEmailCodeSent] = useState(false);
+  const [phoneCodeSent, setPhoneCodeSent] = useState(false);
+  const [emailCode, setEmailCode] = useState('');
+  const [phoneCode, setPhoneCode] = useState('');
+  const [verificationMessage, setVerificationMessage] = useState('');
+  const [verificationError, setVerificationError] = useState('');
   
   // Callback to handle profile creation/update - reload the page to get fresh data
   const handleProfileCreated = () => {
@@ -137,6 +160,165 @@ export default function DashboardInstructorProfileRoute() {
   // Callback to handle cancel - go back to view mode
   const handleCancel = () => {
     setShowForm(false);
+  };
+  
+  // Contact verification handlers
+  const requestEmailCode = async () => {
+    if (!token) {
+      await logout();
+      navigate('/auth');
+      return;
+    }
+    
+    setEmailVerifying(true);
+    setVerificationError('');
+    setVerificationMessage('');
+    
+    try {
+      const apiHost = getApiHost();
+      console.log('requesting email code', apiHost);
+      const response = await fetch(`${apiHost}/instructors/contact/email/request-code`, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        }
+      });
+      
+      if (response.ok) {
+        setEmailCodeSent(true);
+        setVerificationMessage('Verification code sent to your email!');
+      } else {
+        const data = await response.json();
+        setVerificationError(data.message || 'Failed to send verification code');
+      }
+    } catch (error) {
+      console.log('error requesting email code', error);
+      setVerificationError('Network error. Please try again.');
+    } finally {
+      setEmailVerifying(false);
+    }
+  };
+  
+  const verifyEmail = async () => {
+    if (!emailCode.trim()) {
+      setVerificationError('Please enter the verification code');
+      return;
+    }
+    
+    if (!token) {
+      await logout();
+      navigate('/auth');
+      return;
+    }
+    
+    setEmailVerifying(true);
+    setVerificationError('');
+    
+    try {
+      const apiHost = getApiHost();
+      const response = await fetch(`${apiHost}/instructors/contact/email/verify-code`, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ code: emailCode })
+      });
+      
+      if (response.ok) {
+        setVerificationMessage('Email verified successfully!');
+        setEmailCodeSent(false);
+        setEmailCode('');
+        // Reload to get updated profile
+        setTimeout(() => window.location.reload(), 1500);
+      } else {
+        const data = await response.json();
+        setVerificationError(data.message || 'Invalid or expired code');
+      }
+    } catch (error) {
+      setVerificationError('Network error. Please try again.');
+    } finally {
+      setEmailVerifying(false);
+    }
+  };
+  
+  const requestPhoneCode = async () => {
+    if (!token) {
+      await logout();
+      navigate('/auth');
+      return;
+    }
+    
+    setPhoneVerifying(true);
+    setVerificationError('');
+    setVerificationMessage('');
+    
+    try {
+      const apiHost = getApiHost();
+      const response = await fetch(`${apiHost}/instructors/contact/phone/request-code`, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        }
+      });
+      
+      if (response.ok) {
+        setPhoneCodeSent(true);
+        setVerificationMessage('Verification code sent via SMS!');
+      } else {
+        const data = await response.json();
+        setVerificationError(data.message || 'Failed to send verification code');
+      }
+    } catch (error) {
+      setVerificationError('Network error. Please try again.');
+    } finally {
+      setPhoneVerifying(false);
+    }
+  };
+  
+  const verifyPhone = async () => {
+    if (!phoneCode.trim()) {
+      setVerificationError('Please enter the verification code');
+      return;
+    }
+    
+    if (!token) {
+      await logout();
+      navigate('/auth');
+      return;
+    }
+    
+    setPhoneVerifying(true);
+    setVerificationError('');
+    
+    try {
+      const apiHost = getApiHost();
+      const response = await fetch(`${apiHost}/instructors/contact/phone/verify-code`, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ code: phoneCode })
+      });
+      
+      if (response.ok) {
+        setVerificationMessage('Phone number verified successfully!');
+        setPhoneCodeSent(false);
+        setPhoneCode('');
+        // Reload to get updated profile
+        setTimeout(() => window.location.reload(), 1500);
+      } else {
+        const data = await response.json();
+        setVerificationError(data.message || 'Invalid or expired code');
+      }
+    } catch (error) {
+      setVerificationError('Network error. Please try again.');
+    } finally {
+      setPhoneVerifying(false);
+    }
   };
   
   // Calculate profile completion percentage
@@ -305,6 +487,253 @@ export default function DashboardInstructorProfileRoute() {
                         Complete your profile to attract more students and appear higher in search results
                       </p>
                     </div>
+
+                    {/* Contact Verification Section */}
+                    {(!profile.emailVerifiedDate || !profile.phoneNumberVerifiedDate) && (
+                      <div style={{
+                        background: '#fef3c7',
+                        border: '1px solid #fbbf24',
+                        borderRadius: '0',
+                        padding: '1.5rem',
+                        marginBottom: '2rem'
+                      }}>
+                        <h3 style={{
+                          fontSize: '0.875rem',
+                          fontWeight: '600',
+                          color: '#78350f',
+                          marginBottom: '0.75rem'
+                        }}>
+                          Verify Your Contact Details
+                        </h3>
+                        
+                        <p style={{ 
+                          fontSize: '0.8125rem', 
+                          color: '#92400e',
+                          lineHeight: '1.5',
+                          marginBottom: '1rem'
+                        }}>
+                          Your profile won't appear in search results until verified. This also ensures you receive enquiry notifications.
+                        </p>
+                        
+                        {verificationMessage && (
+                          <div style={{
+                            background: '#ecfdf5',
+                            border: '2px solid #10b981',
+                            borderRadius: '0',
+                            padding: '0.75rem',
+                            marginBottom: '1rem',
+                            color: '#065f46',
+                            fontSize: '0.875rem',
+                            fontWeight: '600'
+                          }}>
+                            {verificationMessage}
+                          </div>
+                        )}
+                        
+                        {verificationError && (
+                          <div style={{
+                            background: '#fee2e2',
+                            border: '2px solid #ef4444',
+                            borderRadius: '0',
+                            padding: '0.75rem',
+                            marginBottom: '1rem',
+                            color: '#991b1b',
+                            fontSize: '0.875rem',
+                            fontWeight: '600'
+                          }}>
+                            {verificationError}
+                          </div>
+                        )}
+                        
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+                          {/* Email Verification */}
+                          {!profile.emailVerifiedDate && profile.email && (
+                            <div style={{
+                              background: '#ffffff',
+                              border: '2px solid #e5e7eb',
+                              borderRadius: '0',
+                              padding: '1rem'
+                            }}>
+                              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '0.75rem' }}>
+                                <div>
+                                  <div style={{ fontSize: '0.875rem', fontWeight: '600', color: '#111827' }}>Email Address</div>
+                                  <div style={{ fontSize: '0.75rem', color: '#6b7280' }}>{profile.email}</div>
+                                </div>
+                                <span style={{
+                                  padding: '0.25rem 0.75rem',
+                                  background: '#fef3c7',
+                                  border: '2px solid #f59e0b',
+                                  borderRadius: '0',
+                                  fontSize: '0.75rem',
+                                  fontWeight: '700',
+                                  color: '#92400e'
+                                }}>
+                                  UNVERIFIED
+                                </span>
+                              </div>
+                              
+                              {!emailCodeSent ? (
+                                <button
+                                  onClick={requestEmailCode}
+                                  disabled={emailVerifying}
+                                  className="btn btn-primary"
+                                  style={{
+                                    width: '100%',
+                                    fontSize: '0.875rem',
+                                    padding: '0.625rem',
+                                    borderRadius: '0'
+                                  }}
+                                >
+                                  {emailVerifying ? 'Sending...' : 'Send Verification Code'}
+                                </button>
+                              ) : (
+                                <div>
+                                  <input
+                                    type="text"
+                                    value={emailCode}
+                                    onChange={(e) => setEmailCode(e.target.value)}
+                                    placeholder="Enter 6-digit code"
+                                    maxLength={6}
+                                    style={{
+                                      width: '100%',
+                                      padding: '0.625rem',
+                                      border: '2px solid #e5e7eb',
+                                      borderRadius: '0',
+                                      fontSize: '0.875rem',
+                                      marginBottom: '0.5rem'
+                                    }}
+                                  />
+                                  <div style={{ display: 'flex', gap: '0.5rem' }}>
+                                    <button
+                                      onClick={verifyEmail}
+                                      disabled={emailVerifying}
+                                      className="btn btn-primary"
+                                      style={{
+                                        flex: 1,
+                                        fontSize: '0.875rem',
+                                        padding: '0.625rem',
+                                        borderRadius: '0'
+                                      }}
+                                    >
+                                      {emailVerifying ? 'Verifying...' : 'Verify'}
+                                    </button>
+                                    <button
+                                      onClick={() => {
+                                        setEmailCodeSent(false);
+                                        setEmailCode('');
+                                      }}
+                                      className="btn"
+                                      style={{
+                                        fontSize: '0.875rem',
+                                        padding: '0.625rem',
+                                        borderRadius: '0',
+                                        background: '#f3f4f6',
+                                        border: '2px solid #e5e7eb'
+                                      }}
+                                    >
+                                      Cancel
+                                    </button>
+                                  </div>
+                                </div>
+                              )}
+                            </div>
+                          )}
+                          
+                          {/* Phone Verification */}
+                          {!profile.phoneNumberVerifiedDate && profile.phone && (
+                            <div style={{
+                              background: '#ffffff',
+                              border: '2px solid #e5e7eb',
+                              borderRadius: '0',
+                              padding: '1rem'
+                            }}>
+                              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '0.75rem' }}>
+                                <div>
+                                  <div style={{ fontSize: '0.875rem', fontWeight: '600', color: '#111827' }}>Phone Number</div>
+                                  <div style={{ fontSize: '0.75rem', color: '#6b7280' }}>{profile.phone}</div>
+                                </div>
+                                <span style={{
+                                  padding: '0.25rem 0.75rem',
+                                  background: '#fef3c7',
+                                  border: '2px solid #f59e0b',
+                                  borderRadius: '0',
+                                  fontSize: '0.75rem',
+                                  fontWeight: '700',
+                                  color: '#92400e'
+                                }}>
+                                  UNVERIFIED
+                                </span>
+                              </div>
+                              
+                              {!phoneCodeSent ? (
+                                <button
+                                  onClick={requestPhoneCode}
+                                  disabled={phoneVerifying}
+                                  className="btn btn-primary"
+                                  style={{
+                                    width: '100%',
+                                    fontSize: '0.875rem',
+                                    padding: '0.625rem',
+                                    borderRadius: '0'
+                                  }}
+                                >
+                                  {phoneVerifying ? 'Sending...' : 'Send Verification Code'}
+                                </button>
+                              ) : (
+                                <div>
+                                  <input
+                                    type="text"
+                                    value={phoneCode}
+                                    onChange={(e) => setPhoneCode(e.target.value)}
+                                    placeholder="Enter 6-digit code"
+                                    maxLength={6}
+                                    style={{
+                                      width: '100%',
+                                      padding: '0.625rem',
+                                      border: '2px solid #e5e7eb',
+                                      borderRadius: '0',
+                                      fontSize: '0.875rem',
+                                      marginBottom: '0.5rem'
+                                    }}
+                                  />
+                                  <div style={{ display: 'flex', gap: '0.5rem' }}>
+                                    <button
+                                      onClick={verifyPhone}
+                                      disabled={phoneVerifying}
+                                      className="btn btn-primary"
+                                      style={{
+                                        flex: 1,
+                                        fontSize: '0.875rem',
+                                        padding: '0.625rem',
+                                        borderRadius: '0'
+                                      }}
+                                    >
+                                      {phoneVerifying ? 'Verifying...' : 'Verify'}
+                                    </button>
+                                    <button
+                                      onClick={() => {
+                                        setPhoneCodeSent(false);
+                                        setPhoneCode('');
+                                      }}
+                                      className="btn"
+                                      style={{
+                                        fontSize: '0.875rem',
+                                        padding: '0.625rem',
+                                        borderRadius: '0',
+                                        background: '#f3f4f6',
+                                        border: '2px solid #e5e7eb'
+                                      }}
+                                    >
+                                      Cancel
+                                    </button>
+                                  </div>
+                                </div>
+                              )}
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    )}
 
                 {/* Two Column Layout */}
                 <div className="instructor-profile-grid" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '2rem' }}>
