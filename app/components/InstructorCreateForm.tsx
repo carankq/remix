@@ -768,36 +768,34 @@ const InstructorCreateForm: React.FC<InstructorCreateFormProps> = ({
         
         {/* Credential References Section */}
         <div style={sectionStyle}>
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '1rem' }}>
-            <h3 style={sectionHeaderStyle}>
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ color: '#10b981' }}>
-                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
-                <polyline points="14 2 14 8 20 8"/>
-                <line x1="16" y1="13" x2="8" y2="13"/>
-                <line x1="16" y1="17" x2="8" y2="17"/>
-                <polyline points="10 9 9 9 8 9"/>
-              </svg>
-              Driving Instructor Credentials
-            </h3>
-            {ownerInst && (
-              <label style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', cursor: 'pointer' }}>
-                <input
-                  type="checkbox"
-                  checked={credentialsModified}
-                  onChange={(e) => setCredentialsModified(e.target.checked)}
-                  style={{ 
-                    width: '16px', 
-                    height: '16px', 
-                    cursor: 'pointer',
-                    accentColor: '#2563eb'
-                  }}
-                />
-                <span style={{ fontSize: '0.8125rem', color: '#6b7280', fontWeight: '500' }}>
-                  Update credentials
-                </span>
-              </label>
-            )}
-          </div>
+          <h3 style={sectionHeaderStyle}>
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ color: '#10b981' }}>
+              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+              <polyline points="14 2 14 8 20 8"/>
+              <line x1="16" y1="13" x2="8" y2="13"/>
+              <line x1="16" y1="17" x2="8" y2="17"/>
+              <polyline points="10 9 9 9 8 9"/>
+            </svg>
+            Driving Instructor Credentials
+          </h3>
+          {ownerInst && (
+            <label style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', cursor: 'pointer', marginBottom: '1rem' }}>
+              <input
+                type="checkbox"
+                checked={credentialsModified}
+                onChange={(e) => setCredentialsModified(e.target.checked)}
+                style={{ 
+                  width: '16px', 
+                  height: '16px', 
+                  cursor: 'pointer',
+                  accentColor: '#2563eb'
+                }}
+              />
+              <span style={{ fontSize: '0.8125rem', color: '#6b7280', fontWeight: '500' }}>
+                Update credentials
+              </span>
+            </label>
+          )}
           
           <div style={{
             background: '#eff6ff',
@@ -818,9 +816,10 @@ const InstructorCreateForm: React.FC<InstructorCreateFormProps> = ({
               <p style={{ fontSize: '0.8125rem', color: '#1e40af', fontWeight: '600', marginBottom: '0.25rem' }}>
                 Keep Your Credentials Up to Date
               </p>
-              <p style={{ fontSize: '0.75rem', color: '#1e3a8a', lineHeight: '1.5' }}>
+              <p style={{ fontSize: '0.75rem', color: '#1e3a8a', lineHeight: '1.5', margin: 0 }}>
                 🔒 <strong>Security:</strong> This information is never shared publicly and is used only for verification.<br/>
-                ⚠️ <strong>Important:</strong> Your profile will not appear in search results if your credentials are missing or expired. Please ensure they are current.
+                ⚠️ <strong>Important:</strong> Your profile will not appear in search results if your credentials are missing or expired. Please ensure they are current.<br/>
+                🔄 <strong>Note:</strong> When credentials are updated, your profile will be temporarily removed from search results while verification checks take place. This ensures all instructors meet safety standards.
               </p>
             </div>
           </div>
@@ -846,8 +845,9 @@ const InstructorCreateForm: React.FC<InstructorCreateFormProps> = ({
                 <p style={{ fontSize: '0.8125rem', color: '#92400e', fontWeight: '600', marginBottom: '0.25rem' }}>
                   Important: This will update your credential information
                 </p>
-                <p style={{ fontSize: '0.75rem', color: '#78350f', lineHeight: '1.4' }}>
-                  Ensure all credential details are accurate. Your profile visibility depends on having valid, up-to-date credentials.
+                <p style={{ fontSize: '0.75rem', color: '#78350f', lineHeight: '1.5', margin: 0 }}>
+                  Ensure all credential details are accurate. Your profile visibility depends on having valid, up-to-date credentials.<br/>
+                  Your profile will be temporarily hidden from search results during the verification process.
                 </p>
               </div>
             </div>
@@ -998,7 +998,7 @@ const InstructorCreateForm: React.FC<InstructorCreateFormProps> = ({
             </div>
             {
               mode !== 'edit' ?
-              <div>
+            <div>
               <label className="instructor-form-label">
                 Gender
               </label>

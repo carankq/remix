@@ -17,7 +17,7 @@ interface AuthContextValue {
   token: string | null;
   isAuthenticated: boolean;
   login: (email: string, password: string) => Promise<void>;
-  signup: (params: { email: string; password: string; phoneNumber?: string; ageRange?: string; accountType?: AccountType; fullName?: string; memberSince?: string }) => Promise<void>;
+  signup: (params: { email: string; password: string; phoneNumber?: string; ageRange?: string; accountType?: AccountType; fullName?: string; memberSince?: string; gender?: string }) => Promise<void>;
   logout: () => Promise<void>;
 }
 
@@ -98,12 +98,13 @@ export const AuthProvider: React.FC<{
     setUser(data.user);
   }, []);
 
-  const signup = useCallback(async (params: { email: string; password: string; phoneNumber?: string; ageRange?: string; accountType?: AccountType; fullName?: string; memberSince?: string }) => {
+  const signup = useCallback(async (params: { email: string; password: string; phoneNumber?: string; ageRange?: string; accountType?: AccountType; fullName?: string; memberSince?: string; gender?: string }) => {
     const host = getApiHost();
     const payload = {
       accountType: params.accountType ?? 'student',
       email: params.email,
       password: params.password,
+      gender: params.gender,
       phoneNumber: params.phoneNumber ?? '',
       ageRange: params.ageRange ?? '',
       fullName: params.fullName ?? '',

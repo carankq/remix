@@ -343,6 +343,27 @@ export default function DashboardInstructorProfileRoute() {
   
   const profileComplete = calculateCompletion(profile);
   
+  // Get missing fields for profile completion
+  const getMissingFields = (profile: InstructorProfile | null): string[] => {
+    if (!profile) return [];
+    const missing: string[] = [];
+    
+    if (!profile.name) missing.push('Name');
+    if (!profile.description || profile.description.length <= 50) missing.push('Description (at least 50 characters)');
+    if (!profile.pricePerHour) missing.push('Hourly rate');
+    if (!profile.yearsOfExperience) missing.push('Years of experience');
+    if (!profile.vehicles || profile.vehicles.length === 0) missing.push('Vehicle information');
+    if (!profile.outcodes || profile.outcodes.length === 0) missing.push('Coverage areas (outcodes)');
+    if (!profile.availability?.working || profile.availability.working.length === 0) missing.push('Availability schedule');
+    if (!profile.languages || profile.languages.length === 0) missing.push('Languages');
+    if (!profile.image) missing.push('Profile image');
+    if (!profile.deals || profile.deals.length === 0) missing.push('Deals or offers');
+    
+    return missing;
+  };
+  
+  const missingFields = getMissingFields(profile);
+  
   // Extract display data from profile
   const hourlyRate = profile?.pricePerHour ? `£${profile.pricePerHour}` : 'Not set';
   const experience = profile?.yearsOfExperience ? `${profile.yearsOfExperience} years` : 'Not set';
@@ -483,9 +504,41 @@ export default function DashboardInstructorProfileRoute() {
                           }}/>
                         </div>
                       </div>
-                      <p style={{ fontSize: '0.875rem', color: '#6b7280' }}>
-                        Complete your profile to attract more students and appear higher in search results
-                      </p>
+                      {profileComplete === 100 ? (
+                        <p style={{ fontSize: '0.875rem', color: '#059669', fontWeight: '600' }}>
+                          ✓ Your profile is complete! You're all set to attract students.
+                        </p>
+                      ) : (
+                        <>
+                          <p style={{ fontSize: '0.875rem', color: '#6b7280', marginBottom: '0.75rem' }}>
+                            Complete your profile to attract more students and appear higher in search results
+                          </p>
+                          {missingFields.length > 0 && (
+                            <div style={{
+                              background: '#f9fafb',
+                              border: '1px solid #e5e7eb',
+                              borderRadius: '0',
+                              padding: '0.75rem',
+                              marginTop: '0.75rem'
+                            }}>
+                              <p style={{ fontSize: '0.75rem', fontWeight: '600', color: '#374151', marginBottom: '0.5rem' }}>
+                                To reach 100%, add:
+                              </p>
+                              <ul style={{ 
+                                margin: 0, 
+                                paddingLeft: '1.25rem',
+                                fontSize: '0.75rem',
+                                color: '#6b7280',
+                                lineHeight: '1.6'
+                              }}>
+                                {missingFields.map((field, i) => (
+                                  <li key={i}>{field}</li>
+                                ))}
+                              </ul>
+                            </div>
+                          )}
+                        </>
+                      )}
                     </div>
 
                     {/* Contact Verification Section */}

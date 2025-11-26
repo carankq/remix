@@ -12,6 +12,7 @@ export default function AuthRoute() {
   const [phoneNumber, setPhoneNumber] = useState('');
   const [ageRange, setAgeRange] = useState('');
   const [fullName, setFullName] = useState('');
+  const [gender, setGender] = useState('');
   const [error, setError] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isTransitioning, setIsTransitioning] = useState(false);
@@ -58,6 +59,10 @@ export default function AuthRoute() {
         setError('Please provide your phone number and age range.');
         return;
       }
+      if (!gender || gender === '') {
+        setError('Please select your gender.');
+        return;
+      }
     }
 
     setIsSubmitting(true);
@@ -71,7 +76,8 @@ export default function AuthRoute() {
           accountType: role as 'student' | 'instructor',
           phoneNumber,
           ageRange,
-          fullName
+          fullName,
+          gender
         });
       }
       // Use window.location for full page reload to ensure cookie is sent
@@ -279,6 +285,81 @@ export default function AuthRoute() {
                             e.currentTarget.style.boxShadow = 'none';
                           }}
                         />
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Gender (Signup only) */}
+                  {!isLogin && (
+                    <div>
+                      <label style={{
+                        display: 'block',
+                        fontSize: '0.875rem',
+                        fontWeight: '600',
+                        color: '#374151',
+                        marginBottom: '0.5rem'
+                      }}>
+                        Gender
+                      </label>
+                      <div className="relative">
+                        <span style={{ 
+                          position: 'absolute', 
+                          left: '1rem', 
+                          top: '50%', 
+                          transform: 'translateY(-50%)',
+                          pointerEvents: 'none',
+                          zIndex: 1
+                        }}>
+                          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#9ca3af" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                            <circle cx="12" cy="12" r="10"/>
+                            <path d="M12 6v6l4 2"/>
+                          </svg>
+                        </span>
+                        <select
+                          value={gender}
+                          onChange={(e) => setGender(e.target.value)}
+                          disabled={isSubmitting}
+                          required
+                          style={{
+                            width: '100%',
+                            padding: '0.75rem 1rem 0.75rem 3rem',
+                            fontSize: '1rem',
+                            color: gender ? '#111827' : '#9ca3af',
+                            border: '1px solid #e5e7eb',
+                            borderRadius: '0',
+                            outline: 'none',
+                            transition: 'all 0.2s ease',
+                            background: '#f9fafb',
+                            appearance: 'none',
+                            cursor: 'pointer'
+                          }}
+                          onFocus={(e) => {
+                            e.currentTarget.style.borderColor = '#93c5fd';
+                            e.currentTarget.style.background = '#ffffff';
+                            e.currentTarget.style.boxShadow = '0 0 0 3px rgba(147, 197, 253, 0.1)';
+                          }}
+                          onBlur={(e) => {
+                            e.currentTarget.style.borderColor = '#e5e7eb';
+                            e.currentTarget.style.background = '#f9fafb';
+                            e.currentTarget.style.boxShadow = 'none';
+                          }}
+                        >
+                          <option value="">Select gender</option>
+                          <option value="Male">Male</option>
+                          <option value="Female">Female</option>
+                        </select>
+                        <span style={{ 
+                          position: 'absolute', 
+                          right: '1rem', 
+                          top: '50%', 
+                          transform: 'translateY(-50%)',
+                          pointerEvents: 'none',
+                          zIndex: 1
+                        }}>
+                          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#9ca3af" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                            <polyline points="6 9 12 15 18 9"/>
+                          </svg>
+                        </span>
                       </div>
                     </div>
                   )}
@@ -512,8 +593,11 @@ export default function AuthRoute() {
                           <option value="17-20">17-20</option>
                           <option value="21-25">21-25</option>
                           <option value="26-30">26-30</option>
-                          <option value="31-40">31-40</option>
-                          <option value=">40">40+</option>
+                          <option value="31-35">31-35</option>
+                          <option value="36-40">36-40</option>
+                          <option value="41-45">41-45</option>
+                          <option value="46-50">46-50</option>
+                          <option value="51+">51+</option>
                         </select>
                         <svg 
                           width="18" 

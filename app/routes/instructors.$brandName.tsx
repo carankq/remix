@@ -1,4 +1,4 @@
-import { useLoaderData, useNavigate, useSearchParams } from '@remix-run/react';
+import { useLoaderData, useNavigate, useSearchParams, useRouteError, isRouteErrorResponse } from '@remix-run/react';
 import type { LoaderFunctionArgs, MetaFunction } from '@remix-run/node';
 import { json } from '@remix-run/node';
 import { useState } from 'react';
@@ -244,15 +244,23 @@ export default function InstructorProfilePage() {
                           marginTop: '0.5rem',
                           background: '#ffffff',
                           color: '#111827',
-                          padding: '0.75rem',
+                          padding: '1rem',
                           borderRadius: '0',
                           border: `2px solid ${instructor.instructorType === 'ADI' ? '#10b981' : '#ec4899'}`,
-                          fontSize: '0.75rem',
-                          width: '200px',
+                          fontSize: '0.8125rem',
+                          width: '280px',
                           zIndex: 10,
-                          boxShadow: '0 4px 12px rgba(0, 0, 0, 0.15)'
+                          boxShadow: '0 4px 12px rgba(0, 0, 0, 0.15)',
+                          lineHeight: '1.5'
                         }}>
-                          <strong>{instructor.instructorType === 'ADI' ? 'ADI' : 'PDI'}:</strong> {instructor.instructorType === 'ADI' ? 'Approved Driving Instructor' : 'Potential Driving Instructor'}
+                          <div style={{ fontWeight: '700', marginBottom: '0.5rem', color: instructor.instructorType === 'ADI' ? '#065f46' : '#831843' }}>
+                            {instructor.instructorType === 'ADI' ? 'Approved Driving Instructor (ADI)' : 'Potential Driving Instructor (PDI)'}
+                          </div>
+                          <div style={{ color: '#374151' }}>
+                            {instructor.instructorType === 'ADI' 
+                              ? 'Fully qualified and certified by the DVSA to provide professional driving instruction.'
+                              : 'In training and supervised by an ADI. Working towards full qualification.'}
+                          </div>
                         </div>
                       )}
                     </div>
@@ -591,6 +599,162 @@ export default function InstructorProfilePage() {
               </div>
             </div>
           )}
+        </div>
+      </main>
+      
+      <Footer />
+    </div>
+  );
+}
+
+export function ErrorBoundary() {
+  const error = useRouteError();
+  const navigate = useNavigate();
+  
+  let title = 'Something went wrong';
+  let message = 'An unexpected error occurred while loading this instructor profile.';
+  let statusCode = 500;
+  
+  if (isRouteErrorResponse(error)) {
+    statusCode = error.status;
+    
+    if (error.status === 404) {
+      title = 'Instructor Not Found';
+      message = 'We couldn\'t find an instructor with that profile name. They may have changed their profile URL or the listing may no longer be available.';
+    } else if (error.status === 400) {
+      title = 'Invalid Request';
+      message = 'The instructor profile URL is invalid.';
+    } else if (error.status >= 500) {
+      title = 'Server Error';
+      message = 'Our servers encountered an error while loading this profile. Please try again later.';
+    }
+  }
+  
+  return (
+    <div style={{ display: 'flex', flexDirection: 'column', minHeight: '100vh', background: '#f8fafc' }}>
+      <Header />
+      
+      <main style={{ 
+        flex: 1, 
+        display: 'flex', 
+        alignItems: 'center', 
+        justifyContent: 'center',
+        padding: '2rem 1rem'
+      }}>
+        <div style={{
+          maxWidth: '600px',
+          width: '100%',
+          background: '#ffffff',
+          border: '2px solid #e5e7eb',
+          borderRadius: '0',
+          padding: '3rem 2rem',
+          textAlign: 'center'
+        }}>
+          {/* Error Icon */}
+          <div style={{
+            width: '80px',
+            height: '80px',
+            margin: '0 auto 2rem',
+            background: statusCode === 404 ? '#fef3c7' : '#fee2e2',
+            border: `2px solid ${statusCode === 404 ? '#fbbf24' : '#ef4444'}`,
+            borderRadius: '0',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center'
+          }}>
+            <svg 
+              width="40" 
+              height="40" 
+              viewBox="0 0 24 24" 
+              fill="none" 
+              stroke={statusCode === 404 ? '#92400e' : '#991b1b'}
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            >
+              {statusCode === 404 ? (
+                <>
+                  <circle cx="12" cy="12" r="10"/>
+                  <line x1="12" y1="8" x2="12" y2="12"/>
+                  <line x1="12" y1="16" x2="12.01" y2="16"/>
+                </>
+              ) : (
+                <>
+                  <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/>
+                  <line x1="12" y1="9" x2="12" y2="13"/>
+                  <line x1="12" y1="17" x2="12.01" y2="17"/>
+                </>
+              )}
+            </svg>
+          </div>
+          
+          {/* Title */}
+          <h1 style={{
+            fontSize: '1.875rem',
+            fontWeight: '700',
+            color: '#111827',
+            marginBottom: '1rem',
+            fontFamily: "'Space Grotesk', sans-serif"
+          }}>
+            {title}
+          </h1>
+          
+          {/* Message */}
+          <p style={{
+            fontSize: '1rem',
+            color: '#6b7280',
+            lineHeight: '1.6',
+            marginBottom: '2rem'
+          }}>
+            {message}
+          </p>
+          
+          {/* Status Code */}
+          {statusCode && (
+            <p style={{
+              fontSize: '0.875rem',
+              color: '#9ca3af',
+              marginBottom: '2rem'
+            }}>
+              Error Code: {statusCode}
+            </p>
+          )}
+          
+          {/* Action Buttons */}
+          <div style={{
+            display: 'flex',
+            gap: '1rem',
+            justifyContent: 'center',
+            flexWrap: 'wrap'
+          }}>
+            <button
+              onClick={() => navigate(-1)}
+              className="btn"
+              style={{
+                fontSize: '0.9375rem',
+                padding: '0.75rem 1.5rem',
+                borderRadius: '0',
+                background: '#f3f4f6',
+                border: '2px solid #e5e7eb',
+                color: '#374151',
+                fontWeight: '600'
+              }}
+            >
+              Go Back
+            </button>
+            <button
+              onClick={() => navigate('/')}
+              className="btn btn-primary"
+              style={{
+                fontSize: '0.9375rem',
+                padding: '0.75rem 1.5rem',
+                borderRadius: '0',
+                fontWeight: '600'
+              }}
+            >
+              Go to Homepage
+            </button>
+          </div>
         </div>
       </main>
       
