@@ -29,6 +29,7 @@ type LoaderData = {
   newEnquiries: number;
   archivedEnquiries: number;
   error?: string;
+  noInstructorListing?: boolean;
 };
 
 export async function action({ request }: ActionFunctionArgs) {
@@ -111,7 +112,27 @@ export async function loader({ request }: LoaderFunctionArgs) {
       if (response.status === 403 || response.status === 401) {
         return redirect('/auth');
       }
-      throw new Error('Failed to fetch enquiries');
+      
+      // Check if it's a 404 - instructor listing doesn't exist
+      if (response.status === 404) {
+        return json<LoaderData>({
+          enquiries: [],
+          totalEnquiries: 0,
+          newEnquiries: 0,
+          archivedEnquiries: 0,
+          noInstructorListing: true
+        });
+      }
+      
+      // Other errors
+      const errorData = await response.json().catch(() => ({ message: 'Failed to fetch enquiries' }));
+      return json<LoaderData>({
+        enquiries: [],
+        totalEnquiries: 0,
+        newEnquiries: 0,
+        archivedEnquiries: 0,
+        error: errorData.message || 'Failed to load enquiries. Please try again.'
+      });
     }
     
     const enquiries: Enquiry[] = await response.json();
@@ -134,13 +155,13 @@ export async function loader({ request }: LoaderFunctionArgs) {
       totalEnquiries: 0,
       newEnquiries: 0,
       archivedEnquiries: 0,
-      error: 'Failed to load enquiries. Please try refreshing the page.'
+      error: 'Network error. Please check your connection and try again.'
     });
   }
 }
 
 export default function DashboardEnquiriesRoute() {
-  const { enquiries, totalEnquiries, newEnquiries, archivedEnquiries, error: loaderError } = useLoaderData<typeof loader>();
+  const { enquiries, totalEnquiries, newEnquiries, archivedEnquiries, error: loaderError, noInstructorListing } = useLoaderData<typeof loader>();
   const fetcher = useFetcher<{ success?: boolean; error?: string | null; message?: string }>();
   const [showSuccessAlert, setShowSuccessAlert] = useState(false);
   const [showErrorAlert, setShowErrorAlert] = useState(false);
@@ -260,11 +281,53 @@ export default function DashboardEnquiriesRoute() {
               </div>
             </div>
 
-            {/* Error Message */}
-            {loaderError && (
+            {/* No Instructor Listing Message */}
+            {noInstructorListing && (
               <div style={{
-                background: 'linear-gradient(135deg, #fef2f2 0%, #fee2e2 100%)',
-                border: '3px solid #ef4444',
+                background: '#fef3c7',
+                border: '2px solid #f59e0b',
+                borderRadius: '0',
+                padding: '2rem',
+                marginBottom: '2rem',
+                textAlign: 'center'
+              }}>
+                <div style={{
+                  fontSize: '3rem',
+                  marginBottom: '1rem'
+                }}>
+                  📋
+                </div>
+                <h3 style={{ 
+                  fontSize: '1.25rem', 
+                  fontWeight: '700', 
+                  color: '#92400e',
+                  marginBottom: '0.75rem'
+                }}>
+                  Create Your Instructor Profile First
+                </h3>
+                <p style={{ color: '#78350f', marginBottom: '1.5rem', lineHeight: '1.6' }}>
+                  You need to create your instructor profile before you can receive enquiries from students. 
+                  Once your profile is live, enquiries will appear here.
+                </p>
+                <button
+                  onClick={() => window.location.href = '/dashboard/instructor-profile'}
+                  className="btn btn-primary"
+                  style={{
+                    fontSize: '1rem',
+                    padding: '0.875rem 2rem',
+                    borderRadius: '0'
+                  }}
+                >
+                  Create Instructor Profile
+                </button>
+              </div>
+            )}
+
+            {/* Error Message */}
+            {loaderError && !noInstructorListing && (
+              <div style={{
+                background: '#fef2f2',
+                border: '2px solid #ef4444',
                 borderRadius: '0',
                 padding: '1.5rem',
                 marginBottom: '2rem',

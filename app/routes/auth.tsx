@@ -9,6 +9,7 @@ export default function AuthRoute() {
   const [role, setRole] = useState<'student' | 'instructor' | 'account_type'>('instructor');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
   const [phoneNumber, setPhoneNumber] = useState('');
   const [ageRange, setAgeRange] = useState('');
   const [fullName, setFullName] = useState('');
@@ -51,6 +52,10 @@ export default function AuthRoute() {
       return;
     }
     if (mode === 'signup') {
+      if (password !== confirmPassword) {
+        setError('Passwords do not match.');
+        return;
+      }
       if (!fullName.trim()) {
         setError('Please enter your full name.');
         return;
@@ -477,6 +482,65 @@ export default function AuthRoute() {
                       />
                     </div>
                   </div>
+
+                  {/* Confirm Password (Signup only) */}
+                  {!isLogin && (
+                    <div>
+                      <label style={{
+                        display: 'block',
+                        fontSize: '0.875rem',
+                        fontWeight: '600',
+                        color: '#374151',
+                        marginBottom: '0.5rem'
+                      }}>
+                        Confirm Password
+                      </label>
+                      <div className="relative">
+                        <span style={{ 
+                          position: 'absolute', 
+                          left: '1rem', 
+                          top: '50%', 
+                          transform: 'translateY(-50%)',
+                          pointerEvents: 'none',
+                          zIndex: 1
+                        }}>
+                          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#9ca3af" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                            <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/>
+                            <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+                          </svg>
+                        </span>
+                        <input 
+                          type="password"
+                          value={confirmPassword}
+                          onChange={(e) => setConfirmPassword(e.target.value)}
+                          disabled={isSubmitting}
+                          placeholder="Confirm your password"
+                          required
+                          style={{
+                            width: '100%',
+                            padding: '0.75rem 1rem 0.75rem 3rem',
+                            fontSize: '1rem',
+                            color: '#111827',
+                            border: '1px solid #e5e7eb',
+                            borderRadius: '0',
+                            outline: 'none',
+                            transition: 'all 0.2s ease',
+                            background: '#f9fafb'
+                          }}
+                          onFocus={(e) => {
+                            e.currentTarget.style.borderColor = '#93c5fd';
+                            e.currentTarget.style.background = '#ffffff';
+                            e.currentTarget.style.boxShadow = '0 0 0 3px rgba(147, 197, 253, 0.1)';
+                          }}
+                          onBlur={(e) => {
+                            e.currentTarget.style.borderColor = '#e5e7eb';
+                            e.currentTarget.style.background = '#f9fafb';
+                            e.currentTarget.style.boxShadow = 'none';
+                          }}
+                        />
+                      </div>
+                    </div>
+                  )}
 
                   {/* Phone (Signup only) */}
                   {!isLogin && (
