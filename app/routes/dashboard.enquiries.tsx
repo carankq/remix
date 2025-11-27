@@ -635,22 +635,6 @@ export default function DashboardEnquiriesRoute() {
                         </span>
                       </div>
                       <div style={{ display: 'flex', gap: '0.75rem' }}>
-                        <a 
-                          href={`mailto:${enquiry.studentEmailAddress}`}
-                          className="btn btn-primary" 
-                          style={{ 
-                            padding: '0.625rem 1.5rem', 
-                            fontSize: '0.875rem',
-                            textDecoration: 'none',
-                            display: 'inline-flex',
-                            alignItems: 'center',
-                            gap: '0.5rem',
-                            fontWeight: '600',
-                            borderRadius: '0'
-                          }}
-                        >
-                          💌 Respond via Email
-                        </a>
                         <button 
                           onClick={() => handleArchive(enquiry._id, enquiry.archived)}
                           disabled={isUpdating}

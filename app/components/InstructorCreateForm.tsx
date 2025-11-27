@@ -1226,12 +1226,13 @@ const InstructorCreateForm: React.FC<InstructorCreateFormProps> = ({
               </select>
                 <input
                   className="instructor-form-input"
-                  placeholder="License Plate (e.g., ABC 123)"
+                  placeholder="License Plate (e.g., ABC123)"
                   value={vehicle.licensePlateNumber}
                   disabled={ownerInst && !vehiclesModified}
                   onChange={(e) => {
                     const updated = [...vehicles];
-                    updated[idx].licensePlateNumber = e.target.value;
+                    // Capitalize and remove all spaces
+                    updated[idx].licensePlateNumber = e.target.value.toUpperCase().replace(/\s/g, '');
                     setVehicles(updated);
                   }}
                 />
