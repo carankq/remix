@@ -21,20 +21,19 @@ function AccordionItem({ item, index, active, onToggle }: { item: FAQItem; index
   const opened = active === index;
   return (
     <div style={{ 
-      background: 'white', 
-      border: '1px solid #e5e7eb', 
+      background: opened ? '#fafafa' : 'white', 
+      border: '2px solid #e5e7eb', 
       borderRadius: '0',
-      marginBottom: '1rem',
+      marginBottom: '0.75rem',
       overflow: 'hidden',
-      transition: 'all 0.2s ease',
-      boxShadow: opened ? '0 4px 12px rgba(0,0,0,0.08)' : '0 1px 3px rgba(0,0,0,0.05)'
+      transition: 'all 0.2s ease'
     }}>
       <button 
         onClick={() => onToggle(index)} 
         aria-expanded={opened}
         style={{
           width: '100%',
-          padding: '1.5rem 1.75rem',
+          padding: '1.25rem 1.5rem',
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'space-between',
@@ -43,30 +42,31 @@ function AccordionItem({ item, index, active, onToggle }: { item: FAQItem; index
           border: 'none',
           cursor: 'pointer',
           textAlign: 'left',
-          fontSize: '1.125rem',
+          fontSize: '1.0625rem',
           fontWeight: '600',
           color: '#111827',
-          transition: 'color 0.2s ease'
+          transition: 'all 0.2s ease'
         }}
-        onMouseEnter={(e) => e.currentTarget.style.color = '#2563eb'}
-        onMouseLeave={(e) => e.currentTarget.style.color = '#111827'}
+        onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#f9fafb'}
+        onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
       >
         <span>{item.question}</span>
         <span style={{
           display: 'inline-flex',
           alignItems: 'center',
           justifyContent: 'center',
-          width: '2rem',
-          height: '2rem',
-          borderRadius: '50%',
-          background: opened ? '#2563eb' : '#f3f4f6',
+          width: '1.75rem',
+          height: '1.75rem',
+          borderRadius: '0',
+          background: opened ? '#1e40af' : '#f3f4f6',
+          border: '2px solid' + (opened ? '#1e40af' : '#e5e7eb'),
           color: opened ? 'white' : '#6b7280',
           transition: 'all 0.2s ease',
           transform: opened ? 'rotate(180deg)' : 'rotate(0deg)',
           flexShrink: 0
         }}>
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
-            <path d="M6 9l6 6 6-6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+            <path d="M6 9l6 6 6-6" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
           </svg>
         </span>
       </button>
@@ -76,7 +76,7 @@ function AccordionItem({ item, index, active, onToggle }: { item: FAQItem; index
         transition: 'max-height 0.3s ease-in-out'
       }}>
         <div style={{ 
-          padding: '0 1.75rem 1.5rem 1.75rem',
+          padding: '0 1.5rem 1.25rem 1.5rem',
           fontSize: '1rem',
           lineHeight: '1.7',
           color: '#4b5563'
@@ -117,12 +117,12 @@ export function FAQSection({ blogs }: { blogs: any[] }) {
   const isStudents = audience === 'students';
 
   return (
-    <section style={{ background: '#f9fafb', padding: '5rem 0' }}>
+    <section style={{ background: '#f9fafb', padding: '3rem 0' }}>
       <div className="container mx-auto px-4 md:px-8">
         <div className="max-w-5xl mx-auto">
           
           {/* Blogs Section */}
-          <div style={{ marginBottom: '5rem' }}>
+          <div style={{ marginBottom: '3.5rem' }}>
             <div className="flex items-center justify-between" style={{ marginBottom: '2rem' }}>
               <h2 className="brand-name" style={{
                 fontSize: '2.25rem',
@@ -162,18 +162,17 @@ export function FAQSection({ blogs }: { blogs: any[] }) {
                     key={slug} 
                     style={{
                       background: 'white',
-                      border: '1px solid #e5e7eb',
+                      border: '2px solid #e5e7eb',
                       borderRadius: '0',
                       padding: '2rem',
-                      transition: 'all 0.2s ease',
-                      boxShadow: '0 1px 3px rgba(0,0,0,0.05)'
+                      transition: 'all 0.2s ease'
                     }}
                     onMouseEnter={(e) => {
-                      e.currentTarget.style.boxShadow = '0 8px 24px rgba(0,0,0,0.1)';
+                      e.currentTarget.style.borderColor = '#1e40af';
                       e.currentTarget.style.transform = 'translateY(-2px)';
                     }}
                     onMouseLeave={(e) => {
-                      e.currentTarget.style.boxShadow = '0 1px 3px rgba(0,0,0,0.05)';
+                      e.currentTarget.style.borderColor = '#e5e7eb';
                       e.currentTarget.style.transform = 'translateY(0)';
                     }}
                   >
@@ -207,21 +206,24 @@ export function FAQSection({ blogs }: { blogs: any[] }) {
                           alignItems: 'center',
                           gap: '0.5rem',
                           padding: '0.75rem 1.5rem',
-                          background: '#2563eb',
+                          background: '#1e40af',
                           color: 'white',
                           borderRadius: '0',
+                          border: '2px solid #1e40af',
                           fontSize: '0.95rem',
-                          fontWeight: '500',
+                          fontWeight: '600',
                           transition: 'all 0.2s ease',
                           flexShrink: 0,
                           whiteSpace: 'nowrap'
                         }}
                         onMouseEnter={(e) => {
-                          e.currentTarget.style.background = '#1d4ed8';
+                          e.currentTarget.style.background = '#1e3a8a';
+                          e.currentTarget.style.borderColor = '#1e3a8a';
                           e.currentTarget.style.transform = 'translateX(2px)';
                         }}
                         onMouseLeave={(e) => {
-                          e.currentTarget.style.background = '#2563eb';
+                          e.currentTarget.style.background = '#1e40af';
+                          e.currentTarget.style.borderColor = '#1e40af';
                           e.currentTarget.style.transform = 'translateX(0)';
                         }}
                       >

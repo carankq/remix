@@ -2,7 +2,7 @@ export function HowItWorksSection() {
   return (
     <section style={{ 
       background: '#f8fafc',
-      padding: '2rem 0 4rem 0'
+      padding: '2rem 0 3rem 0'
     }}>
       <div className="container mx-auto px-4">
         <div style={{ maxWidth: '1200px', margin: '0 auto' }}>

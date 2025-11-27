@@ -31,7 +31,7 @@ export function InstructorBenefitsSection() {
   return (
     <section style={{ 
       background: 'linear-gradient(to bottom, #f9fafb 0%, #ffffff 100%)',
-      padding: '4rem 0 2rem 0'
+      padding: '3rem 0 3rem 0'
     }}>
       <div className="container mx-auto px-4">
         <div style={{ maxWidth: '1200px', margin: '0 auto' }}>
