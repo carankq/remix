@@ -645,6 +645,12 @@ select {
     height: 100% !important;
     object-position: center !important;
   }
+
+  /* Move slideshow arrows higher on mobile to avoid covering text */
+  .slideshow-arrow-left,
+  .slideshow-arrow-right {
+    top: 30% !important;
+  }
   
   /* Smaller hero title on mobile */
   .search-hero-title {

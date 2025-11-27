@@ -87,7 +87,7 @@ export function Slideshow({ slides, autoPlayInterval = 5000, height = '24rem' }:
           <button 
             onClick={() => setCurrentSlide(p => (p - 1 + slides.length) % slides.length)} 
             aria-label="Previous slide" 
-            className="absolute left-4 z-20"
+            className="slideshow-arrow-left absolute left-4 z-20"
             style={{ 
               top: '50%', 
               transform: 'translateY(-50%)',
@@ -122,7 +122,7 @@ export function Slideshow({ slides, autoPlayInterval = 5000, height = '24rem' }:
           <button 
             onClick={() => setCurrentSlide(p => (p + 1) % slides.length)} 
             aria-label="Next slide" 
-            className="absolute right-4 z-20"
+            className="slideshow-arrow-right absolute right-4 z-20"
             style={{ 
               top: '50%', 
               transform: 'translateY(-50%)',
