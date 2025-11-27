@@ -27,9 +27,9 @@ export async function loader({ request }: LoaderFunctionArgs) {
       STRIPE_PUBLISHABLE_KEY: process.env.STRIPE_PUBLISHABLE_KEY || ""
     },
     user: userSession ? {
-      id: userSession.id,
-      email: userSession.email || '',
-      accountType: userSession.accountType || 'student',
+      id: userSession.id as string,
+      email: userSession.email as string,
+      accountType: (userSession.accountType || 'student') as 'student' | 'instructor',
       fullName: userSession.fullName,
       phoneNumber: userSession.phoneNumber,
       ageRange: userSession.ageRange,
