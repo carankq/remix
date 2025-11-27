@@ -30,8 +30,7 @@ export function HowItWorksSection() {
               background: '#ffffff',
               borderRadius: '0',
               padding: '2.5rem',
-              transition: 'transform 0.3s ease, box-shadow 0.3s ease',
-              border: '2px solid #e5e7eb'
+              transition: 'transform 0.3s ease, box-shadow 0.3s ease'
             }}>
               <div className="how-it-works-title" style={{ 
                 marginBottom: '2rem'
@@ -84,8 +83,7 @@ export function HowItWorksSection() {
               background: '#ffffff',
               borderRadius: '0',
               padding: '2.5rem',
-              transition: 'transform 0.3s ease, box-shadow 0.3s ease',
-              border: '2px solid #e5e7eb'
+              transition: 'transform 0.3s ease, box-shadow 0.3s ease'
             }}>
               <div className="how-it-works-title" style={{ 
                 marginBottom: '2rem'
