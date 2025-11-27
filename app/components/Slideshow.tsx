@@ -60,26 +60,24 @@ export function Slideshow({ slides, autoPlayInterval = 5000, height = '24rem' }:
             className="absolute inset-0" 
             style={{ background: 'linear-gradient(135deg, rgba(30, 64, 175, 0.75) 0%, rgba(15, 23, 42, 0.85) 100%)' }} 
           />
-          <div className="absolute inset-0 flex flex-col justify-end p-8 text-white z-10">
-            <div style={{ maxWidth: '600px' }}>
-              <h3 style={{ 
-                fontSize: '1.875rem', 
-                fontWeight: '700', 
-                marginBottom: '0.75rem',
-                lineHeight: '1.2',
-                textShadow: '0 2px 4px rgba(0,0,0,0.3)'
-              }}>
-                {slide.title}
-              </h3>
-              <p style={{ 
-                fontSize: '1.125rem', 
-                opacity: 0.95,
-                lineHeight: '1.6',
-                textShadow: '0 1px 2px rgba(0,0,0,0.3)'
-              }}>
-                {slide.description}
-              </p>
-            </div>
+          <div className="absolute bottom-6 left-6 text-white z-10" style={{ maxWidth: '55%' }}>
+            <h3 style={{ 
+              fontSize: '1.875rem', 
+              fontWeight: '700', 
+              marginBottom: '0.75rem',
+              lineHeight: '1.2',
+              textShadow: '0 2px 4px rgba(0,0,0,0.3)'
+            }}>
+              {slide.title}
+            </h3>
+            <p style={{ 
+              fontSize: '1.125rem', 
+              opacity: 0.95,
+              lineHeight: '1.6',
+              textShadow: '0 1px 2px rgba(0,0,0,0.3)'
+            }}>
+              {slide.description}
+            </p>
           </div>
         </div>
       ))}
@@ -157,7 +155,7 @@ export function Slideshow({ slides, autoPlayInterval = 5000, height = '24rem' }:
             </svg>
           </button>
           <div 
-            className="absolute bottom-6 left-0 right-0 flex items-center justify-center gap-2 z-20"
+            className="absolute bottom-6 right-6 flex items-center gap-2 z-20"
           >
             {slides.map((_, index) => (
               <button 
