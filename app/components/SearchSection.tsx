@@ -207,7 +207,7 @@ export function SearchSection({
                     onChange={(e) => handleFilterChange('gender', e.target.value)} 
                     style={{
                       width: '100%',
-                      padding: '1rem 1rem 1rem 2.5rem',
+                      padding: '1rem 2.5rem 1rem 1rem',
                       fontSize: '1rem',
                       color: filters.gender ? '#111827' : '#94a3b8',
                       border: '2px solid #e5e7eb',
@@ -245,7 +245,7 @@ export function SearchSection({
                     strokeLinejoin="round"
                     style={{
                       position: 'absolute',
-                      left: '0.75rem',
+                      right: '0.75rem',
                       top: '50%',
                       transform: 'translateY(-50%)',
                       pointerEvents: 'none'
@@ -292,7 +292,7 @@ export function SearchSection({
                     onChange={(e) => handleFilterChange('vehicleType', e.target.value)} 
                     style={{
                       width: '100%',
-                      padding: '1rem 1rem 1rem 2.5rem',
+                      padding: '1rem 2.5rem 1rem 1rem',
                       fontSize: '1rem',
                       color: filters.vehicleType ? '#111827' : '#94a3b8',
                       border: '2px solid #e5e7eb',
@@ -331,7 +331,7 @@ export function SearchSection({
                     strokeLinejoin="round"
                     style={{
                       position: 'absolute',
-                      left: '0.75rem',
+                      right: '0.75rem',
                       top: '50%',
                       transform: 'translateY(-50%)',
                       pointerEvents: 'none'
@@ -377,7 +377,7 @@ export function SearchSection({
                     onChange={(e) => handleFilterChange('language', e.target.value)} 
                     style={{
                       width: '100%',
-                      padding: '1rem 1rem 1rem 2.5rem',
+                      padding: '1rem 2.5rem 1rem 1rem',
                       fontSize: '1rem',
                       color: filters.language ? '#111827' : '#94a3b8',
                       border: '2px solid #e5e7eb',
@@ -419,7 +419,7 @@ export function SearchSection({
                     strokeLinejoin="round"
                     style={{
                       position: 'absolute',
-                      left: '0.75rem',
+                      right: '0.75rem',
                       top: '50%',
                       transform: 'translateY(-50%)',
                       pointerEvents: 'none'
