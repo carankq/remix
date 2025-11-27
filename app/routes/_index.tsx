@@ -1,6 +1,7 @@
 import { useNavigate, useLoaderData, useSearchParams } from "@remix-run/react";
 import type { ActionFunctionArgs, LoaderFunctionArgs } from "@remix-run/node";
 import { json } from "@remix-run/node";
+import { useEffect, useRef, useState } from "react";
 import { Header } from "../components/Header";
 import { Footer } from "../components/Footer";
 import { SearchSection } from "../components/SearchSection";
@@ -71,6 +72,22 @@ export async function action({ request }: ActionFunctionArgs) {
 export default function Index() {
   const navigate = useNavigate();
   const { blogsTop3, searchParams } = useLoaderData<typeof loader>();
+  const videoRef = useRef<HTMLVideoElement>(null);
+
+  useEffect(() => {
+    const video = videoRef.current;
+    if (!video) return;
+
+    const handleLoadedMetadata = () => {
+      video.playbackRate = 1;
+    };
+
+    video.addEventListener('loadedmetadata', handleLoadedMetadata);
+
+    return () => {
+      video.removeEventListener('loadedmetadata', handleLoadedMetadata);
+    };
+  }, []);
   
   return (
     <div>
@@ -81,6 +98,7 @@ export default function Index() {
       }}>
         {/* Background Video */}
         <video
+          ref={videoRef}
           autoPlay
           loop
           muted
@@ -93,11 +111,12 @@ export default function Index() {
             width: '100%',
             height: '100%',
             objectFit: 'cover',
-            zIndex: 0
+            zIndex: 0,
+            filter: 'brightness(0.9)',
+            transform: 'scale(1.1)'
           }}
         >
-          <source src="https://assets.coverr.co/videos/coverr-driving-on-the-road-1573414264700-34a9faa8f8/1080p.mp4" type="video/mp4" />
-          <source src="https://cdn.pixabay.com/video/2023/10/12/184734-873923034_large.mp4" type="video/mp4" />
+          <source src="https://cdn.pixabay.com/video/2015/10/16/1052-142621416_large.mp4" type="video/mp4" />
         </video>
 
         {/* Overlay Filter */}

@@ -27,145 +27,109 @@ export function HowItWorksSection() {
             
             {/* For Students */}
             <div className="how-it-works-card" style={{ 
-              position: 'relative',
-              overflow: 'hidden',
+              background: '#ffffff',
               borderRadius: '0',
-              backgroundImage: 'url("https://images.unsplash.com/photo-1449965408869-eaa3f722e40d?auto=format&fit=crop&w=1400&q=85")',
-              backgroundSize: 'cover',
-              backgroundPosition: 'center',
+              padding: '2.5rem',
               transition: 'transform 0.3s ease, box-shadow 0.3s ease',
               border: '2px solid #e5e7eb'
             }}>
-              <div style={{
-                position: 'absolute',
-                inset: 0,
-                background: 'linear-gradient(135deg, rgba(30, 64, 175, 0.92) 0%, rgba(15, 23, 42, 0.88) 100%)',
-                backdropFilter: 'blur(2px)'
-              }} />
               <div style={{ 
-                position: 'relative',
-                zIndex: 1,
-                padding: '2.5rem'
+                marginBottom: '2rem'
               }}>
-                <div style={{ 
-                  marginBottom: '2rem'
-                }}>
-                  <h3 className="text-2xl font-bold" style={{ color: '#f8fafc' }}>
-                    For Students
-                  </h3>
-                </div>
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+                <h3 className="text-2xl font-bold" style={{ color: '#111827' }}>
+                  For Students
+                </h3>
+              </div>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
                 {/* Step 1 */}
                 <div style={{ 
-                  background: 'rgba(255, 255, 255, 0.08)',
-                  border: '1px solid rgba(255, 255, 255, 0.15)',
+                  background: '#eff6ff',
                   padding: '1.5rem',
                   borderRadius: '0'
                 }}>
-                  <h4 className="font-bold mb-2" style={{ fontSize: '1.125rem', color: '#f8fafc' }}>Search by Location</h4>
-                  <p style={{ lineHeight: '1.6', color: '#e2e8f0' }}>
+                  <h4 className="font-bold mb-2" style={{ fontSize: '1.125rem', color: '#1e40af' }}>Search by Location</h4>
+                  <p style={{ lineHeight: '1.6', color: '#475569' }}>
                     Enter your outcode to find DVLA-verified instructors in your area
                   </p>
                 </div>
                 
                 {/* Step 2 */}
                 <div style={{ 
-                  background: 'rgba(255, 255, 255, 0.08)',
-                  border: '1px solid rgba(255, 255, 255, 0.15)',
+                  background: '#eff6ff',
                   padding: '1.5rem',
                   borderRadius: '0'
                 }}>
-                  <h4 className="font-bold mb-2" style={{ fontSize: '1.125rem', color: '#f8fafc' }}>Compare & Choose</h4>
-                  <p style={{ lineHeight: '1.6', color: '#e2e8f0' }}>
+                  <h4 className="font-bold mb-2" style={{ fontSize: '1.125rem', color: '#1e40af' }}>Compare & Choose</h4>
+                  <p style={{ lineHeight: '1.6', color: '#475569' }}>
                     Review profiles, prices, experience, and vehicle types to find your perfect match
                   </p>
                 </div>
                 
                 {/* Step 3 */}
                 <div style={{ 
-                  background: 'rgba(255, 255, 255, 0.08)',
-                  border: '1px solid rgba(255, 255, 255, 0.15)',
+                  background: '#eff6ff',
                   padding: '1.5rem',
                   borderRadius: '0'
                 }}>
-                  <h4 className="font-bold mb-2" style={{ fontSize: '1.125rem', color: '#f8fafc' }}>Make Enquiries</h4>
-                  <p style={{ lineHeight: '1.6', color: '#e2e8f0' }}>
+                  <h4 className="font-bold mb-2" style={{ fontSize: '1.125rem', color: '#1e40af' }}>Make Enquiries</h4>
+                  <p style={{ lineHeight: '1.6', color: '#475569' }}>
                     Contact instructors directly to discuss availability and start your driving journey
                   </p>
                 </div>
-              </div>
               </div>
             </div>
 
             {/* For Instructors */}
             <div className="how-it-works-card" style={{ 
-              position: 'relative',
-              overflow: 'hidden',
+              background: '#ffffff',
               borderRadius: '0',
-              backgroundImage: 'url("https://images.unsplash.com/photo-1544620347-c4fd4a3d5957?auto=format&fit=crop&w=1400&q=85")',
-              backgroundSize: 'cover',
-              backgroundPosition: 'center',
+              padding: '2.5rem',
               transition: 'transform 0.3s ease, box-shadow 0.3s ease',
               border: '2px solid #e5e7eb'
             }}>
-              <div style={{
-                position: 'absolute',
-                inset: 0,
-                background: 'linear-gradient(135deg, rgba(16, 185, 129, 0.88) 0%, rgba(15, 23, 42, 0.90) 100%)',
-                backdropFilter: 'blur(2px)'
-              }} />
-              <div style={{
-                position: 'relative',
-                zIndex: 1,
-                padding: '2.5rem'
-              }}>
               <div style={{ 
                 marginBottom: '2rem'
               }}>
-                <h3 className="text-2xl font-bold" style={{ color: '#f8fafc' }}>
+                <h3 className="text-2xl font-bold" style={{ color: '#111827' }}>
                   For Instructors
                 </h3>
               </div>
               <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
                 {/* Step 1 */}
                 <div style={{ 
-                  background: 'rgba(255, 255, 255, 0.08)',
-                  border: '1px solid rgba(255, 255, 255, 0.18)',
+                  background: '#f0fdf4',
                   padding: '1.5rem',
                   borderRadius: '0'
                 }}>
-                  <h4 className="font-bold mb-2" style={{ fontSize: '1.125rem', color: '#f8fafc' }}>Create Your Profile</h4>
-                  <p style={{ lineHeight: '1.6', color: '#e2e8f0' }}>
+                  <h4 className="font-bold mb-2" style={{ fontSize: '1.125rem', color: '#15803d' }}>Create Your Profile</h4>
+                  <p style={{ lineHeight: '1.6', color: '#475569' }}>
                     Sign up and add your details, availability, pricing, and areas you cover
                   </p>
                 </div>
                 
                 {/* Step 2 */}
                 <div style={{ 
-                  background: 'rgba(255, 255, 255, 0.08)',
-                  border: '1px solid rgba(255, 255, 255, 0.18)',
+                  background: '#f0fdf4',
                   padding: '1.5rem',
                   borderRadius: '0'
                 }}>
-                  <h4 className="font-bold mb-2" style={{ fontSize: '1.125rem', color: '#f8fafc' }}>Get DVLA Verified</h4>
-                  <p style={{ lineHeight: '1.6', color: '#e2e8f0' }}>
+                  <h4 className="font-bold mb-2" style={{ fontSize: '1.125rem', color: '#15803d' }}>Get DVLA Verified</h4>
+                  <p style={{ lineHeight: '1.6', color: '#475569' }}>
                     Verify your credentials to build instant trust with potential students
                   </p>
                 </div>
 
                 {/* Step 3 */}
                 <div style={{ 
-                  background: 'rgba(255, 255, 255, 0.08)',
-                  border: '1px solid rgba(255, 255, 255, 0.18)',
+                  background: '#f0fdf4',
                   padding: '1.5rem',
                   borderRadius: '0'
                 }}>
-                  <h4 className="font-bold mb-2" style={{ fontSize: '1.125rem', color: '#f8fafc' }}>Receive Enquiries</h4>
-                  <p style={{ lineHeight: '1.6', color: '#e2e8f0' }}>
+                  <h4 className="font-bold mb-2" style={{ fontSize: '1.125rem', color: '#15803d' }}>Receive Enquiries</h4>
+                  <p style={{ lineHeight: '1.6', color: '#475569' }}>
                     Local students find you by outcode and contact you directly to arrange lessons
                   </p>
                 </div>
-              </div>
               </div>
             </div>
 
