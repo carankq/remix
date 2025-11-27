@@ -56,39 +56,39 @@ export function InstructorBenefitsSection() {
             {/* Stats - Horizontal */}
             <div className="instructor-stats-grid">
               <div style={{ 
-                background: '#f0fdf4',
+                background: '#faf5ff',
                 padding: '1.5rem',
                 borderRadius: '0',
                 flex: 1,
                 maxWidth: '360px'
               }}>
-                <p className="font-bold mb-2" style={{ fontSize: '1.125rem', color: '#15803d' }}>DVLA Verification</p>
+                <p className="font-bold mb-2" style={{ fontSize: '1.125rem', color: '#7c3aed' }}>DVLA Verification</p>
                 <p className="text-gray-600" style={{ lineHeight: '1.6' }}>
                   Build instant trust with verified credentials
                 </p>
               </div>
               
               <div style={{ 
-                background: '#f0fdf4',
+                background: '#faf5ff',
                 padding: '1.5rem',
                 borderRadius: '0',
                 flex: 1,
                 maxWidth: '360px'
               }}>
-                <p className="font-bold mb-2" style={{ fontSize: '1.125rem', color: '#15803d' }}>Local Matching</p>
+                <p className="font-bold mb-2" style={{ fontSize: '1.125rem', color: '#7c3aed' }}>Local Matching</p>
                 <p className="text-gray-600" style={{ lineHeight: '1.6' }}>
                   Students find you by area — no more long drives
                 </p>
               </div>
               
               <div style={{ 
-                background: '#f0fdf4',
+                background: '#faf5ff',
                 padding: '1.5rem',
                 borderRadius: '0',
                 flex: 1,
                 maxWidth: '360px'
               }}>
-                <p className="font-bold mb-2" style={{ fontSize: '1.125rem', color: '#15803d' }}>Direct Enquiries</p>
+                <p className="font-bold mb-2" style={{ fontSize: '1.125rem', color: '#7c3aed' }}>Direct Enquiries</p>
                 <p className="text-gray-600" style={{ lineHeight: '1.6' }}>
                   Connect directly with interested learners
                 </p>
