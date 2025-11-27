@@ -30,15 +30,17 @@ export function HowItWorksSection() {
               position: 'relative',
               overflow: 'hidden',
               borderRadius: '0',
-              backgroundImage: 'url("https://images.unsplash.com/photo-1514477917009-389c76a86b68?auto=format&fit=crop&w=1200&q=80")',
+              backgroundImage: 'url("https://images.unsplash.com/photo-1449965408869-eaa3f722e40d?auto=format&fit=crop&w=1400&q=85")',
               backgroundSize: 'cover',
-              backgroundPosition: 'center'
+              backgroundPosition: 'center',
+              transition: 'transform 0.3s ease, box-shadow 0.3s ease',
+              border: '2px solid #e5e7eb'
             }}>
               <div style={{
                 position: 'absolute',
                 inset: 0,
-                background: 'rgba(15, 23, 42, 0.75)',
-                backdropFilter: 'blur(4px)'
+                background: 'linear-gradient(135deg, rgba(30, 64, 175, 0.92) 0%, rgba(15, 23, 42, 0.88) 100%)',
+                backdropFilter: 'blur(2px)'
               }} />
               <div style={{ 
                 position: 'relative',
@@ -100,15 +102,17 @@ export function HowItWorksSection() {
               position: 'relative',
               overflow: 'hidden',
               borderRadius: '0',
-              backgroundImage: 'url("https://images.unsplash.com/photo-1489515217757-5fd1be406fef?auto=format&fit=crop&w=1200&q=80")',
+              backgroundImage: 'url("https://images.unsplash.com/photo-1544620347-c4fd4a3d5957?auto=format&fit=crop&w=1400&q=85")',
               backgroundSize: 'cover',
-              backgroundPosition: 'center'
+              backgroundPosition: 'center',
+              transition: 'transform 0.3s ease, box-shadow 0.3s ease',
+              border: '2px solid #e5e7eb'
             }}>
               <div style={{
                 position: 'absolute',
                 inset: 0,
-                background: 'rgba(15, 23, 42, 0.78)',
-                backdropFilter: 'blur(4px)'
+                background: 'linear-gradient(135deg, rgba(16, 185, 129, 0.88) 0%, rgba(15, 23, 42, 0.90) 100%)',
+                backdropFilter: 'blur(2px)'
               }} />
               <div style={{
                 position: 'relative',
@@ -148,7 +152,7 @@ export function HowItWorksSection() {
                     Verify your credentials to build instant trust with potential students
                   </p>
                 </div>
-                
+
                 {/* Step 3 */}
                 <div style={{ 
                   background: 'rgba(255, 255, 255, 0.08)',
