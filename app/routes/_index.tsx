@@ -9,6 +9,8 @@ import { InstructorBenefitsSection } from "../components/InstructorBenefitsSecti
 import { HowItWorksSection } from "../components/HowItWorksSection";
 import { TrustTechnologySection } from "../components/TrustTechnologySection";
 import { FAQSection } from "../components/FAQSection";
+// @ts-ignore - Video asset
+import movingCarsVideo from "../assets/moving_cars.mp4";
 
 export async function loader({ request }: LoaderFunctionArgs) {
   const url = new URL(request.url);
@@ -116,7 +118,7 @@ export default function Index() {
             transform: 'scale(1.1)'
           }}
         >
-          <source src="https://cdn.pixabay.com/video/2015/10/16/1052-142621416_large.mp4" type="video/mp4" />
+          <source src={movingCarsVideo} type="video/mp4" />
         </video>
 
         {/* Overlay Filter */}
