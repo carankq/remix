@@ -117,7 +117,7 @@ export function FAQSection({ blogs }: { blogs: any[] }) {
   const isStudents = audience === 'students';
 
   return (
-    <section style={{ background: '#f9fafb', padding: '3rem 0' }}>
+    <section style={{ background: '#f1f5f9', padding: '3rem 0' }}>
       <div className="container mx-auto px-4 md:px-8">
         <div className="max-w-5xl mx-auto">
           

@@ -672,7 +672,7 @@ select {
   .search-card {
     margin-left: -1rem !important;
     margin-right: -1rem !important;
-    margin-bottom: 0 !important;
+    margin-bottom: 0.3px !important;
     border-radius: 0 !important;
     padding: 1.5rem 1rem !important;
   }
@@ -717,7 +717,7 @@ select {
   
   /* Reduce search section header spacing on mobile */
   .search-section-mobile {
-    padding: 1.25rem 0 0 0 !important;
+    padding: 1.25rem 0 0 !important;
   }
   
   .search-header-mobile {

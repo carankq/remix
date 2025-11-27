@@ -1,7 +1,7 @@
 export function HowItWorksSection() {
   return (
     <section style={{ 
-      background: '#f8fafc',
+      background: '#f1f5f9',
       padding: '2rem 0 3rem 0'
     }}>
       <div className="container mx-auto px-4">
