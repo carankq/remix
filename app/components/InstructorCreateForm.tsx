@@ -71,7 +71,7 @@ const InstructorCreateForm: React.FC<InstructorCreateFormProps> = ({
   const [vehicles, setVehicles] = useState<Array<{ type: string; licensePlateNumber: string }>>([]);
   const [vehiclesModified, setVehiclesModified] = useState(false); // Track if vehicles were changed
   const [deals, setDeals] = useState<string[]>([]);
-  const [languages, setLanguages] = useState<string[]>([]);
+  const [languages, setLanguages] = useState<string[]>(['English']);
   
   // Credential References state
   const [credentialType, setCredentialType] = useState<'ADI' | 'PDI' | ''>('');
