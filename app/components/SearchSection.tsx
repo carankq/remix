@@ -73,11 +73,9 @@ export function SearchSection({
   return (
     <section className="search-section-mobile" style={{
       padding: '3.5rem 0 4.5rem',
-      position: 'relative',
-      background: '#1e40af'
+      position: 'relative'
     }}>
-
-      <div className="container mx-auto px-4" style={{ position: 'relative', zIndex: 1 }}>
+      <div className="container mx-auto px-4">
         <div style={{ maxWidth: '1200px', margin: '0 auto' }}>
 
           {/* Header */}

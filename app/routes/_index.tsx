@@ -74,27 +74,70 @@ export default function Index() {
   
   return (
     <div>
-      <Header />
-        <SearchSection 
-          initialFilters={{
-            outcode: searchParams.outcode?.join(',') || '',
-            gender: searchParams.gender,
-            vehicleType: searchParams.vehicleType,
-            language: searchParams.language,
+      {/* Hero Section with Video Background */}
+      <div style={{
+        position: 'relative',
+        overflow: 'hidden'
+      }}>
+        {/* Background Video */}
+        <video
+          autoPlay
+          loop
+          muted
+          playsInline
+          preload="auto"
+          style={{
+            position: 'absolute',
+            top: 0,
+            left: 0,
+            width: '100%',
+            height: '100%',
+            objectFit: 'cover',
+            zIndex: 0
           }}
-          onSearch={(q, filters) => {
-            const params = new URLSearchParams();
-            if (filters.outcode) filters.outcode.split(',').map(p => p.trim()).filter(Boolean).forEach(oc => params.append('outcode', oc));
-            if (filters.gender) params.set('gender', filters.gender);
-            if (filters.vehicleType) params.set('vehicleType', filters.vehicleType);
-            if (filters.language) params.set('language', filters.language);
-            navigate(`/results?${params.toString()}`);
-          }} 
-        />
-        <HowItWorksSection />
-        <InstructorBenefitsSection />
-        {/* <TrustTechnologySection /> */}
-        <FAQSection blogs={blogsTop3} />
+        >
+          <source src="https://assets.coverr.co/videos/coverr-driving-on-the-road-1573414264700-34a9faa8f8/1080p.mp4" type="video/mp4" />
+          <source src="https://cdn.pixabay.com/video/2023/10/12/184734-873923034_large.mp4" type="video/mp4" />
+        </video>
+
+        {/* Overlay Filter */}
+        <div style={{
+          position: 'absolute',
+          top: 0,
+          left: 0,
+          width: '100%',
+          height: '100%',
+          background: 'linear-gradient(135deg, rgba(30, 64, 175, 0.92) 0%, rgba(15, 23, 42, 0.88) 100%)',
+          backdropFilter: 'blur(2px)',
+          zIndex: 1
+        }} />
+
+        {/* Content */}
+        <div style={{ position: 'relative', zIndex: 2 }}>
+          <Header />
+          <SearchSection 
+            initialFilters={{
+              outcode: searchParams.outcode?.join(',') || '',
+              gender: searchParams.gender,
+              vehicleType: searchParams.vehicleType,
+              language: searchParams.language,
+            }}
+            onSearch={(q, filters) => {
+              const params = new URLSearchParams();
+              if (filters.outcode) filters.outcode.split(',').map(p => p.trim()).filter(Boolean).forEach(oc => params.append('outcode', oc));
+              if (filters.gender) params.set('gender', filters.gender);
+              if (filters.vehicleType) params.set('vehicleType', filters.vehicleType);
+              if (filters.language) params.set('language', filters.language);
+              navigate(`/results?${params.toString()}`);
+            }} 
+          />
+        </div>
+      </div>
+      
+      <HowItWorksSection />
+      <InstructorBenefitsSection />
+      {/* <TrustTechnologySection /> */}
+      <FAQSection blogs={blogsTop3} />
       <Footer />
     </div>
   );

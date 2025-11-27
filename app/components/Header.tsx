@@ -18,7 +18,7 @@ export function Header() {
 
   return (
     <header style={{
-      background: isHomePage ? '#1e40af' : '#ffffff',
+      background: isHomePage ? 'transparent' : '#ffffff',
       borderBottom: isHomePage ? '1px solid rgba(255, 255, 255, 0.1)' : '1px solid #f3f4f6'
     }}>
       <div className="container px-4 py-4">
