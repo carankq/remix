@@ -685,6 +685,7 @@ select {
   /* Stack how it works on mobile */
   .how-it-works-grid {
     grid-template-columns: 1fr !important;
+    gap: 0 !important;
   }
   
   /* Full width how it works cards on mobile */
@@ -693,6 +694,13 @@ select {
     margin-right: -1rem !important;
     border-radius: 0 !important;
     padding: 1.5rem 1rem !important;
+    border: none !important;
+  }
+
+  /* Align titles with step boxes on mobile */
+  .how-it-works-title {
+    padding-left: 1.5rem !important;
+    padding-right: 1.5rem !important;
   }
   
   /* Center CTA on mobile */

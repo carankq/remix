@@ -33,7 +33,7 @@ export function HowItWorksSection() {
               transition: 'transform 0.3s ease, box-shadow 0.3s ease',
               border: '2px solid #e5e7eb'
             }}>
-              <div style={{ 
+              <div className="how-it-works-title" style={{ 
                 marginBottom: '2rem'
               }}>
                 <h3 className="text-2xl font-bold" style={{ color: '#111827' }}>
@@ -87,7 +87,7 @@ export function HowItWorksSection() {
               transition: 'transform 0.3s ease, box-shadow 0.3s ease',
               border: '2px solid #e5e7eb'
             }}>
-              <div style={{ 
+              <div className="how-it-works-title" style={{ 
                 marginBottom: '2rem'
               }}>
                 <h3 className="text-2xl font-bold" style={{ color: '#111827' }}>
