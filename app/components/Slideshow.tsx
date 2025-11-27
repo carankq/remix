@@ -30,8 +30,12 @@ export function Slideshow({ slides, autoPlayInterval = 5000, height = '24rem' }:
 
   return (
     <div 
-      className="relative overflow-hidden shadow-2xl" 
-      style={{ height, borderRadius: '0' }}
+      className="relative overflow-hidden" 
+      style={{ 
+        height, 
+        borderRadius: '0',
+        border: '2px solid #e5e7eb'
+      }}
       tabIndex={0} 
       onMouseEnter={() => setPaused(true)} 
       onMouseLeave={() => setPaused(false)} 
@@ -43,7 +47,7 @@ export function Slideshow({ slides, autoPlayInterval = 5000, height = '24rem' }:
       {slides.map((slide, index) => (
         <div 
           key={slide.id} 
-          className={`absolute inset-0 transition-opacity duration-500 ${index === currentSlide ? 'opacity-100' : 'opacity-0'}`}
+          className={`absolute inset-0 transition-all duration-700 ${index === currentSlide ? 'opacity-100 scale-100' : 'opacity-0 scale-105'}`}
           style={{ pointerEvents: index === currentSlide ? 'auto' : 'none' }}
         >
           <img 
@@ -54,11 +58,28 @@ export function Slideshow({ slides, autoPlayInterval = 5000, height = '24rem' }:
           />
           <div 
             className="absolute inset-0" 
-            style={{ background: 'linear-gradient(to top, rgba(0, 0, 0, 0.7), transparent, transparent)' }} 
+            style={{ background: 'linear-gradient(135deg, rgba(30, 64, 175, 0.75) 0%, rgba(15, 23, 42, 0.85) 100%)' }} 
           />
-          <div className="absolute bottom-6 left-6 right-6 text-white z-10">
-            <h3 className="text-2xl font-bold mb-2">{slide.title}</h3>
-            <p className="text-lg opacity-90">{slide.description}</p>
+          <div className="absolute inset-0 flex flex-col justify-end p-8 text-white z-10">
+            <div style={{ maxWidth: '600px' }}>
+              <h3 style={{ 
+                fontSize: '1.875rem', 
+                fontWeight: '700', 
+                marginBottom: '0.75rem',
+                lineHeight: '1.2',
+                textShadow: '0 2px 4px rgba(0,0,0,0.3)'
+              }}>
+                {slide.title}
+              </h3>
+              <p style={{ 
+                fontSize: '1.125rem', 
+                opacity: 0.95,
+                lineHeight: '1.6',
+                textShadow: '0 1px 2px rgba(0,0,0,0.3)'
+              }}>
+                {slide.description}
+              </p>
+            </div>
           </div>
         </div>
       ))}
@@ -68,37 +89,100 @@ export function Slideshow({ slides, autoPlayInterval = 5000, height = '24rem' }:
           <button 
             onClick={() => setCurrentSlide(p => (p - 1 + slides.length) % slides.length)} 
             aria-label="Previous slide" 
-            className="carousel-btn absolute left-4 z-20"
-            style={{ top: '50%', transform: 'translateY(-50%)' }}
+            className="absolute left-4 z-20"
+            style={{ 
+              top: '50%', 
+              transform: 'translateY(-50%)',
+              background: 'rgba(255, 255, 255, 0.95)',
+              color: '#1e40af',
+              border: '2px solid #e5e7eb',
+              borderRadius: '0',
+              width: '48px',
+              height: '48px',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              cursor: 'pointer',
+              transition: 'all 0.2s ease',
+              backdropFilter: 'blur(4px)'
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.background = '#1e40af';
+              e.currentTarget.style.color = 'white';
+              e.currentTarget.style.transform = 'translateY(-50%) translateX(-2px)';
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.background = 'rgba(255, 255, 255, 0.95)';
+              e.currentTarget.style.color = '#1e40af';
+              e.currentTarget.style.transform = 'translateY(-50%)';
+            }}
           >
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
-              <path d="M15 18L9 12L15 6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+              <path d="M15 18L9 12L15 6" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"/>
             </svg>
           </button>
           <button 
             onClick={() => setCurrentSlide(p => (p + 1) % slides.length)} 
             aria-label="Next slide" 
-            className="carousel-btn absolute right-4 z-20"
-            style={{ top: '50%', transform: 'translateY(-50%)' }}
+            className="absolute right-4 z-20"
+            style={{ 
+              top: '50%', 
+              transform: 'translateY(-50%)',
+              background: 'rgba(255, 255, 255, 0.95)',
+              color: '#1e40af',
+              border: '2px solid #e5e7eb',
+              borderRadius: '0',
+              width: '48px',
+              height: '48px',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              cursor: 'pointer',
+              transition: 'all 0.2s ease',
+              backdropFilter: 'blur(4px)'
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.background = '#1e40af';
+              e.currentTarget.style.color = 'white';
+              e.currentTarget.style.transform = 'translateY(-50%) translateX(2px)';
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.background = 'rgba(255, 255, 255, 0.95)';
+              e.currentTarget.style.color = '#1e40af';
+              e.currentTarget.style.transform = 'translateY(-50%)';
+            }}
           >
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
-              <path d="M9 18L15 12L9 6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+              <path d="M9 18L15 12L9 6" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"/>
             </svg>
           </button>
           <div 
-            className="absolute bottom-6 right-6 flex items-center gap-2 z-20"
-            style={{ 
-              background: 'rgba(0, 0, 0, 0.5)', 
-              padding: '0.5rem 0.75rem',
-              borderRadius: '0'
-            }}
+            className="absolute bottom-6 left-0 right-0 flex items-center justify-center gap-2 z-20"
           >
             {slides.map((_, index) => (
               <button 
                 key={index} 
                 aria-label={`Go to slide ${index + 1}`} 
                 onClick={() => setCurrentSlide(index)} 
-                className={index === currentSlide ? 'indicator-dot active' : 'indicator-dot'}
+                style={{
+                  width: index === currentSlide ? '32px' : '12px',
+                  height: '12px',
+                  background: index === currentSlide ? '#ffffff' : 'rgba(255, 255, 255, 0.5)',
+                  border: '2px solid rgba(255, 255, 255, 0.8)',
+                  borderRadius: '0',
+                  cursor: 'pointer',
+                  transition: 'all 0.3s ease'
+                }}
+                onMouseEnter={(e) => {
+                  if (index !== currentSlide) {
+                    e.currentTarget.style.background = 'rgba(255, 255, 255, 0.8)';
+                  }
+                }}
+                onMouseLeave={(e) => {
+                  if (index !== currentSlide) {
+                    e.currentTarget.style.background = 'rgba(255, 255, 255, 0.5)';
+                  }
+                }}
               />
             ))}
           </div>
