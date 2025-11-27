@@ -56,39 +56,39 @@ export function InstructorBenefitsSection() {
             {/* Stats - Horizontal */}
             <div className="instructor-stats-grid">
               <div style={{ 
-                background: '#eff6ff',
+                background: '#f0fdf4',
                 padding: '1.5rem',
                 borderRadius: '0',
                 flex: 1,
                 maxWidth: '360px'
               }}>
-                <p className="font-bold text-gray-900 mb-2" style={{ fontSize: '1.125rem' }}>DVLA Verification</p>
+                <p className="font-bold mb-2" style={{ fontSize: '1.125rem', color: '#15803d' }}>DVLA Verification</p>
                 <p className="text-gray-600" style={{ lineHeight: '1.6' }}>
                   Build instant trust with verified credentials
                 </p>
               </div>
               
               <div style={{ 
-                background: '#eff6ff',
+                background: '#f0fdf4',
                 padding: '1.5rem',
                 borderRadius: '0',
                 flex: 1,
                 maxWidth: '360px'
               }}>
-                <p className="font-bold text-gray-900 mb-2" style={{ fontSize: '1.125rem' }}>Local Matching</p>
+                <p className="font-bold mb-2" style={{ fontSize: '1.125rem', color: '#15803d' }}>Local Matching</p>
                 <p className="text-gray-600" style={{ lineHeight: '1.6' }}>
                   Students find you by area — no more long drives
                 </p>
               </div>
               
               <div style={{ 
-                background: '#eff6ff',
+                background: '#f0fdf4',
                 padding: '1.5rem',
                 borderRadius: '0',
                 flex: 1,
                 maxWidth: '360px'
               }}>
-                <p className="font-bold text-gray-900 mb-2" style={{ fontSize: '1.125rem' }}>Direct Enquiries</p>
+                <p className="font-bold mb-2" style={{ fontSize: '1.125rem', color: '#15803d' }}>Direct Enquiries</p>
                 <p className="text-gray-600" style={{ lineHeight: '1.6' }}>
                   Connect directly with interested learners
                 </p>
@@ -96,22 +96,65 @@ export function InstructorBenefitsSection() {
             </div>
             
             {/* CTA Button */}
-            <div className="instructor-cta" style={{ marginTop: '3rem' }}>
+            <div className="instructor-cta" style={{ 
+              marginTop: '3rem',
+              display: 'flex',
+              flexDirection: 'column',
+              alignItems: 'center',
+              gap: '1rem'
+            }}>
               <a 
                 href="/auth" 
-                className="btn"
                 style={{ 
                   display: 'inline-block',
                   padding: '1rem 2.5rem',
                   fontSize: '1.125rem',
                   fontWeight: '600',
-                  textDecoration: 'none'
+                  textDecoration: 'none',
+                  background: '#1e40af',
+                  color: 'white',
+                  borderRadius: '0',
+                  border: '2px solid #1e40af',
+                  transition: 'all 0.2s ease',
+                  cursor: 'pointer'
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.background = '#1e3a8a';
+                  e.currentTarget.style.borderColor = '#1e3a8a';
+                  e.currentTarget.style.transform = 'translateY(-2px)';
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.background = '#1e40af';
+                  e.currentTarget.style.borderColor = '#1e40af';
+                  e.currentTarget.style.transform = 'translateY(0)';
                 }}
               >
                 Join as an Instructor
               </a>
-              <p style={{ fontSize: '0.875rem', color: '#6b7280', marginTop: '1rem' }}>
-                Already registered? <a href="/auth" style={{ color: '#2563eb', fontWeight: '600', textDecoration: 'none' }}>Sign in to your dashboard</a>
+              <p style={{ 
+                fontSize: '0.9375rem', 
+                color: '#6b7280',
+                fontWeight: '500'
+              }}>
+                Already registered? {' '}
+                <a 
+                  href="/auth" 
+                  style={{ 
+                    color: '#15803d', 
+                    fontWeight: '600', 
+                    textDecoration: 'none',
+                    borderBottom: '2px solid transparent',
+                    transition: 'border-color 0.2s ease'
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.borderBottomColor = '#15803d';
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.borderBottomColor = 'transparent';
+                  }}
+                >
+                  Sign in to your dashboard
+                </a>
               </p>
             </div>
           </div>

@@ -34,7 +34,7 @@ export function Slideshow({ slides, autoPlayInterval = 5000, height = '24rem' }:
       style={{ 
         height, 
         borderRadius: '0',
-        border: '2px solid #e5e7eb'
+        boxShadow: '0 10px 30px rgba(0, 0, 0, 0.15)'
       }}
       tabIndex={0} 
       onMouseEnter={() => setPaused(true)} 
