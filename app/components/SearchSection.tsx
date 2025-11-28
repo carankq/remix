@@ -404,7 +404,7 @@ export function SearchSection({
                 color: '#111827',
                 margin: 0 
               }}>
-                Postcode or Outcode Required
+                Postcode Required
               </h3>
             </div>
             <p style={{ 

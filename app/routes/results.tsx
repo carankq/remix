@@ -126,12 +126,49 @@ export async function action({ request }: ActionFunctionArgs) {
 
 export default function ResultsRoute() {
   const loaderData = useLoaderData<typeof loader>();
-  const [searchParams] = useSearchParams();
+  const [searchParams, setSearchParams] = useSearchParams();
   const [sortBy, setSortBy] = useState('relevance');
   const { token, isAuthenticated } = useAuth();
   const [instructors, setInstructors] = useState<Instructor[]>(loaderData.instructors);
   const [isRefetching, setIsRefetching] = useState(false);
+  const [includeNearest, setIncludeNearest] = useState(searchParams.get('getNearest') === 'true' || searchParams.get('getNearest') === '1');
+  const [userToggledNearest, setUserToggledNearest] = useState(false);
   
+
+  // Handle toggle for include nearest
+  const handleToggleNearest = () => {
+    const newValue = !includeNearest;
+    setIncludeNearest(newValue);
+    setUserToggledNearest(true);
+    
+    const newParams = new URLSearchParams(searchParams.toString());
+    if (newValue) {
+      newParams.set('getNearest', 'true');
+    } else {
+      newParams.delete('getNearest');
+    }
+    // Use navigate instead of replace to trigger a full page reload
+    setSearchParams(newParams);
+  };
+
+  // Sync instructors state with loader data when it changes
+  useEffect(() => {
+    setInstructors(loaderData.instructors);
+  }, [loaderData.instructors]);
+
+  // Auto-enable getNearest when no instructors found (only if user hasn't manually toggled)
+  useEffect(() => {
+    if (instructors.length === 0 && !includeNearest && !isRefetching && !userToggledNearest) {
+      const outcodes = searchParams.getAll('outcode');
+      // Only auto-enable if there's an outcode search
+      if (outcodes.length > 0) {
+        setIncludeNearest(true);
+        const newParams = new URLSearchParams(searchParams.toString());
+        newParams.set('getNearest', 'true');
+        setSearchParams(newParams, { replace: true });
+      }
+    }
+  }, [instructors.length, includeNearest, searchParams, setSearchParams, isRefetching, userToggledNearest]);
 
   // Sort instructors based on selected option
   const sortedInstructors = useMemo(() => {
@@ -206,6 +243,50 @@ export default function ResultsRoute() {
                   </svg>
                   Refine
                 </Link>
+                
+                <span style={{ color: 'rgba(255,255,255,0.3)' }}>|</span>
+                
+                <button
+                  onClick={handleToggleNearest}
+                  style={{
+                    background: 'transparent',
+                    border: 'none',
+                    color: 'white',
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: '0.5rem',
+                    fontSize: '0.875rem',
+                    fontWeight: '500',
+                    cursor: 'pointer',
+                    opacity: 0.9,
+                    transition: 'opacity 0.2s ease',
+                    padding: '0'
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.opacity = '1';
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.opacity = '0.9';
+                  }}
+                >
+                  <div style={{
+                    width: '14px',
+                    height: '14px',
+                    border: '2px solid white',
+                    borderRadius: '0',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    background: includeNearest ? 'white' : 'transparent'
+                  }}>
+                    {includeNearest && (
+                      <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#1e40af" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
+                        <polyline points="20 6 9 17 4 12"/>
+                      </svg>
+                    )}
+                  </div>
+                  Include Nearby
+                </button>
                 
                 <span style={{ color: 'rgba(255,255,255,0.3)' }}>|</span>
                 
@@ -383,12 +464,70 @@ export default function ResultsRoute() {
                 <h3 style={{ fontSize: '1.5rem', fontWeight: '600', color: '#111827', marginBottom: '0.5rem' }}>
                   No instructors found
                 </h3>
-                <p style={{ color: '#6b7280', fontSize: '1rem' }}>
-                  Try adjusting your search filters to see more results
+                <p style={{ color: '#6b7280', fontSize: '1rem', marginBottom: '1.5rem' }}>
+                  {includeNearest 
+                    ? 'No instructors found in your area or nearby locations. Try adjusting your search filters.' 
+                    : 'Try adjusting your search filters or enable "Include Nearby" to expand your search area'}
                 </p>
-                <Link to="/" className="btn btn-primary" style={{ marginTop: '1.5rem', display: 'inline-block' }}>
-                  Back to Search
-                </Link>
+                <div style={{ display: 'flex', gap: '1rem', justifyContent: 'center', flexWrap: 'wrap' }}>
+                  {!includeNearest && (
+                    <button
+                      onClick={handleToggleNearest}
+                      style={{
+                        padding: '0.75rem 1.5rem',
+                        background: '#1e40af',
+                        color: 'white',
+                        border: '2px solid #1e40af',
+                        borderRadius: '0',
+                        fontSize: '1rem',
+                        fontWeight: '600',
+                        cursor: 'pointer',
+                        transition: 'all 0.2s ease',
+                        display: 'inline-flex',
+                        alignItems: 'center',
+                        gap: '0.5rem'
+                      }}
+                      onMouseEnter={(e) => {
+                        e.currentTarget.style.background = '#1e3a8a';
+                        e.currentTarget.style.borderColor = '#1e3a8a';
+                      }}
+                      onMouseLeave={(e) => {
+                        e.currentTarget.style.background = '#1e40af';
+                        e.currentTarget.style.borderColor = '#1e40af';
+                      }}
+                    >
+                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                        <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/>
+                        <circle cx="12" cy="10" r="3"/>
+                      </svg>
+                      Include Nearby Areas
+                    </button>
+                  )}
+                  <Link 
+                    to="/" 
+                    style={{ 
+                      padding: '0.75rem 1.5rem',
+                      background: 'white',
+                      color: '#1e40af',
+                      border: '2px solid #1e40af',
+                      borderRadius: '0',
+                      fontSize: '1rem',
+                      fontWeight: '600',
+                      textDecoration: 'none',
+                      display: 'inline-flex',
+                      alignItems: 'center',
+                      transition: 'all 0.2s ease'
+                    }}
+                    onMouseEnter={(e) => {
+                      e.currentTarget.style.background = '#eff6ff';
+                    }}
+                    onMouseLeave={(e) => {
+                      e.currentTarget.style.background = 'white';
+                    }}
+                  >
+                    Back to Search
+                  </Link>
+                </div>
               </div>
             ) : (
               <div style={{ display: 'grid', gap: '1.5rem' }}>
