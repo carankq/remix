@@ -73,28 +73,51 @@ export function CustomSelect({
       </label>
       
       <div style={{ position: 'relative' }}>
-        <button
-          type="button"
-          onClick={() => setIsOpen(!isOpen)}
-          style={{
-            width: '100%',
-            padding: '1rem 2.5rem 1rem 1rem',
-            fontSize: '1rem',
-            color: hasValue ? '#111827' : '#94a3b8',
-            border: '2px solid #e5e7eb',
-            borderRadius: '0',
-            outline: 'none',
-            transition: 'all 0.2s ease',
-            background: '#ffffff',
-            cursor: 'pointer',
-            fontWeight: '500',
-            textAlign: 'left',
-            borderColor: isOpen ? '#3b82f6' : '#e5e7eb',
-            boxShadow: isOpen ? '0 0 0 4px rgba(59, 130, 246, 0.1)' : 'none'
-          }}
-        >
-          {displayValue}
-        </button>
+        {searchable && isOpen ? (
+          <input
+            type="text"
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            placeholder={placeholder}
+            autoFocus
+            style={{
+              width: '100%',
+              padding: '1rem 2.5rem 1rem 1rem',
+              fontSize: '1rem',
+              color: '#111827',
+              border: '2px solid #3b82f6',
+              borderRadius: '0',
+              outline: 'none',
+              transition: 'all 0.2s ease',
+              background: '#ffffff',
+              fontWeight: '500',
+              boxShadow: '0 0 0 4px rgba(59, 130, 246, 0.1)'
+            }}
+          />
+        ) : (
+          <button
+            type="button"
+            onClick={() => setIsOpen(!isOpen)}
+            style={{
+              width: '100%',
+              padding: '1rem 2.5rem 1rem 1rem',
+              fontSize: '1rem',
+              color: hasValue ? '#111827' : '#94a3b8',
+              border: '2px solid #e5e7eb',
+              borderRadius: '0',
+              outline: 'none',
+              transition: 'all 0.2s ease',
+              background: '#ffffff',
+              cursor: 'pointer',
+              fontWeight: '500',
+              textAlign: 'left',
+              borderColor: isOpen ? '#3b82f6' : '#e5e7eb',
+              boxShadow: isOpen ? '0 0 0 4px rgba(59, 130, 246, 0.1)' : 'none'
+            }}
+          >
+            {displayValue}
+          </button>
+        )}
         
         <svg 
           width="16" 
@@ -133,34 +156,6 @@ export function CustomSelect({
           overflowY: 'auto',
           zIndex: 50
         }}>
-          {searchable && (
-            <div style={{ padding: '0.75rem', borderBottom: '2px solid #e5e7eb' }}>
-              <input
-                type="text"
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                placeholder="Search..."
-                autoFocus
-                style={{
-                  width: '100%',
-                  padding: '0.625rem',
-                  fontSize: '0.875rem',
-                  border: '2px solid #e5e7eb',
-                  borderRadius: '0',
-                  outline: 'none',
-                  transition: 'all 0.2s ease'
-                }}
-                onFocus={(e) => {
-                  e.currentTarget.style.borderColor = '#3b82f6';
-                  e.currentTarget.style.boxShadow = '0 0 0 3px rgba(59, 130, 246, 0.1)';
-                }}
-                onBlur={(e) => {
-                  e.currentTarget.style.borderColor = '#e5e7eb';
-                  e.currentTarget.style.boxShadow = 'none';
-                }}
-              />
-            </div>
-          )}
           
           <div>
             {filteredOptions.length === 0 ? (
