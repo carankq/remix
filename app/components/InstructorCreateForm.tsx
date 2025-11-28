@@ -11,14 +11,7 @@ interface InstructorCreateFormProps {
   initialMode?: 'summary' | 'edit'; // Control initial mode (default: auto-detect)
 }
 
-const PRESET_LANGUAGES = [
-  'British Sign Language',
-  'English',
-  'Spanish',
-  'French',
-  'Urdu',
-  'Polish'
-];
+// Languages will be fetched from API
 
 const VEHICLE_TYPES = ['Manual', 'Automatic', 'Electric'] as const;
 
@@ -72,6 +65,7 @@ const InstructorCreateForm: React.FC<InstructorCreateFormProps> = ({
   const [vehiclesModified, setVehiclesModified] = useState(false); // Track if vehicles were changed
   const [deals, setDeals] = useState<string[]>([]);
   const [languages, setLanguages] = useState<string[]>(['English']);
+  const [availableLanguages, setAvailableLanguages] = useState<string[]>([]);
   
   // Credential References state
   const [credentialType, setCredentialType] = useState<'ADI' | 'PDI' | ''>('');
@@ -199,6 +193,25 @@ const InstructorCreateForm: React.FC<InstructorCreateFormProps> = ({
     // Otherwise, fetch from API (legacy behavior)
     if (user?.accountType === 'instructor') refreshOwner(); 
   }, [user?.accountType, user?.id, skipFetch, initialProfile, initialMode]);
+
+  // Fetch available languages
+  useEffect(() => {
+    const fetchLanguages = async () => {
+      try {
+        const apiHost = (window as any).__ENV__?.API_HOST || 'http://localhost:3001';
+        const response = await fetch(`${apiHost}/languages`);
+        if (response.ok) {
+          const data = await response.json();
+          setAvailableLanguages(data.languages || []);
+        }
+      } catch (error) {
+        console.error('Failed to fetch languages:', error);
+        // Fallback to default languages
+        setAvailableLanguages(['English', 'Welsh', 'British Sign Language', 'Polish', 'Punjabi', 'Urdu', 'Spanish', 'French']);
+      }
+    };
+    fetchLanguages();
+  }, []);
 
   // When entering edit mode with an existing ownerInst, prefill the form
   useEffect(() => {
@@ -1415,7 +1428,7 @@ const InstructorCreateForm: React.FC<InstructorCreateFormProps> = ({
             <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '1.25rem' }}>
               <select className="instructor-form-select" value={langSelect} onChange={(e)=>setLangSelect(e.target.value)}>
                 <option value="">Choose a language</option>
-                {PRESET_LANGUAGES.map(l => (
+                {availableLanguages.map(l => (
                   <option key={l} value={l}>{l}</option>
                 ))}
               </select>

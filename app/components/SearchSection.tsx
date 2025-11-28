@@ -1,6 +1,14 @@
 import "../tailwind.css";
 import { useEffect, useState } from 'react';
 import { Search, RotateCcw } from './Icons';
+import { CustomSelect } from './CustomSelect';
+
+const getApiHost = () => {
+  if (typeof window !== 'undefined') {
+    return (window as any).__ENV__?.API_HOST || 'http://localhost:3001';
+  }
+  return process.env.API_HOST || 'http://localhost:3001';
+};
 
 type FilterCriteria = {
   priceRange: [number, number];
@@ -43,6 +51,7 @@ export function SearchSection({
   );
   
   const [showAlert, setShowAlert] = useState(false);
+  const [languages, setLanguages] = useState<string[]>([]);
 
   const handleFilterChange = (key: keyof FilterCriteria, value: any) => {
     const normalizedValue = key === 'outcode' && typeof value === 'string' ? value.toUpperCase() : value;
@@ -65,6 +74,24 @@ export function SearchSection({
   };
 
   useEffect(() => { if (autoSearch) { onSearch('', { ...filters, outcode }); } }, []);
+
+  // Fetch languages on mount
+  useEffect(() => {
+    const fetchLanguages = async () => {
+      try {
+        const response = await fetch(`${getApiHost()}/languages`);
+        if (response.ok) {
+          const data = await response.json();
+          setLanguages(data.languages || []);
+        }
+      } catch (error) {
+        console.error('Failed to fetch languages:', error);
+        // Fallback to default languages
+        setLanguages(['English', 'Welsh', 'British Sign Language', 'Polish', 'Punjabi', 'Urdu', 'Spanish', 'French']);
+      }
+    };
+    fetchLanguages();
+  }, []);
 
   const handleOutcodeInputChange = (value: string) => {
     setOutcode(value.toUpperCase());
@@ -174,18 +201,13 @@ export function SearchSection({
               </div>
 
               {/* Gender */}
-              <div>
-                <label style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '0.5rem',
-                  fontSize: '0.75rem',
-                  fontWeight: '600',
-                  color: '#64748b',
-                  marginBottom: '0.625rem',
-                  textTransform: 'uppercase',
-                  letterSpacing: '0.05em'
-                }}>
+              <CustomSelect
+                    value={filters.gender} 
+                onChange={(value) => handleFilterChange('gender', value)}
+                options={['Male', 'Female']}
+                placeholder="Any Gender"
+                label="Instructor Gender"
+                icon={
                   <svg 
                     width="14" 
                     height="14" 
@@ -196,79 +218,20 @@ export function SearchSection({
                     strokeLinecap="round" 
                     strokeLinejoin="round"
                   >
-                      <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
-                      <circle cx="12" cy="7" r="4"/>
-                    </svg>
-                  Instructor Gender
-                </label>
-                <div style={{ position: 'relative' }}>
-                  <select 
-                    value={filters.gender} 
-                    onChange={(e) => handleFilterChange('gender', e.target.value)} 
-                    style={{
-                      width: '100%',
-                      padding: '1rem 2.5rem 1rem 1rem',
-                      fontSize: '1rem',
-                      color: filters.gender ? '#111827' : '#94a3b8',
-                      border: '2px solid #e5e7eb',
-                      borderRadius: '0',
-                      outline: 'none',
-                      transition: 'all 0.2s ease',
-                      background: '#ffffff',
-                      cursor: 'pointer',
-                      fontWeight: '500',
-                      appearance: 'none',
-                      WebkitAppearance: 'none',
-                      MozAppearance: 'none'
-                    }}
-                    onFocus={(e) => {
-                      e.currentTarget.style.borderColor = '#3b82f6';
-                      e.currentTarget.style.boxShadow = '0 0 0 4px rgba(59, 130, 246, 0.1)';
-                    }}
-                    onBlur={(e) => {
-                      e.currentTarget.style.borderColor = '#e5e7eb';
-                      e.currentTarget.style.boxShadow = 'none';
-                    }}
-                  >
-                    <option value="">Any Gender</option>
-                    <option value="Male">Male</option>
-                    <option value="Female">Female</option>
-                  </select>
-                  <svg 
-                    width="16" 
-                    height="16" 
-                    viewBox="0 0 24 24" 
-                    fill="none" 
-                    stroke="#64748b" 
-                    strokeWidth="2.5" 
-                    strokeLinecap="round" 
-                    strokeLinejoin="round"
-                    style={{
-                      position: 'absolute',
-                      right: '0.75rem',
-                      top: '50%',
-                      transform: 'translateY(-50%)',
-                      pointerEvents: 'none'
-                    }}
-                  >
-                    <polyline points="6 9 12 15 18 9"/>
+                    <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+                    <circle cx="12" cy="7" r="4"/>
                   </svg>
-                </div>
-              </div>
+                }
+              />
 
               {/* Vehicle Type */}
-              <div>
-                <label style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '0.5rem',
-                  fontSize: '0.75rem',
-                  fontWeight: '600',
-                  color: '#64748b',
-                  marginBottom: '0.625rem',
-                  textTransform: 'uppercase',
-                  letterSpacing: '0.05em'
-                }}>
+              <CustomSelect
+                    value={filters.vehicleType} 
+                onChange={(value) => handleFilterChange('vehicleType', value)}
+                options={['Manual', 'Automatic', 'Electric']}
+                placeholder="Any Type"
+                label="Vehicle Type"
+                icon={
                   <svg 
                     width="14" 
                     height="14" 
@@ -279,82 +242,23 @@ export function SearchSection({
                     strokeLinecap="round" 
                     strokeLinejoin="round"
                   >
-                      <path d="M3 13l2-5a3 3 0 0 1 3-2h6a3 3 0 0 1 3 2l2 5"/>
-                      <rect x="3" y="13" width="18" height="6" rx="2"/>
-                      <circle cx="7.5" cy="17" r="1.5"/>
-                      <circle cx="16.5" cy="17" r="1.5"/>
-                    </svg>
-                  Vehicle Type
-                </label>
-                <div style={{ position: 'relative' }}>
-                  <select 
-                    value={filters.vehicleType} 
-                    onChange={(e) => handleFilterChange('vehicleType', e.target.value)} 
-                    style={{
-                      width: '100%',
-                      padding: '1rem 2.5rem 1rem 1rem',
-                      fontSize: '1rem',
-                      color: filters.vehicleType ? '#111827' : '#94a3b8',
-                      border: '2px solid #e5e7eb',
-                      borderRadius: '0',
-                      outline: 'none',
-                      transition: 'all 0.2s ease',
-                      background: '#ffffff',
-                      cursor: 'pointer',
-                      fontWeight: '500',
-                      appearance: 'none',
-                      WebkitAppearance: 'none',
-                      MozAppearance: 'none'
-                    }}
-                    onFocus={(e) => {
-                      e.currentTarget.style.borderColor = '#3b82f6';
-                      e.currentTarget.style.boxShadow = '0 0 0 4px rgba(59, 130, 246, 0.1)';
-                    }}
-                    onBlur={(e) => {
-                      e.currentTarget.style.borderColor = '#e5e7eb';
-                      e.currentTarget.style.boxShadow = 'none';
-                    }}
-                  >
-                    <option value="">Any Type</option>
-                    <option value="Manual">Manual</option>
-                    <option value="Automatic">Automatic</option>
-                    <option value="Electric">Electric</option>
-                  </select>
-                  <svg 
-                    width="16" 
-                    height="16" 
-                    viewBox="0 0 24 24" 
-                    fill="none" 
-                    stroke="#64748b" 
-                    strokeWidth="2.5" 
-                    strokeLinecap="round" 
-                    strokeLinejoin="round"
-                    style={{
-                      position: 'absolute',
-                      right: '0.75rem',
-                      top: '50%',
-                      transform: 'translateY(-50%)',
-                      pointerEvents: 'none'
-                    }}
-                  >
-                    <polyline points="6 9 12 15 18 9"/>
+                    <path d="M3 13l2-5a3 3 0 0 1 3-2h6a3 3 0 0 1 3 2l2 5"/>
+                    <rect x="3" y="13" width="18" height="6" rx="2"/>
+                    <circle cx="7.5" cy="17" r="1.5"/>
+                    <circle cx="16.5" cy="17" r="1.5"/>
                   </svg>
-                </div>
-              </div>
+                }
+              />
 
               {/* Language */}
-              <div>
-                <label style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '0.5rem',
-                  fontSize: '0.75rem',
-                  fontWeight: '600',
-                  color: '#64748b',
-                  marginBottom: '0.625rem',
-                  textTransform: 'uppercase',
-                  letterSpacing: '0.05em'
-                }}>
+              <CustomSelect
+                value={filters.language || ''}
+                onChange={(value) => handleFilterChange('language', value)}
+                options={languages}
+                placeholder="Any Language"
+                label="Language"
+                searchable={true}
+                icon={
                   <svg 
                     width="14" 
                     height="14" 
@@ -365,70 +269,12 @@ export function SearchSection({
                     strokeLinecap="round" 
                     strokeLinejoin="round"
                   >
-                      <circle cx="12" cy="12" r="10"/>
-                      <line x1="2" y1="12" x2="22" y2="12"/>
-                      <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/>
-                    </svg>
-                  Language
-                </label>
-                <div style={{ position: 'relative' }}>
-                  <select 
-                    value={filters.language} 
-                    onChange={(e) => handleFilterChange('language', e.target.value)} 
-                    style={{
-                      width: '100%',
-                      padding: '1rem 2.5rem 1rem 1rem',
-                      fontSize: '1rem',
-                      color: filters.language ? '#111827' : '#94a3b8',
-                      border: '2px solid #e5e7eb',
-                      borderRadius: '0',
-                      outline: 'none',
-                      transition: 'all 0.2s ease',
-                      background: '#ffffff',
-                      cursor: 'pointer',
-                      fontWeight: '500',
-                      appearance: 'none',
-                      WebkitAppearance: 'none',
-                      MozAppearance: 'none'
-                    }}
-                    onFocus={(e) => {
-                      e.currentTarget.style.borderColor = '#3b82f6';
-                      e.currentTarget.style.boxShadow = '0 0 0 4px rgba(59, 130, 246, 0.1)';
-                    }}
-                    onBlur={(e) => {
-                      e.currentTarget.style.borderColor = '#e5e7eb';
-                      e.currentTarget.style.boxShadow = 'none';
-                    }}
-                  >
-                    <option value="">Any Language</option>
-                    <option value="British Sign Language">British Sign Language</option>
-                    <option value="English">English</option>
-                    <option value="Spanish">Spanish</option>
-                    <option value="French">French</option>
-                    <option value="Urdu">Urdu</option>
-                    <option value="Polish">Polish</option>
-                  </select>
-                  <svg 
-                    width="16" 
-                    height="16" 
-                    viewBox="0 0 24 24" 
-                    fill="none" 
-                    stroke="#64748b" 
-                    strokeWidth="2.5" 
-                    strokeLinecap="round" 
-                    strokeLinejoin="round"
-                    style={{
-                      position: 'absolute',
-                      right: '0.75rem',
-                      top: '50%',
-                      transform: 'translateY(-50%)',
-                      pointerEvents: 'none'
-                    }}
-                  >
-                    <polyline points="6 9 12 15 18 9"/>
+                    <circle cx="12" cy="12" r="10"/>
+                    <line x1="2" y1="12" x2="22" y2="12"/>
+                    <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/>
                   </svg>
-                </div>
-              </div>
+                }
+              />
             </div>
 
             {/* Action Buttons */}
@@ -501,10 +347,10 @@ export function SearchSection({
                 <Search size={22} />
                 Search Instructors
               </button>
+                </div>
+              </div>
             </div>
           </div>
-        </div>
-      </div>
 
       {/* Custom Alert */}
       {showAlert && (
