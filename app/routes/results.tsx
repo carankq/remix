@@ -181,8 +181,6 @@ export default function ResultsRoute() {
         return sorted.sort((a, b) => (b.pricePerHour || 0) - (a.pricePerHour || 0));
       case 'experience':
         return sorted.sort((a, b) => (b.yearsOfExperience || 0) - (a.yearsOfExperience || 0));
-      case 'rating':
-        return sorted.sort((a, b) => (b.rating || 0) - (a.rating || 0));
       default: // relevance
         return sorted;
     }
@@ -312,7 +310,6 @@ export default function ResultsRoute() {
                     <option value="price-low" style={{ background: '#1e293b', color: 'white' }}>Price: Low-High</option>
                     <option value="price-high" style={{ background: '#1e293b', color: 'white' }}>Price: High-Low</option>
                     <option value="experience" style={{ background: '#1e293b', color: 'white' }}>Experience</option>
-                    <option value="rating" style={{ background: '#1e293b', color: 'white' }}>Rating</option>
                   </select>
                   <svg 
                     width="14" 
