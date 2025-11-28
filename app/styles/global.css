@@ -672,7 +672,7 @@ select {
   .search-card {
     margin-left: -1rem !important;
     margin-right: -1rem !important;
-    margin-bottom: 0.3px !important;
+    margin-bottom: 2rem !important;
     border-radius: 0 !important;
     padding: 1.5rem 1rem !important;
   }

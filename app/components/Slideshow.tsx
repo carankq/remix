@@ -83,108 +83,36 @@ export function Slideshow({ slides, autoPlayInterval = 5000, height = '24rem' }:
       ))}
       
       {slides.length > 1 && (
-        <>
-          <button 
-            onClick={() => setCurrentSlide(p => (p - 1 + slides.length) % slides.length)} 
-            aria-label="Previous slide" 
-            className="slideshow-arrow-left absolute left-4 z-20"
-            style={{ 
-              top: '50%', 
-              transform: 'translateY(-50%)',
-              background: 'rgba(255, 255, 255, 0.95)',
-              color: '#1e40af',
-              border: '2px solid #e5e7eb',
-              borderRadius: '0',
-              width: '48px',
-              height: '48px',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              cursor: 'pointer',
-              transition: 'all 0.2s ease',
-              backdropFilter: 'blur(4px)'
-            }}
-            onMouseEnter={(e) => {
-              e.currentTarget.style.background = '#1e40af';
-              e.currentTarget.style.color = 'white';
-              e.currentTarget.style.transform = 'translateY(-50%) translateX(-2px)';
-            }}
-            onMouseLeave={(e) => {
-              e.currentTarget.style.background = 'rgba(255, 255, 255, 0.95)';
-              e.currentTarget.style.color = '#1e40af';
-              e.currentTarget.style.transform = 'translateY(-50%)';
-            }}
-          >
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
-              <path d="M15 18L9 12L15 6" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"/>
-            </svg>
-          </button>
-          <button 
-            onClick={() => setCurrentSlide(p => (p + 1) % slides.length)} 
-            aria-label="Next slide" 
-            className="slideshow-arrow-right absolute right-4 z-20"
-            style={{ 
-              top: '50%', 
-              transform: 'translateY(-50%)',
-              background: 'rgba(255, 255, 255, 0.95)',
-              color: '#1e40af',
-              border: '2px solid #e5e7eb',
-              borderRadius: '0',
-              width: '48px',
-              height: '48px',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              cursor: 'pointer',
-              transition: 'all 0.2s ease',
-              backdropFilter: 'blur(4px)'
-            }}
-            onMouseEnter={(e) => {
-              e.currentTarget.style.background = '#1e40af';
-              e.currentTarget.style.color = 'white';
-              e.currentTarget.style.transform = 'translateY(-50%) translateX(2px)';
-            }}
-            onMouseLeave={(e) => {
-              e.currentTarget.style.background = 'rgba(255, 255, 255, 0.95)';
-              e.currentTarget.style.color = '#1e40af';
-              e.currentTarget.style.transform = 'translateY(-50%)';
-            }}
-          >
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
-              <path d="M9 18L15 12L9 6" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"/>
-            </svg>
-          </button>
-          <div 
-            className="absolute bottom-6 right-6 flex items-center gap-2 z-20"
-          >
-            {slides.map((_, index) => (
-              <button 
-                key={index} 
-                aria-label={`Go to slide ${index + 1}`} 
-                onClick={() => setCurrentSlide(index)} 
-                style={{
-                  width: index === currentSlide ? '32px' : '12px',
-                  height: '12px',
-                  background: index === currentSlide ? '#ffffff' : 'rgba(255, 255, 255, 0.5)',
-                  border: '2px solid rgba(255, 255, 255, 0.8)',
-                  borderRadius: '0',
-                  cursor: 'pointer',
-                  transition: 'all 0.3s ease'
-                }}
-                onMouseEnter={(e) => {
-                  if (index !== currentSlide) {
-                    e.currentTarget.style.background = 'rgba(255, 255, 255, 0.8)';
-                  }
-                }}
-                onMouseLeave={(e) => {
-                  if (index !== currentSlide) {
-                    e.currentTarget.style.background = 'rgba(255, 255, 255, 0.5)';
-                  }
-                }}
-              />
-            ))}
-          </div>
-        </>
+        <div 
+          className="absolute bottom-6 right-6 flex items-center gap-2 z-20"
+        >
+          {slides.map((_, index) => (
+            <button 
+              key={index} 
+              aria-label={`Go to slide ${index + 1}`} 
+              onClick={() => setCurrentSlide(index)} 
+              style={{
+                width: index === currentSlide ? '32px' : '12px',
+                height: '12px',
+                background: index === currentSlide ? '#ffffff' : 'rgba(255, 255, 255, 0.5)',
+                border: '2px solid rgba(255, 255, 255, 0.8)',
+                borderRadius: '0',
+                cursor: 'pointer',
+                transition: 'all 0.3s ease'
+              }}
+              onMouseEnter={(e) => {
+                if (index !== currentSlide) {
+                  e.currentTarget.style.background = 'rgba(255, 255, 255, 0.8)';
+                }
+              }}
+              onMouseLeave={(e) => {
+                if (index !== currentSlide) {
+                  e.currentTarget.style.background = 'rgba(255, 255, 255, 0.5)';
+                }
+              }}
+            />
+          ))}
+        </div>
       )}
     </div>
   );
