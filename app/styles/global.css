@@ -1086,5 +1086,23 @@ select {
     border-left: none !important;
     border-right: none !important;
   }
+
+  /* Results Page Mobile Styles */
+  .results-container {
+    padding-left: 0 !important;
+    padding-right: 0 !important;
+  }
+
+  .results-grid-container {
+    max-width: 100% !important;
+    padding-left: 0 !important;
+    padding-right: 0 !important;
+  }
+
+  /* Instructor Card Mobile Full Width */
+  .instructor-card {
+    border-left: none !important;
+    border-right: none !important;
+  }
 }
 

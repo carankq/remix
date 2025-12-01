@@ -283,7 +283,7 @@ export default function ResultsRoute() {
                       </svg>
                     )}
                   </div>
-                  Include Nearby
+                  Nearby
                 </button>
                 
                 <span style={{ color: 'rgba(255,255,255,0.3)' }}>|</span>
@@ -444,8 +444,8 @@ export default function ResultsRoute() {
 
       {/* Results Grid */}
       <section style={{ padding: '3rem 0' }}>
-        <div className="container mx-auto px-4 md:px-8">
-          <div className="max-w-6xl mx-auto">
+        <div className="results-container container mx-auto px-4 md:px-8">
+          <div className="results-grid-container max-w-6xl mx-auto">
             {sortedInstructors.length === 0 ? (
               <div style={{
                 background: 'white',
