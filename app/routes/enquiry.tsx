@@ -522,7 +522,7 @@ export default function EnquiryPage() {
                 color: '#374151',
                 marginBottom: '0.5rem'
               }}>
-                Gender of Student (For Safeguarding Purposes) *
+                Gender (For Safeguarding Purposes) *
               </label>
               <select
                 value={formData.gender}
