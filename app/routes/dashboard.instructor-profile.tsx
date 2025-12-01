@@ -541,6 +541,44 @@ export default function DashboardInstructorProfileRoute() {
                       )}
                     </div>
 
+                    {/* Admin Status Warning */}
+                    {profile.adminDisabled && (
+                      <div style={{
+                        background: 'white',
+                        border: '2px solid #ef4444',
+                        borderRadius: '0',
+                        padding: '1.5rem',
+                        marginBottom: '2rem'
+                      }}>
+                        <div style={{ display: 'flex', alignItems: 'flex-start', gap: '1rem' }}>
+                          <div style={{
+                            width: '40px',
+                            height: '40px',
+                            borderRadius: '0',
+                            background: '#ef4444',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            flexShrink: 0
+                          }}>
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                              <circle cx="12" cy="12" r="10"/>
+                              <line x1="12" y1="8" x2="12" y2="12"/>
+                              <line x1="12" y1="16" x2="12.01" y2="16"/>
+                            </svg>
+                          </div>
+                          <div>
+                            <div style={{ fontSize: '1rem', fontWeight: '600', color: '#111827', marginBottom: '0.5rem' }}>
+                              Profile Disabled
+                            </div>
+                            <div style={{ fontSize: '0.875rem', color: '#6b7280', lineHeight: '1.5' }}>
+                              {profile.adminDisabledReason || 'Your profile has been disabled by an administrator.'}
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    )}
+
                     {/* Contact Verification Section */}
                     {(!profile.emailVerifiedDate || !profile.phoneNumberVerifiedDate) && (
                       <div style={{
@@ -982,43 +1020,6 @@ export default function DashboardInstructorProfileRoute() {
                               </span>
                             </div>
                           ))}
-                        </div>
-                      </div>
-                    )}
-
-                    {/* Admin Status Warning */}
-                    {profile.adminDisabled && (
-                      <div style={{
-                        background: 'white',
-                        border: '2px solid #ef4444',
-                        borderRadius: '0',
-                        padding: '1.5rem'
-                      }}>
-                        <div style={{ display: 'flex', alignItems: 'flex-start', gap: '1rem' }}>
-                          <div style={{
-                            width: '40px',
-                            height: '40px',
-                            borderRadius: '0',
-                            background: '#ef4444',
-                            display: 'flex',
-                            alignItems: 'center',
-                            justifyContent: 'center',
-                            flexShrink: 0
-                          }}>
-                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                              <circle cx="12" cy="12" r="10"/>
-                              <line x1="12" y1="8" x2="12" y2="12"/>
-                              <line x1="12" y1="16" x2="12.01" y2="16"/>
-                            </svg>
-                          </div>
-                          <div>
-                            <div style={{ fontSize: '1rem', fontWeight: '600', color: '#111827', marginBottom: '0.5rem' }}>
-                              Profile Disabled
-                            </div>
-                            <div style={{ fontSize: '0.875rem', color: '#6b7280', lineHeight: '1.5' }}>
-                              {profile.adminDisabledReason || 'Your profile has been disabled by an administrator.'}
-                            </div>
-                          </div>
                         </div>
                       </div>
                     )}
