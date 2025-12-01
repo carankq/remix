@@ -140,7 +140,7 @@ export default function ResultsRoute() {
     const newValue = !includeNearest;
     setIncludeNearest(newValue);
     setUserToggledNearest(true);
-    
+
     const newParams = new URLSearchParams(searchParams.toString());
     if (newValue) {
       newParams.set('getNearest', 'true');

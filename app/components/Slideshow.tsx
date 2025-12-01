@@ -58,7 +58,7 @@ export function Slideshow({ slides, autoPlayInterval = 5000, height = '24rem' }:
           />
           <div 
             className="absolute inset-0" 
-            style={{ background: 'linear-gradient(135deg, rgba(30, 64, 175, 0.75) 0%, rgba(15, 23, 42, 0.85) 100%)' }} 
+            style={{ background: 'linear-gradient(135deg, rgba(30, 64, 175, 0.35) 0%, rgba(15, 23, 42, 0.45) 100%)' }} 
           />
           <div className="absolute bottom-6 left-6 text-white z-10" style={{ maxWidth: '55%' }}>
             <h3 style={{ 
