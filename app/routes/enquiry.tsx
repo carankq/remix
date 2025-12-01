@@ -326,23 +326,29 @@ export default function EnquiryPage() {
   return (
     <>
       <Header />
-      <div style={{
-        minHeight: 'calc(100vh - 400px)',
-        background: '#f8fafc',
-        padding: '2rem 1rem'
-      }}>
-        <div style={{
-          maxWidth: '700px',
-          margin: '0 auto'
+      <div 
+        className="enquiry-page-container"
+        style={{
+          minHeight: 'calc(100vh - 400px)',
+          background: '#f8fafc',
+          padding: '2rem 1rem'
         }}>
+        <div 
+          className="enquiry-page-content"
+          style={{
+            maxWidth: '700px',
+            margin: '0 auto'
+          }}>
         {/* Header */}
-        <div style={{
-          background: '#ffffff',
-          padding: '2rem',
-          borderRadius: '0',
-          border: '2px solid #e5e7eb',
-          marginBottom: '2rem'
-        }}>
+        <div 
+          className="enquiry-page-header"
+          style={{
+            background: '#ffffff',
+            padding: '2rem',
+            borderRadius: '0',
+            border: '2px solid #e5e7eb',
+            marginBottom: '2rem'
+          }}>
           <button
             onClick={() => navigate(-1)}
             style={{
@@ -366,21 +372,27 @@ export default function EnquiryPage() {
             </svg>
             Back
           </button>
-          <h1 style={{ fontSize: '2rem', fontWeight: 'bold', color: '#111827', marginBottom: '0.5rem' }}>
+          <h1 
+            className="enquiry-page-title"
+            style={{ fontSize: '2rem', fontWeight: 'bold', color: '#111827', marginBottom: '0.5rem' }}>
             Make an Enquiry
           </h1>
-          <p style={{ color: '#6b7280', fontSize: '1rem', lineHeight: '1.6' }}>
+          <p 
+            className="enquiry-page-subtitle"
+            style={{ color: '#6b7280', fontSize: '1rem', lineHeight: '1.6' }}>
             Send an enquiry to <strong style={{ color: '#111827' }}>{instructorName}</strong>
           </p>
         </div>
 
         {/* Form */}
-        <div style={{
-          background: '#ffffff',
-          padding: '2rem',
-          borderRadius: '0',
-          border: '2px solid #e5e7eb'
-        }}>
+        <div 
+          className="enquiry-page-form"
+          style={{
+            background: '#ffffff',
+            padding: '2rem',
+            borderRadius: '0',
+            border: '2px solid #e5e7eb'
+          }}>
           <form onSubmit={handleSubmit}>
             {/* Your Name */}
             <div style={{ marginBottom: '1.5rem' }}>
